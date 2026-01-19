@@ -13,7 +13,7 @@ export const colors = {
   textWhite: '#FFFFFF',
   
   // UI colors
-  white: '#FFFFFF',
+  white: '#F5F1ED',
   border: '#D0CEC2',
   borderLight: '#E5E3D7',
   cardBackground: '#F8F7F2',
