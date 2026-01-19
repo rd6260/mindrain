@@ -19,12 +19,22 @@ export default function HomePage() {
   ];
 
   return (
-    <div style={{ backgroundColor: colors.background }} className="min-h-screen">
+    <div style={{ backgroundColor: colors.background }} className="min-h-screen relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div 
+        className="fixed top-20 right-0 w-[600px] h-[600px] rounded-full blur-3xl opacity-5 pointer-events-none"
+        style={{ backgroundColor: colors.accent }}
+      />
+      <div 
+        className="fixed bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-3xl opacity-5 pointer-events-none"
+        style={{ backgroundColor: colors.accent }}
+      />
+      
       <Navigation />
       
       {/* Hero Section - Current Competition */}
-      <section className="min-h-[75vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
-        <div className="max-w-5xl w-full">
+      <section className="min-h-[75vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-16 relative">
+        <div className="max-w-6xl w-full">
           <CompetitionCard
             name="Architecture Competition 'Imaginative Home' design challenge 2025-2026 edition"
             prizePool="₹50,000+"
@@ -39,29 +49,40 @@ export default function HomePage() {
       </section>
 
       {/* Previous Winners Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
+      <section className="py-24 px-4 sm:px-6 lg:px-8 relative">
         <div className="max-w-7xl mx-auto">
-          <h2 
-            className="text-4xl md:text-5xl font-bold text-center mb-12"
-            style={{ color: colors.textPrimary }}
-          >
-            Previous Competition Winners
-          </h2>
-          
-          <p 
-            className="text-center text-xl mb-4"
-            style={{ color: colors.textSecondary }}
-          >
-            {previousWinners.name} - {previousWinners.year}
-          </p>
+          <div className="text-center mb-16 animate-fade-in-up">
+            <h2 
+              className="text-5xl md:text-6xl font-bold mb-6 gradient-text"
+            >
+              Previous Competition Winners
+            </h2>
+            <div 
+              className="w-32 h-1.5 mx-auto mb-8 rounded-full"
+              style={{ 
+                background: `linear-gradient(90deg, transparent, ${colors.accent}, transparent)` 
+              }}
+            />
+            <p 
+              className="text-2xl font-medium"
+              style={{ color: colors.textSecondary }}
+            >
+              {previousWinners.name} - {previousWinners.year}
+            </p>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {allWinners.map((winner, index) => (
-              <WinnerCard
+              <div 
                 key={index}
-                winner={winner}
-                position={winner.position}
-              />
+                className="animate-fade-in-up"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <WinnerCard
+                  winner={winner}
+                  position={winner.position}
+                />
+              </div>
             ))}
           </div>
         </div>
