@@ -15,108 +15,154 @@ interface CompetitionCardProps {
 export default function CompetitionCard(props: CompetitionCardProps) {
   return (
     <div 
-      className="rounded-2xl p-8 md:p-12 shadow-lg"
-      style={{ backgroundColor: colors.white }}
+      className="rounded-3xl p-10 md:p-14 shadow-2xl relative overflow-hidden animate-fade-in-up glass"
+      style={{ 
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      }}
       data-testid="competition-card"
     >
-      <h2 
-        className="text-3xl md:text-4xl font-bold mb-8"
-        style={{ color: colors.textPrimary }}
-      >
-        {props.name}
-      </h2>
+      {/* Decorative elements */}
+      <div 
+        className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl opacity-10"
+        style={{ backgroundColor: colors.accent }}
+      />
+      <div 
+        className="absolute bottom-0 left-0 w-48 h-48 rounded-full blur-3xl opacity-10"
+        style={{ backgroundColor: colors.accent }}
+      />
       
-      <div className="mb-8">
-        <div 
-          className="inline-block px-6 py-2 rounded-full mb-6"
-          style={{ backgroundColor: colors.accent }}
+      <div className="relative z-10">
+        <h2 
+          className="text-3xl md:text-5xl font-bold mb-10 leading-tight"
+          style={{ color: colors.textPrimary }}
         >
-          <p className="text-white font-semibold text-xl">
-            Total Prize Pool: {props.prizePool}
-          </p>
-        </div>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-8 mb-8">
-        <div>
-          <h3 
-            className="text-xl font-semibold mb-4"
-            style={{ color: colors.accent }}
+          {props.name}
+        </h2>
+        
+        <div className="mb-10">
+          <div 
+            className="inline-block px-8 py-4 rounded-full shadow-lg"
+            style={{ 
+              background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`,
+            }}
           >
-            Category 1
-          </h3>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span style={{ color: colors.textSecondary }}>1st Prize:</span>
-              <span className="font-semibold" style={{ color: colors.textPrimary }}>
-                {props.category1First}
-              </span>
+            <p className="text-white font-bold text-2xl">
+              Total Prize Pool: {props.prizePool}
+            </p>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-10 mb-10">
+          {/* Category 1 */}
+          <div 
+            className="rounded-2xl p-8 border-2 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+            style={{ 
+              borderColor: colors.borderLight,
+              backgroundColor: colors.cardBackground 
+            }}
+          >
+            <h3 
+              className="text-2xl font-bold mb-6 pb-3 border-b-2"
+              style={{ 
+                color: colors.accent,
+                borderColor: colors.accent 
+              }}
+            >
+              Category 1
+            </h3>
+            <div className="space-y-4">
+              {[
+                { label: '1st Prize', value: props.category1First, emoji: '🥇' },
+                { label: '2nd Prize', value: props.category1Second, emoji: '🥈' },
+                { label: '3rd Prize', value: props.category1Third, emoji: '🥉' },
+              ].map((item, idx) => (
+                <div key={idx} className="flex justify-between items-center group">
+                  <span 
+                    className="text-base flex items-center gap-2"
+                    style={{ color: colors.textSecondary }}
+                  >
+                    <span className="text-xl">{item.emoji}</span>
+                    {item.label}
+                  </span>
+                  <span 
+                    className="font-bold text-xl group-hover:scale-110 transition-transform"
+                    style={{ color: colors.textPrimary }}
+                  >
+                    {item.value}
+                  </span>
+                </div>
+              ))}
             </div>
-            <div className="flex justify-between">
-              <span style={{ color: colors.textSecondary }}>2nd Prize:</span>
-              <span className="font-semibold" style={{ color: colors.textPrimary }}>
-                {props.category1Second}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span style={{ color: colors.textSecondary }}>3rd Prize:</span>
-              <span className="font-semibold" style={{ color: colors.textPrimary }}>
-                {props.category1Third}
-              </span>
+          </div>
+
+          {/* Category 2 */}
+          <div 
+            className="rounded-2xl p-8 border-2 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+            style={{ 
+              borderColor: colors.borderLight,
+              backgroundColor: colors.cardBackground 
+            }}
+          >
+            <h3 
+              className="text-2xl font-bold mb-6 pb-3 border-b-2"
+              style={{ 
+                color: colors.accent,
+                borderColor: colors.accent 
+              }}
+            >
+              Category 2
+            </h3>
+            <div className="space-y-4">
+              {[
+                { label: '1st Prize', value: props.category2First, emoji: '🥇' },
+                { label: '2nd Prize', value: props.category2Second, emoji: '🥈' },
+                { label: '3rd Prize', value: props.category2Third, emoji: '🥉' },
+              ].map((item, idx) => (
+                <div key={idx} className="flex justify-between items-center group">
+                  <span 
+                    className="text-base flex items-center gap-2"
+                    style={{ color: colors.textSecondary }}
+                  >
+                    <span className="text-xl">{item.emoji}</span>
+                    {item.label}
+                  </span>
+                  <span 
+                    className="font-bold text-xl group-hover:scale-110 transition-transform"
+                    style={{ color: colors.textPrimary }}
+                  >
+                    {item.value}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
-        <div>
-          <h3 
-            className="text-xl font-semibold mb-4"
-            style={{ color: colors.accent }}
+        <div className="flex flex-col sm:flex-row gap-5">
+          <Link
+            href="/competition/imaginative-home-2025-2026"
+            className="px-10 py-4 rounded-full font-semibold text-center transition-all duration-300 hover:scale-105 hover:shadow-xl text-lg"
+            style={{ 
+              background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`,
+              color: colors.white 
+            }}
+            data-testid="learn-more-button"
           >
-            Category 2
-          </h3>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span style={{ color: colors.textSecondary }}>1st Prize:</span>
-              <span className="font-semibold" style={{ color: colors.textPrimary }}>
-                {props.category2First}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span style={{ color: colors.textSecondary }}>2nd Prize:</span>
-              <span className="font-semibold" style={{ color: colors.textPrimary }}>
-                {props.category2Second}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span style={{ color: colors.textSecondary }}>3rd Prize:</span>
-              <span className="font-semibold" style={{ color: colors.textPrimary }}>
-                {props.category2Third}
-              </span>
-            </div>
-          </div>
+            Learn More →
+          </Link>
+          <Link
+            href="/competition/imaginative-home-2025-2026#register"
+            className="px-10 py-4 rounded-full font-semibold text-center border-2 transition-all duration-300 hover:scale-105 hover:shadow-xl text-lg"
+            style={{ 
+              borderColor: colors.accent, 
+              color: colors.accent,
+              backgroundColor: 'transparent'
+            }}
+            data-testid="register-button"
+          >
+            Register Now
+          </Link>
         </div>
-      </div>
-
-      <div className="flex flex-col sm:flex-row gap-4">
-        <Link
-          href="/competition/imaginative-home-2025-2026"
-          className="px-8 py-3 rounded-full font-medium text-center transition-all hover:opacity-90"
-          style={{ backgroundColor: colors.accent, color: colors.white }}
-          data-testid="learn-more-button"
-        >
-          Learn More
-        </Link>
-        <Link
-          href="/competition/imaginative-home-2025-2026#register"
-          className="px-8 py-3 rounded-full font-medium text-center border-2 transition-all hover:opacity-70"
-          style={{ 
-            borderColor: colors.accent, 
-            color: colors.accent 
-          }}
-          data-testid="register-button"
-        >
-          Register Now
-        </Link>
       </div>
     </div>
   );
