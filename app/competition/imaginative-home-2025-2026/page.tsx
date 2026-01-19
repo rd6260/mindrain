@@ -26,7 +26,13 @@ export default function CompetitionPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <div style={{ backgroundColor: colors.background }} className="min-h-screen">
+    <div style={{ backgroundColor: colors.background }} className="min-h-screen relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div 
+        className="fixed top-0 right-1/4 w-[700px] h-[700px] rounded-full blur-3xl opacity-5 pointer-events-none"
+        style={{ backgroundColor: colors.accent }}
+      />
+      
       {/* Hero Section with Background Image */}
       <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
         {/* Background Image */}
@@ -35,38 +41,39 @@ export default function CompetitionPage() {
             src="/competition-hero.png"
             alt="Imaginative Home Competition"
             fill
-            className="object-cover opacity-30"
+            className="object-cover opacity-20"
             priority
           />
           <div 
             className="absolute inset-0"
-            style={{ backgroundColor: `${colors.background}CC` }}
+            style={{ 
+              background: `linear-gradient(135deg, ${colors.background}DD, ${colors.background}EE)` 
+            }}
           />
         </div>
 
         {/* Content */}
-        <div className="relative z-10 max-w-4xl text-center">
-          <h1 className="space-y-2">
+        <div className="relative z-10 max-w-5xl text-center animate-fade-in">
+          <h1 className="space-y-4">
             <span 
-              className="block text-2xl md:text-3xl font-medium"
+              className="block text-2xl md:text-4xl font-medium tracking-wide"
               style={{ color: colors.textSecondary }}
             >
               Architecture Competition
             </span>
             <span 
-              className="block text-5xl md:text-7xl lg:text-8xl font-bold my-4"
-              style={{ color: colors.accent }}
+              className="block text-6xl md:text-8xl lg:text-9xl font-black my-6 gradient-text leading-tight"
             >
               Imaginative Home
             </span>
             <span 
-              className="block text-2xl md:text-3xl font-medium"
+              className="block text-2xl md:text-4xl font-medium tracking-wide"
               style={{ color: colors.textSecondary }}
             >
               design challenge 2025-2026
             </span>
             <span 
-              className="block text-xl md:text-2xl mt-4"
+              className="block text-xl md:text-2xl mt-6 font-light italic"
               style={{ color: colors.textLight }}
             >
               edition
@@ -75,11 +82,13 @@ export default function CompetitionPage() {
 
           <button
             onClick={() => setIsModalOpen(true)}
-            className="mt-12 px-12 py-4 rounded-full text-white font-semibold text-lg transition-all hover:opacity-90 shadow-lg"
-            style={{ backgroundColor: colors.accent }}
+            className="mt-16 px-16 py-5 rounded-full text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow"
+            style={{ 
+              background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})` 
+            }}
             data-testid="register-now-button"
           >
-            Register Now
+            Register Now →
           </button>
         </div>
       </section>
