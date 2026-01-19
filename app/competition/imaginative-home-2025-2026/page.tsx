@@ -94,139 +94,116 @@ export default function CompetitionPage() {
       </section>
 
       {/* Prize Pool Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto">
-          <h2 
-            className="text-4xl md:text-5xl font-bold text-center mb-12"
-            style={{ color: colors.textPrimary }}
-          >
-            Prize Pool
-          </h2>
+      <section className="py-28 px-4 sm:px-6 lg:px-8 relative">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16 animate-fade-in-up">
+            <h2 
+              className="text-5xl md:text-6xl font-bold mb-6 gradient-text"
+            >
+              Prize Pool
+            </h2>
+            <div 
+              className="w-32 h-1.5 mx-auto rounded-full"
+              style={{ 
+                background: `linear-gradient(90deg, transparent, ${colors.accent}, transparent)` 
+              }}
+            />
+          </div>
 
           <div 
-            className="text-center mb-12 p-6 rounded-2xl"
-            style={{ backgroundColor: colors.white }}
+            className="text-center mb-16 p-10 rounded-3xl shadow-2xl animate-fade-in-up glass"
+            style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }}
           >
             <p 
-              className="text-3xl font-bold"
-              style={{ color: colors.accent }}
+              className="text-5xl font-black gradient-text"
             >
               Total Prize Pool: ₹50,000+
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-10">
             {/* Category 1 */}
             <div 
-              className="rounded-2xl p-8"
-              style={{ backgroundColor: colors.white }}
+              className="rounded-3xl p-10 shadow-xl hover-lift animate-fade-in-up border-2"
+              style={{ 
+                backgroundColor: colors.white,
+                borderColor: colors.borderLight 
+              }}
             >
               <h3 
-                className="text-2xl font-bold mb-6"
-                style={{ color: colors.accent }}
+                className="text-3xl font-bold mb-8 pb-4 border-b-2"
+                style={{ 
+                  color: colors.accent,
+                  borderColor: colors.accent 
+                }}
               >
                 Category 1
               </h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span 
-                    className="text-lg"
-                    style={{ color: colors.textSecondary }}
-                  >
-                    1st Prize
-                  </span>
-                  <span 
-                    className="text-2xl font-bold"
-                    style={{ color: colors.textPrimary }}
-                  >
-                    ₹11,000
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span 
-                    className="text-lg"
-                    style={{ color: colors.textSecondary }}
-                  >
-                    2nd Prize
-                  </span>
-                  <span 
-                    className="text-2xl font-bold"
-                    style={{ color: colors.textPrimary }}
-                  >
-                    ₹8,000
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span 
-                    className="text-lg"
-                    style={{ color: colors.textSecondary }}
-                  >
-                    3rd Prize
-                  </span>
-                  <span 
-                    className="text-2xl font-bold"
-                    style={{ color: colors.textPrimary }}
-                  >
-                    ₹6,000
-                  </span>
-                </div>
+              <div className="space-y-6">
+                {[
+                  { label: '1st Prize', amount: '₹11,000', emoji: '🥇' },
+                  { label: '2nd Prize', amount: '₹8,000', emoji: '🥈' },
+                  { label: '3rd Prize', amount: '₹6,000', emoji: '🥉' },
+                ].map((prize, idx) => (
+                  <div key={idx} className="flex justify-between items-center group p-4 rounded-xl transition-all hover:bg-gray-50">
+                    <span 
+                      className="text-xl font-medium flex items-center gap-3"
+                      style={{ color: colors.textSecondary }}
+                    >
+                      <span className="text-3xl">{prize.emoji}</span>
+                      {prize.label}
+                    </span>
+                    <span 
+                      className="text-3xl font-black group-hover:scale-110 transition-transform"
+                      style={{ color: colors.textPrimary }}
+                    >
+                      {prize.amount}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
 
             {/* Category 2 */}
             <div 
-              className="rounded-2xl p-8"
-              style={{ backgroundColor: colors.white }}
+              className="rounded-3xl p-10 shadow-xl hover-lift animate-fade-in-up border-2"
+              style={{ 
+                backgroundColor: colors.white,
+                borderColor: colors.borderLight,
+                animationDelay: '0.2s'
+              }}
             >
               <h3 
-                className="text-2xl font-bold mb-6"
-                style={{ color: colors.accent }}
+                className="text-3xl font-bold mb-8 pb-4 border-b-2"
+                style={{ 
+                  color: colors.accent,
+                  borderColor: colors.accent 
+                }}
               >
                 Category 2
               </h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span 
-                    className="text-lg"
-                    style={{ color: colors.textSecondary }}
-                  >
-                    1st Prize
-                  </span>
-                  <span 
-                    className="text-2xl font-bold"
-                    style={{ color: colors.textPrimary }}
-                  >
-                    ₹11,000
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span 
-                    className="text-lg"
-                    style={{ color: colors.textSecondary }}
-                  >
-                    2nd Prize
-                  </span>
-                  <span 
-                    className="text-2xl font-bold"
-                    style={{ color: colors.textPrimary }}
-                  >
-                    ₹8,000
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span 
-                    className="text-lg"
-                    style={{ color: colors.textSecondary }}
-                  >
-                    3rd Prize
-                  </span>
-                  <span 
-                    className="text-2xl font-bold"
-                    style={{ color: colors.textPrimary }}
-                  >
-                    ₹6,000
-                  </span>
-                </div>
+              <div className="space-y-6">
+                {[
+                  { label: '1st Prize', amount: '₹11,000', emoji: '🥇' },
+                  { label: '2nd Prize', amount: '₹8,000', emoji: '🥈' },
+                  { label: '3rd Prize', amount: '₹6,000', emoji: '🥉' },
+                ].map((prize, idx) => (
+                  <div key={idx} className="flex justify-between items-center group p-4 rounded-xl transition-all hover:bg-gray-50">
+                    <span 
+                      className="text-xl font-medium flex items-center gap-3"
+                      style={{ color: colors.textSecondary }}
+                    >
+                      <span className="text-3xl">{prize.emoji}</span>
+                      {prize.label}
+                    </span>
+                    <span 
+                      className="text-3xl font-black group-hover:scale-110 transition-transform"
+                      style={{ color: colors.textPrimary }}
+                    >
+                      {prize.amount}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
