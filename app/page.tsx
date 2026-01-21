@@ -12,7 +12,7 @@ export default function RootPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen">
-      <p className="text-lg">Redirecting to home...</p>
+      <p className="text-lg">Welcome Back</p>
     </div>
   );
 }
