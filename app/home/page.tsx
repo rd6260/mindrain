@@ -129,7 +129,7 @@ function CompetitionCard(props: CompetitionCardProps) {
 
   return (
     <div 
-      className="rounded-3xl p-10 md:p-14 shadow-2xl relative overflow-hidden"
+      className="rounded-3xl p-10 md:p-14 relative overflow-hidden"
       style={{ 
         backgroundColor: colors.white,
       }}
@@ -172,10 +172,10 @@ function CompetitionCard(props: CompetitionCardProps) {
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Category 1 */}
-          <CategoryPrizes title="Category 1" prizes={category1Prizes} />
+          <CategoryPrizes title="Category 1 (1st, 2nd Year students)" prizes={category1Prizes} />
           
           {/* Category 2 */}
-          <CategoryPrizes title="Category 2" prizes={category2Prizes} />
+          <CategoryPrizes title="Category 2 (3rd, 4th, 5th Year students)" prizes={category2Prizes} />
         </div>
       </div>
     </div>
@@ -289,7 +289,7 @@ export default function HomePage() {
                   color: colors.white,
                 }}
               >
-                Register Now
+                Login Now
               </Link>
             </div>
           </div>
