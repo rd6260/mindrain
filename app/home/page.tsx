@@ -172,10 +172,10 @@ function CompetitionCard(props: CompetitionCardProps) {
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Category 1 */}
-          <CategoryPrizes title="Category 1 (1st, 2nd Year students)" prizes={category1Prizes} />
+          <CategoryPrizes title="Category 1 (1st, 2nd year students)" prizes={category1Prizes} />
           
           {/* Category 2 */}
-          <CategoryPrizes title="Category 2 (3rd, 4th, 5th Year students)" prizes={category2Prizes} />
+          <CategoryPrizes title="Category 2 (3rd, 4th, 5th year students)" prizes={category2Prizes} />
         </div>
       </div>
     </div>
