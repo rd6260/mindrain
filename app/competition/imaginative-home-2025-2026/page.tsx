@@ -62,21 +62,22 @@ export default function CompetitionPage() {
               Architecture Competition
             </span>
             <span 
+              className="block text-xl md:text-2xl font-light italic"
+              style={{ color: colors.textLight }}
+            >
+              edition 05
+            </span>
+
+            <span 
               className="block text-6xl md:text-8xl lg:text-9xl font-black my-6 gradient-text leading-tight"
             >
-              Imaginative Home
+              The Unreal House
             </span>
             <span 
               className="block text-2xl md:text-4xl font-medium tracking-wide"
               style={{ color: colors.textSecondary }}
             >
-              design challenge 2025-2026
-            </span>
-            <span 
-              className="block text-xl md:text-2xl mt-6 font-light italic"
-              style={{ color: colors.textLight }}
-            >
-              edition
+              An Imaginary Home Design Challenge
             </span>
           </h1>
 
@@ -111,7 +112,7 @@ export default function CompetitionPage() {
           </div>
 
           <div 
-            className="text-center mb-16 p-10 rounded-3xl shadow-2xl animate-fade-in-up glass"
+            className="text-center mb-16 p-10 rounded-2xl shadow-2xl animate-fade-in-up glass"
             style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }}
           >
             <p 
@@ -419,6 +420,12 @@ export default function CompetitionPage() {
               className="text-lg mb-6 leading-relaxed"
               style={{ color: colors.textSecondary }}
             >
+              Participate and avail discount <span className="font-bold">Flat 40%</span>
+            </p>
+            <p 
+              className="text-lg mb-6 leading-relaxed"
+              style={{ color: colors.textSecondary }}
+            >
               The Mind Rain Competition Team welcomes participation from universities, colleges, and design schools
               across the world.
             </p>
@@ -427,7 +434,7 @@ export default function CompetitionPage() {
               className="text-lg mb-6 leading-relaxed"
               style={{ color: colors.textSecondary }}
             >
-              Students can avail exclusive discounts through group registration offers (valid for 15 or more participants
+              Students can avail exclusive discounts through group registration offers (valid for <span className="font-bold">30 or more</span> participants
               registering from the same institution).
             </p>
 
@@ -451,7 +458,7 @@ export default function CompetitionPage() {
               </h3>
               <ul className="space-y-2 list-disc list-inside">
                 <li style={{ color: colors.textSecondary }}>
-                  Email us via your official university e-mail ID
+                  Email us from your official university e-mail ID
                 </li>
                 <li style={{ color: colors.textSecondary }}>
                   Include your university name, your role, and number of participants

@@ -346,26 +346,6 @@ export default function HomePage() {
               >
                 Join hundreds of talented architects and designers from prestigious institutions across the country in this prestigious competition.
               </p>
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <div 
-                    className="text-4xl font-bold mb-2"
-                    style={{ color: colors.accent }}
-                  >
-                    500+
-                  </div>
-                  <p style={{ color: colors.textSecondary }}>Participants</p>
-                </div>
-                <div>
-                  <div 
-                    className="text-4xl font-bold mb-2"
-                    style={{ color: colors.accent }}
-                  >
-                    ₹50K+
-                  </div>
-                  <p style={{ color: colors.textSecondary }}>Prize Pool</p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
