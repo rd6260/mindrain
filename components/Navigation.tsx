@@ -9,7 +9,7 @@ const navItems = [
   { label: 'Architecture Design Competitions', href: '/competition/imaginative-home-2025-2026' },
   { label: 'Photography Competition', href: '#' },
   { label: 'Workshops', href: '#' },
-  { label: 'Blog', href: '#' },
+  { label: 'Past Winners', href: '#' },
   { label: 'About us', href: '/about' },
   { label: 'Contact', href: '#' },
 ];
