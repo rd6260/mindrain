@@ -65,7 +65,7 @@ export default function CompetitionPage() {
               className="block text-xl md:text-2xl font-light italic"
               style={{ color: colors.textLight }}
             >
-              edition 05
+              edition 06
             </span>
 
             <span 
@@ -420,7 +420,7 @@ export default function CompetitionPage() {
               className="text-lg mb-6 leading-relaxed"
               style={{ color: colors.textSecondary }}
             >
-              Participate and avail discount <span className="font-bold">Flat 40%</span>
+              Participate and avail discount <span className="font-bold">Flat 35%</span>
             </p>
             <p 
               className="text-lg mb-6 leading-relaxed"

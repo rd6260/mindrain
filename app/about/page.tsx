@@ -68,7 +68,7 @@ export default function AboutPage() {
                 className="text-4xl md:text-5xl font-bold leading-tight"
                 style={{ color: '#2C2C2C' }}
               >
-                The Highest Level of Creativity and Innovation
+                Redefining How Students Experience Creativity and Competition
               </h2>
 
               <p 
@@ -86,7 +86,7 @@ export default function AboutPage() {
                   className="text-lg leading-relaxed"
                   style={{ color: '#6B6B6B' }}
                 >
-                  We are concerned about the current generation of students of fine arts and design who end up suppressing their creative talent in the race for marks and jobs. We want to give you a free space to manifest your creativity without any fear or inhibition and let your imagination fly.
+                  We are concerned about the current generation of design and art students to end up suppressing their creative talent in the race for marks and jobs. We want to give them a free space to manifest your creativity without any fear or inhibition and let their imagination fly.
                 </p>
               </div>
             </div>
