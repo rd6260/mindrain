@@ -147,7 +147,7 @@ function CompetitionCard(props: CompetitionCardProps) {
             className="text-4xl md:text-5xl font-bold mb-4 tracking-tight"
             style={{ color: colors.textPrimary }}
           >
-            Imaginative Home
+            The Unreal Home
           </h2>
           <p 
             className="text-lg mb-2"
@@ -177,6 +177,20 @@ function CompetitionCard(props: CompetitionCardProps) {
           {/* Category 2 */}
           <CategoryPrizes title="Category 2 (3rd, 4th, 5th year students)" prizes={category2Prizes} />
         </div>
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            href="/competition/imaginative-home-2025-2026"
+          >
+            Learn More →
+          </Link>
+          <Link
+            href="/competition/imaginative-home-2025-2026#register"
+          >
+            Login Now
+          </Link>
+        </div>
+
       </div>
     </div>
   );
@@ -270,28 +284,6 @@ export default function HomePage() {
             <p className="text-xl md:text-2xl mb-8 font-light">
               Architecture Design and Photography Challenges and Events
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/competition/imaginative-home-2025-2026"
-                className="px-10 py-4 rounded-full font-semibold text-center transition-all duration-300 hover:scale-105 text-lg"
-                style={{ 
-                  background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`,
-                  color: colors.white 
-                }}
-              >
-                Learn More →
-              </Link>
-              <Link
-                href="/competition/imaginative-home-2025-2026#register"
-                className="px-10 py-4 rounded-full font-semibold text-center border-2 transition-all duration-300 hover:scale-105 text-lg bg-white/10 backdrop-blur-sm"
-                style={{ 
-                  borderColor: colors.white, 
-                  color: colors.white,
-                }}
-              >
-                Login Now
-              </Link>
-            </div>
           </div>
         </div>
       </section>
@@ -301,7 +293,7 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto">
 
           <CompetitionCard
-            name="Architecture Competition Imaginative Home design challenge 2025-2026 edition"
+            name="Architecture Competition Imaginative Home design challenge 2025-2026 edition 06"
             prizePool="₹50,000+"
             category1First="₹11,000"
             category1Second="₹8,000"
