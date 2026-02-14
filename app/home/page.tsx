@@ -185,7 +185,7 @@ function CompetitionCard(props: CompetitionCardProps) {
             Learn More →
           </Link>
           <Link
-            href="/competition/imaginative-home-2025-2026#register"
+            href="/login"
           >
             Login Now
           </Link>

@@ -17,7 +17,7 @@ const navItems = [
         href: '#',
         subSubItems: [
           { label: 'The Unreal Home', href: '/competition/imaginative-home-2025-2026' },
-          { label: 'Thesis', href: '/competition/thesis' }
+          // { label: 'Thesis', href: '/competition/thesis' }
         ]
       },
       { label: 'Photography', href: '/competition/photography' }

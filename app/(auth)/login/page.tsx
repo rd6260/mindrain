@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 
@@ -8,8 +8,19 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSignup, setIsSignup] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const router = useRouter();
   const supabase = createClient();
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        router.push('/onboarding');
+      }
+    };
+    checkUser();
+  }, [router, supabase]);
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -28,7 +39,7 @@ export default function LoginPage() {
 
       if (error) throw error;
       
-      router.push('/dashboard');
+      router.push('/onboarding');
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -43,7 +54,6 @@ export default function LoginPage() {
     setError(null);
 
     const formData = new FormData(e.currentTarget);
-    const name = formData.get('name') as string;
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
@@ -52,15 +62,13 @@ export default function LoginPage() {
         email,
         password,
         options: {
-          data: {
-            name,
-          },
+          emailRedirectTo: `${window.location.origin}/onboarding`,
         },
       });
 
       if (error) throw error;
       
-      alert('Check your email to confirm your account! CHECK SPAM FOLDER');
+      setShowSuccessPopup(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -69,10 +77,34 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#edebdf]">
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#edebdf' }}>
+      {/* Error Toast */}
       {error && (
         <div className="fixed top-5 right-5 px-5 py-4 bg-red-500 text-white rounded-md border-2 border-[#323232] shadow-[4px_4px_0_0_#323232] z-50 animate-slide-in">
           {error}
+        </div>
+      )}
+
+      {/* Success Popup */}
+      {showSuccessPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-lg border-2 border-[#323232] shadow-[8px_8px_0_0_#323232] max-w-md mx-4">
+            <div className="text-2xl font-black text-[#323232] mb-4 text-center">
+              Check your email!
+            </div>
+            <p className="text-[#323232] text-center mb-2">
+              We've sent you a confirmation link.
+            </p>
+            <p className="text-[#323232] font-semibold text-center mb-6">
+              CHECK SPAM FOLDER
+            </p>
+            <button
+              onClick={() => setShowSuccessPopup(false)}
+              className="w-full h-10 rounded-md border-2 border-[#323232] bg-[#2d8cf0] shadow-[4px_4px_0_0_#323232] text-[17px] font-semibold text-white cursor-pointer active:shadow-none active:translate-x-[3px] active:translate-y-[3px]"
+            >
+              Got it!
+            </button>
+          </div>
         </div>
       )}
       
@@ -158,14 +190,6 @@ export default function LoginPage() {
               Sign up
             </div>
             <form onSubmit={handleSignup} className="flex flex-col items-center gap-5">
-              <input
-                type="text"
-                placeholder="Name"
-                name="name"
-                className="w-[250px] h-10 rounded-md border-2 border-[#323232] bg-white shadow-[4px_4px_0_0_#323232] text-[15px] font-semibold text-[#323232] px-2.5 outline-none placeholder:text-[#666] placeholder:opacity-80 focus:border-[#2d8cf0] disabled:opacity-60 disabled:cursor-not-allowed"
-                required
-                disabled={isLoading}
-              />
               <input
                 type="email"
                 placeholder="Email"
