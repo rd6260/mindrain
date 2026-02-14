@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { colors } from '@/utils/colors';
 import Footer from '@/components/Footer';
 import Timeline from '@/components/Timeline';
-import RegistrationModal from '@/components/RegistrationModal';
 import { ImportantDate } from '@/types';
 
 const importantDates: ImportantDate[] = [
@@ -23,7 +22,6 @@ const importantDates: ImportantDate[] = [
 ];
 
 export default function CompetitionPage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <div style={{ backgroundColor: colors.background }} className="min-h-screen relative overflow-hidden">
@@ -81,16 +79,16 @@ export default function CompetitionPage() {
             </span>
           </h1>
 
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="mt-16 px-16 py-5 rounded-full text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow"
+          <a
+            href="/registration?event_id=3f123e78-60d6-494d-b307-18c5b4c8ab7f"
+            className="mt-16 px-16 py-5 rounded-full text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow inline-block text-center"
             style={{ 
               background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})` 
             }}
             data-testid="register-now-button"
           >
             Register Now →
-          </button>
+          </a>
         </div>
       </section>
 
@@ -485,10 +483,6 @@ export default function CompetitionPage() {
 
       <Footer />
       
-      <RegistrationModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-      />
     </div>
   );
 }
