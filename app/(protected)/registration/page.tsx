@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useSearchParams } from 'next/navigation';
 
@@ -19,7 +19,7 @@ interface Event {
   code_name: string;
 }
 
-export default function RegistrationPage() {
+function RegistrationContent() {
   const searchParams = useSearchParams();
   const eventIdFromUrl = searchParams.get('event_id');
 
@@ -846,3 +846,16 @@ export default function RegistrationPage() {
     </div>
   );
 }
+
+export default function RegistrationPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#e8e6db] flex items-center justify-center">
+        <div className="text-2xl font-bold text-[#323232]">Loading...</div>
+      </div>
+    }>
+      <RegistrationContent />
+    </Suspense>
+  );
+}
+
