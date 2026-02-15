@@ -27,6 +27,7 @@ function RegistrationContent() {
   const [eventPreCode, setEventPreCode] = useState<string>('');
   const [availableEvents, setAvailableEvents] = useState<Event[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(false);
+  const [countryType, setCountryType] = useState<'India' | 'Other'>('India');
 
   const [country, setCountry] = useState('India');
   const [group, setGroup] = useState<'A' | 'B' | ''>('');
@@ -513,9 +514,41 @@ function RegistrationContent() {
           )}
 
           <div className="p-6 space-y-6">
-            {/* Country */}
-            <div className="space-y-3">
-              <label className="text-lg font-bold text-[#323232]">Country *</label>
+          {/* Country */}
+          <div className="space-y-3">
+            <label className="text-lg font-bold text-[#323232]">Country *</label>
+            
+            {/* Radio buttons */}
+            <div className="flex gap-4">
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="countryType"
+                  value="India"
+                  checked={countryType === 'India'}
+                  onChange={(e) => setCountryType('India')}
+                  disabled={isLoading}
+                  className="w-5 h-5 mr-2 cursor-pointer accent-[#2d8cf0]"
+                />
+                <span className="text-[15px] font-semibold text-[#323232]">India</span>
+              </label>
+              
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="countryType"
+                  value="Other"
+                  checked={countryType === 'Other'}
+                  onChange={(e) => setCountryType('Other')}
+                  disabled={isLoading}
+                  className="w-5 h-5 mr-2 cursor-pointer accent-[#2d8cf0]"
+                />
+                <span className="text-[15px] font-semibold text-[#323232]">Other</span>
+              </label>
+            </div>
+            
+            {/* Text field for Other */}
+            {countryType === 'Other' && (
               <input
                 type="text"
                 value={country}
@@ -524,7 +557,8 @@ function RegistrationContent() {
                 disabled={isLoading}
                 placeholder="Enter your country"
               />
-            </div>
+            )}
+          </div>
 
             {/* Group Selection */}
             <div className="space-y-3">
