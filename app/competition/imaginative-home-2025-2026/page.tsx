@@ -388,14 +388,16 @@ export default function CompetitionPage() {
           </div>
 
           <div className="text-center mt-8">
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="px-12 py-4 rounded-full text-white font-semibold text-lg transition-all hover:opacity-90"
-              style={{ backgroundColor: colors.accent }}
-              data-testid="register-fees-button"
+            <a
+              href="/registration?event_id=3f123e78-60d6-494d-b307-18c5b4c8ab7f"
+              className="mt-16 px-16 py-5 rounded-full text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow inline-block text-center"
+              style={{ 
+                background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})` 
+              }}
+              data-testid="register-now-button"
             >
-              Register Now
-            </button>
+              Register Now →
+            </a>
           </div>
         </div>
       </section>
