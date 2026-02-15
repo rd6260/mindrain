@@ -1,12 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Script from 'next/script';
 
-// this to solve "Error occurred prerendering" in vercel
-export const dynamic = 'force-dynamic';
 
 interface RegistrationData {
   id: string;
@@ -22,7 +20,7 @@ interface FeeCalculation {
   mindrain_fee: number;
 }
 
-export default function PaymentPage() {
+function PaymentContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const registrationId = searchParams.get('registration_id');
@@ -421,5 +419,19 @@ export default function PaymentPage() {
         </div>
       )}
     </div>
+  );
+}
+
+
+
+export default function PaymentPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#e8e6db] flex items-center justify-center">
+        <div className="text-2xl font-bold text-[#323232]">Loading...</div>
+      </div>
+    }>
+      <PaymentContent />
+    </Suspense>
   );
 }
