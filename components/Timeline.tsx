@@ -175,6 +175,7 @@ export default function Timeline({ dates = importantDates }: TimelineProps) {
       </div>
 
       {/* End marker */}
+      {/*
       <div className="flex justify-center mt-12">
         <div 
           className="relative"
@@ -198,6 +199,7 @@ export default function Timeline({ dates = importantDates }: TimelineProps) {
           </div>
         </div>
       </div>
+      */}
     </div>
   );
 }
