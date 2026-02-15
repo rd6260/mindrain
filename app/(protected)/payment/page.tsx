@@ -5,6 +5,9 @@ import { createClient } from '@/lib/supabase/client';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Script from 'next/script';
 
+// this to solve "Error occurred prerendering" in vercel
+export const dynamic = 'force-dynamic';
+
 interface RegistrationData {
   id: string;
   country: string;
