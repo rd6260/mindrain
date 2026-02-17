@@ -19,41 +19,43 @@ export default function AboutPage() {
       </div>
 
       {/* About Us */}
-      <section className="px-4 sm:px-6 lg:px-8 pb-28 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+      <section className="px-4 sm:px-6 lg:px-8 pb-28">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
 
-          {/* Left: heading pinned */}
-          <div className="lg:col-span-4 lg:sticky lg:top-28">
-            <h2
-              className="text-5xl md:text-6xl font-bold leading-none"
-              style={{ color: colors.textPrimary }}
-            >
-              ABOUT US
-            </h2>
-          </div>
+            {/* Left: heading pinned */}
+            <div className="lg:col-span-4 lg:sticky lg:top-28">
+              <h2
+                className="text-5xl md:text-6xl font-bold leading-none"
+                style={{ color: colors.textPrimary }}
+              >
+                ABOUT US
+              </h2>
+            </div>
 
-          {/* Right: body text */}
-          <div className="lg:col-span-8 space-y-6 lg:pt-2">
-            <p
-              className="text-xl md:text-2xl leading-relaxed"
-              style={{ color: colors.textSecondary }}
-            >
-              We are a group of students and professionals from various fields of art and design who believe that our classrooms and studios can be spiced up a little to make them more interesting.
-            </p>
-
-            <div
-              className="rounded-2xl p-8 mt-2"
-              style={{ backgroundColor: colors.cardBackground }}
-            >
+            {/* Right: body text */}
+            <div className="lg:col-span-8 space-y-6 lg:pt-2">
               <p
-                className="text-lg leading-relaxed"
+                className="text-xl md:text-2xl leading-relaxed"
                 style={{ color: colors.textSecondary }}
               >
-                We are concerned about the current generation of design and art students ending up suppressing their creative talent in the race for marks and jobs. We want to give them a free space to manifest creativity without any fear or inhibition — and let their imagination fly.
+                We are a group of students and professionals from various fields of art and design who believe that our classrooms and studios can be spiced up a little to make them more interesting.
               </p>
-            </div>
-          </div>
 
+              <div
+                className="rounded-2xl p-8 mt-2"
+                style={{ backgroundColor: colors.cardBackground }}
+              >
+                <p
+                  className="text-lg leading-relaxed"
+                  style={{ color: colors.textSecondary }}
+                >
+                  We are concerned about the current generation of design and art students ending up suppressing their creative talent in the race for marks and jobs. We want to give them a free space to manifest creativity without any fear or inhibition — and let their imagination fly.
+                </p>
+              </div>
+            </div>
+
+          </div>
         </div>
       </section>
 
@@ -68,7 +70,7 @@ export default function AboutPage() {
                 className="text-5xl md:text-6xl font-bold leading-none"
                 style={{ color: colors.textPrimary }}
               >
-                Our AIM
+                OUR AIM
               </h2>
             </div>
 
