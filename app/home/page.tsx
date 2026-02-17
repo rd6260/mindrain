@@ -128,69 +128,102 @@ function CompetitionCard(props: CompetitionCardProps) {
   ];
 
   return (
-    <div 
-      className="rounded-3xl p-10 md:p-14 relative overflow-hidden"
-      style={{ 
-        backgroundColor: colors.white,
-      }}
+    <div
+      className="rounded-3xl overflow-hidden"
+      style={{ backgroundColor: colors.white }}
       data-testid="competition-card"
-    >      
-      <div className="relative z-10">
-        <div className="mb-8">
-          <p 
-            className="text-sm uppercase tracking-widest mb-4 font-semibold"
-            style={{ color: colors.accent }}
-          >
-            Current Competition
-          </p>
-          <h2 
-            className="text-4xl md:text-5xl font-bold mb-4 tracking-tight"
-            style={{ color: colors.textPrimary }}
-          >
-            The Unreal Home
-          </h2>
-          <p 
-            className="text-lg mb-2"
-            style={{ color: colors.textSecondary }}
-          >
-            Architecture Competition design challenge 2025-2026
-          </p>
-        </div>
-        
-        <div className="mb-8">
-          <div 
-            className="inline-block px-8 py-3 rounded-full shadow-lg"
-            style={{ 
-              background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`,
+    >
+      <div className="flex flex-col md:flex-row">
+
+        {/* Left — Cover Image */}
+        <div className="relative md:w-2/5 w-full min-h-[280px] md:min-h-0 flex-shrink-0">
+          <img
+            src="/the-unreal-house/TUH-cover.jpg"
+            alt="The Unreal House"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          {/* Subtle gradient overlay at bottom for blending on mobile */}
+          <div
+            className="absolute inset-0 md:hidden"
+            style={{
+              background: `linear-gradient(to top, ${colors.white} 0%, transparent 50%)`,
             }}
-          >
-            <p className="text-white font-bold text-xl">
-              Total Prize Pool: {props.prizePool}
+          />
+        </div>
+
+        {/* Right — Content */}
+        <div className="flex-1 p-8 md:p-10 flex flex-col justify-between gap-7">
+
+          {/* Header */}
+          <div>
+            <p
+              className="text-xs uppercase tracking-widest font-semibold mb-3"
+              style={{ color: colors.accent }}
+            >
+              Current Competition
+            </p>
+            <h2
+              className="text-3xl md:text-4xl font-bold tracking-tight mb-2"
+              style={{ color: colors.textPrimary }}
+            >
+              The Unreal House
+            </h2>
+            <p
+              className="text-sm"
+              style={{ color: colors.textSecondary }}
+            >
+              Architecture design challenge 2025–2026
             </p>
           </div>
-        </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Category 1 */}
-          <CategoryPrizes title="Category 1 (1st, 2nd year students)" prizes={category1Prizes} />
-          
-          {/* Category 2 */}
-          <CategoryPrizes title="Category 2 (3rd, 4th, 5th year students)" prizes={category2Prizes} />
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link
-            href="/competition/imaginative-home-2025-2026"
+          {/* Prize Pool — plain text treatment */}
+          <div
+            className="flex items-baseline gap-2 border-b pb-6"
+            style={{ borderColor: colors.borderLight }}
           >
-            Learn More →
-          </Link>
-          <Link
-            href="/login"
-          >
-            Login Now
-          </Link>
-        </div>
+            <span
+              className="text-xs uppercase tracking-widest font-semibold"
+              style={{ color: colors.textLight }}
+            >
+              Total Prize Pool
+            </span>
+            <span
+              className="text-2xl font-bold"
+              style={{ color: colors.accent }}
+            >
+              {props.prizePool}
+            </span>
+          </div>
 
+          {/* Prize Categories */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <CategoryPrizes title="Category 1 (1st, 2nd year)" prizes={category1Prizes} />
+            <CategoryPrizes title="Category 2 (3rd–5th year)" prizes={category2Prizes} />
+          </div>
+
+          {/* CTA */}
+          <div>
+            <Link
+              href="/competition/imaginative-home-2025-2026"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:translate-x-0.5"
+              style={{
+                backgroundColor: colors.accent,
+                color: colors.textWhite,
+              }}
+            >
+              Learn More
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </div>
+
+        </div>
       </div>
     </div>
   );
