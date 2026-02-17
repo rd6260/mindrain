@@ -338,44 +338,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* About Section with Side Image */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: colors.cardBackground }}>
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="relative h-[600px] rounded-2xl overflow-hidden shadow-2xl">
-              <img
-                src="https://i.pinimg.com/736x/20/55/f4/2055f4df61a6ac372876e413b7a3db82.jpg"
-                alt="Innovative Architecture"
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            <div>
-              <h2
-                className="text-4xl md:text-5xl font-bold mb-6"
-                style={{ color: colors.textPrimary }}
-              >
-                The Highest Level of
-                <br />
-                <span style={{ color: colors.accent }}>Creative Excellence</span>
-              </h2>
-              <p
-                className="text-lg mb-6 leading-relaxed"
-                style={{ color: colors.textSecondary }}
-              >
-                At Imaginative Home, we combine premium design challenges with exceptional rewards. Whether it's a solo endeavor, a collaborative team effort, or a transformative concept – we celebrate every form of architectural innovation.
-              </p>
-              <p
-                className="text-lg mb-8 leading-relaxed"
-                style={{ color: colors.textSecondary }}
-              >
-                Join hundreds of talented architects and designers from prestigious institutions across the country in this prestigious competition.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Previous Winners Section */}
       <section className="py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
