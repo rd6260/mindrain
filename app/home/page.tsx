@@ -7,6 +7,15 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { colors } from '@/utils/colors';
 import { previousWinners } from '@/data/winners';
+import LiveCompetitionCard from '@/components/LiveCompetitionCard';
+
+import { Changa } from "next/font/google"
+
+const changa = Changa({
+  subsets: ["latin"],
+  weight: ["500"],
+})
+
 
 interface WinnerCardProps {
   winner: Winner;
@@ -97,183 +106,6 @@ function WinnerCard({ winner, position }: WinnerCardProps) {
   );
 }
 
-interface PrizeItem {
-  label: string;
-  value: string;
-  emoji: string;
-}
-
-interface CompetitionCardProps {
-  name: string;
-  prizePool: string;
-  category1First: string;
-  category1Second: string;
-  category1Third: string;
-  category2First: string;
-  category2Second: string;
-  category2Third: string;
-}
-
-function CompetitionCard(props: CompetitionCardProps) {
-  const category1Prizes: PrizeItem[] = [
-    { label: '1st Prize', value: props.category1First, emoji: '🥇' },
-    { label: '2nd Prize', value: props.category1Second, emoji: '🥈' },
-    { label: '3rd Prize', value: props.category1Third, emoji: '🥉' },
-  ];
-
-  const category2Prizes: PrizeItem[] = [
-    { label: '1st Prize', value: props.category2First, emoji: '🥇' },
-    { label: '2nd Prize', value: props.category2Second, emoji: '🥈' },
-    { label: '3rd Prize', value: props.category2Third, emoji: '🥉' },
-  ];
-
-  return (
-    <div
-      className="rounded-3xl overflow-hidden"
-      style={{ backgroundColor: colors.white }}
-      data-testid="competition-card"
-    >
-      <div className="flex flex-col md:flex-row">
-
-        {/* Left — Cover Image */}
-        <div className="relative md:w-2/5 w-full min-h-[280px] md:min-h-0 flex-shrink-0">
-          <img
-            src="/the-unreal-house/TUH-cover.jpg"
-            alt="The Unreal House"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-          {/* Subtle gradient overlay at bottom for blending on mobile */}
-          <div
-            className="absolute inset-0 md:hidden"
-            style={{
-              background: `linear-gradient(to top, ${colors.white} 0%, transparent 50%)`,
-            }}
-          />
-        </div>
-
-        {/* Right — Content */}
-        <div className="flex-1 p-8 md:p-10 flex flex-col justify-between gap-7">
-
-          {/* Header */}
-          <div>
-            <p
-              className="text-xs uppercase tracking-widest font-semibold mb-3"
-              style={{ color: colors.accent }}
-            >
-              Current Competition
-            </p>
-            <h2
-              className="text-3xl md:text-4xl font-bold tracking-tight mb-2"
-              style={{ color: colors.textPrimary }}
-            >
-              The Unreal House
-            </h2>
-            <p
-              className="text-sm"
-              style={{ color: colors.textSecondary }}
-            >
-              Architecture design challenge 2025–2026
-            </p>
-          </div>
-
-          {/* Prize Pool — plain text treatment */}
-          <div
-            className="flex items-baseline gap-2 border-b pb-6"
-            style={{ borderColor: colors.borderLight }}
-          >
-            <span
-              className="text-xs uppercase tracking-widest font-semibold"
-              style={{ color: colors.textLight }}
-            >
-              Total Prize Pool
-            </span>
-            <span
-              className="text-2xl font-bold"
-              style={{ color: colors.accent }}
-            >
-              {props.prizePool}
-            </span>
-          </div>
-
-          {/* Prize Categories */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <CategoryPrizes title="Category 1 (1st, 2nd year)" prizes={category1Prizes} />
-            <CategoryPrizes title="Category 2 (3rd–5th year)" prizes={category2Prizes} />
-          </div>
-
-          {/* CTA */}
-          <div>
-            <Link
-              href="/competition/imaginative-home-2025-2026"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:translate-x-0.5"
-              style={{
-                backgroundColor: colors.accent,
-                color: colors.textWhite,
-              }}
-            >
-              Learn More
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </Link>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  );
-}
-
-interface CategoryPrizesProps {
-  title: string;
-  prizes: PrizeItem[];
-}
-
-function CategoryPrizes({ title, prizes }: CategoryPrizesProps) {
-  return (
-    <div
-      className="rounded-2xl p-6 border transition-all duration-300 hover:shadow-lg"
-      style={{
-        borderColor: colors.borderLight,
-        backgroundColor: colors.cardBackground
-      }}
-    >
-      <h3
-        className="text-xl font-bold mb-5 pb-3 border-b"
-        style={{
-          color: colors.accent,
-          borderColor: colors.borderLight
-        }}
-      >
-        {title}
-      </h3>
-      <div className="space-y-3">
-        {prizes.map((item, idx) => (
-          <div key={idx} className="flex justify-between items-center">
-            <span
-              className="text-sm flex items-center gap-2"
-              style={{ color: colors.textSecondary }}
-            >
-              <span className="text-lg">{item.emoji}</span>
-              {item.label}
-            </span>
-            <span
-              className="font-bold text-lg"
-              style={{ color: colors.textPrimary }}
-            >
-              {item.value}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 interface WinnerWithPosition extends Winner {
   position: string;
@@ -324,22 +156,25 @@ export default function HomePage() {
       {/* Competition Details Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
-
-          <CompetitionCard
-            name="Architecture Competition Imaginative Home design challenge 2025-2026 edition 06"
-            prizePool="₹50,000+"
-            category1First="₹11,000"
-            category1Second="₹8,000"
-            category1Third="₹6,000"
-            category2First="₹11,000"
-            category2Second="₹8,000"
-            category2Third="₹6,000"
+          <h2
+            className={`${changa.className} text-5xl md:text-6xl font-bold`}
+            style={{ color: colors.textPrimary }}
+          >
+            Live Competitions
+          </h2>
+          <div
+            className="h-px flex-1 bg-black mt-4 mb-16"
           />
+
+
+          <LiveCompetitionCard />
+
+
         </div>
-      </section>
+      </section >
 
       {/* Previous Winners Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8">
+      < section className="py-24 px-4 sm:px-6 lg:px-8" >
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2
@@ -455,9 +290,9 @@ export default function HomePage() {
           </div>
 
         </div>
-      </section>
+      </section >
 
       <Footer />
-    </div>
+    </div >
   );
 }

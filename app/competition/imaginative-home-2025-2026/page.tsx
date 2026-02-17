@@ -109,16 +109,6 @@ export default function CompetitionPage() {
             />
           </div>
 
-          <div 
-            className="text-center mb-16 p-10 rounded-2xl shadow-2xl animate-fade-in-up glass"
-            style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }}
-          >
-            <p 
-              className="text-5xl font-black gradient-text"
-            >
-              Total Prize Pool: ₹50,000+
-            </p>
-          </div>
 
           <div className="grid md:grid-cols-2 gap-10">
             {/* Category 1 */}
