@@ -8,14 +8,12 @@ export default function AboutPage() {
       <Navigation />
 
       {/* Hero Image - Full Width */}
-      <div className="mb-24">
-        <div className="overflow-hidden" style={{ aspectRatio: '21/9' }}>
-          <img
-            src="/about-us-banner.png"
-            alt="Modern architecture"
-            className="w-full object-contain"
-          />
-        </div>
+      <div className="overflow-hidden" style={{ aspectRatio: '21/9' }}>
+        <img
+          src="/about-us-banner.png"
+          alt="Modern architecture"
+          className="w-full object-contain"
+        />
       </div>
 
       {/* About Us */}
