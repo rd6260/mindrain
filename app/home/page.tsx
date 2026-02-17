@@ -23,11 +23,11 @@ function WinnerCard({ winner, position }: WinnerCardProps) {
   const displayMembers: Member[] = winner.members && winner.members.length > 0
     ? winner.members
     : winner.profilePicture
-    ? [{ name: winner.name, profilePicture: winner.profilePicture }]
-    : [];
+      ? [{ name: winner.name, profilePicture: winner.profilePicture }]
+      : [];
 
   return (
-    <div 
+    <div
       className="rounded-2xl overflow-hidden shadow-lg hover-lift group"
       style={{ backgroundColor: colors.white }}
       data-testid="winner-card"
@@ -47,11 +47,11 @@ function WinnerCard({ winner, position }: WinnerCardProps) {
 
       {/* Winner Info */}
       <div className="p-6">
-        <div 
+        <div
           className="inline-block px-4 py-2 rounded-full text-xs font-bold mb-4 shadow-md"
-          style={{ 
+          style={{
             background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`,
-            color: colors.white 
+            color: colors.white
           }}
         >
           {position}
@@ -62,8 +62,8 @@ function WinnerCard({ winner, position }: WinnerCardProps) {
           <div className="flex items-center gap-2 mb-4">
             {displayMembers.map((member, index) => (
               member.profilePicture ? (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   className="relative w-12 h-12 rounded-full border-3 shadow-md transition-transform hover:scale-110"
                   style={{ borderColor: colors.accent }}
                 >
@@ -80,13 +80,13 @@ function WinnerCard({ winner, position }: WinnerCardProps) {
           </div>
         )}
 
-        <h3 
+        <h3
           className="font-bold text-lg mb-2 line-clamp-2"
           style={{ color: colors.textPrimary }}
         >
           {winner.name}
         </h3>
-        <p 
+        <p
           className="text-sm leading-relaxed line-clamp-2"
           style={{ color: colors.textSecondary }}
         >
@@ -236,18 +236,18 @@ interface CategoryPrizesProps {
 
 function CategoryPrizes({ title, prizes }: CategoryPrizesProps) {
   return (
-    <div 
+    <div
       className="rounded-2xl p-6 border transition-all duration-300 hover:shadow-lg"
-      style={{ 
+      style={{
         borderColor: colors.borderLight,
-        backgroundColor: colors.cardBackground 
+        backgroundColor: colors.cardBackground
       }}
     >
-      <h3 
+      <h3
         className="text-xl font-bold mb-5 pb-3 border-b"
-        style={{ 
+        style={{
           color: colors.accent,
-          borderColor: colors.borderLight 
+          borderColor: colors.borderLight
         }}
       >
         {title}
@@ -255,14 +255,14 @@ function CategoryPrizes({ title, prizes }: CategoryPrizesProps) {
       <div className="space-y-3">
         {prizes.map((item, idx) => (
           <div key={idx} className="flex justify-between items-center">
-            <span 
+            <span
               className="text-sm flex items-center gap-2"
               style={{ color: colors.textSecondary }}
             >
               <span className="text-lg">{item.emoji}</span>
               {item.label}
             </span>
-            <span 
+            <span
               className="font-bold text-lg"
               style={{ color: colors.textPrimary }}
             >
@@ -292,13 +292,13 @@ export default function HomePage() {
     ...(previousWinners.categories[1].winners.third?.map((w) => ({ ...w, position: '3rd Prize' })) || []),
   ];
 
-  const honorableMentions: WinnerWithPosition[] = 
+  const honorableMentions: WinnerWithPosition[] =
     previousWinners.honorableMentions?.map((w) => ({ ...w, position: 'Honorable Mention' })) || [];
 
   return (
     <div style={{ backgroundColor: colors.background }} className="min-h-screen">
       <Navigation />
-      
+
       {/* Hero Image Section */}
       <section className="relative w-full h-[70vh] overflow-hidden">
         <img
@@ -307,7 +307,7 @@ export default function HomePage() {
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-transparent" />
-        
+
         {/* Hero Text Overlay */}
         <div className="absolute inset-0 flex items-center justify-center px-4">
           <div className="text-center text-white max-w-4xl">
@@ -349,9 +349,9 @@ export default function HomePage() {
                 className="w-full h-full object-cover"
               />
             </div>
-            
+
             <div>
-              <h2 
+              <h2
                 className="text-4xl md:text-5xl font-bold mb-6"
                 style={{ color: colors.textPrimary }}
               >
@@ -359,13 +359,13 @@ export default function HomePage() {
                 <br />
                 <span style={{ color: colors.accent }}>Creative Excellence</span>
               </h2>
-              <p 
+              <p
                 className="text-lg mb-6 leading-relaxed"
                 style={{ color: colors.textSecondary }}
               >
                 At Imaginative Home, we combine premium design challenges with exceptional rewards. Whether it's a solo endeavor, a collaborative team effort, or a transformative concept – we celebrate every form of architectural innovation.
               </p>
-              <p 
+              <p
                 className="text-lg mb-8 leading-relaxed"
                 style={{ color: colors.textSecondary }}
               >
@@ -380,13 +380,13 @@ export default function HomePage() {
       <section className="py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 
+            <h2
               className="text-5xl md:text-6xl font-bold mb-4"
               style={{ color: colors.textPrimary }}
             >
               Previous Competition Winners
             </h2>
-            <p 
+            <p
               className="text-xl"
               style={{ color: colors.textSecondary }}
             >
@@ -397,13 +397,13 @@ export default function HomePage() {
           {/* Category 1 Winners */}
           <div className="mb-20">
             <div className="flex items-center gap-4 mb-8">
-              <h3 
+              <h3
                 className="text-3xl font-bold"
                 style={{ color: colors.textPrimary }}
               >
                 Category 1
               </h3>
-              <div 
+              <div
                 className="h-px flex-1"
                 style={{ backgroundColor: colors.borderLight }}
               />
@@ -422,13 +422,13 @@ export default function HomePage() {
           {/* Category 2 Winners */}
           <div className="mb-20">
             <div className="flex items-center gap-4 mb-8">
-              <h3 
+              <h3
                 className="text-3xl font-bold"
                 style={{ color: colors.textPrimary }}
               >
                 Category 2
               </h3>
-              <div 
+              <div
                 className="h-px flex-1"
                 style={{ backgroundColor: colors.borderLight }}
               />
@@ -448,13 +448,13 @@ export default function HomePage() {
           {honorableMentions.length > 0 && (
             <div>
               <div className="flex items-center gap-4 mb-8">
-                <h3 
+                <h3
                   className="text-3xl font-bold"
                   style={{ color: colors.textPrimary }}
                 >
                   Honorable Mentions
                 </h3>
-                <div 
+                <div
                   className="h-px flex-1"
                   style={{ backgroundColor: colors.borderLight }}
                 />
@@ -470,6 +470,28 @@ export default function HomePage() {
               </div>
             </div>
           )}
+
+          <div className='flex justify-center mt-20'>
+            <Link
+              href="/pastWinners"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:translate-x-0.5"
+              style={{
+                backgroundColor: colors.accent,
+                color: colors.textWhite,
+              }}
+            >
+              View All Past Winners
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </div>
+
         </div>
       </section>
 
