@@ -13,7 +13,7 @@ export default function AboutPage() {
           <img
             src="/about-us-banner.png"
             alt="Modern architecture"
-            className="w-full h-full object-contain"
+            className="w-full object-contain"
           />
         </div>
       </div>
@@ -97,12 +97,13 @@ export default function AboutPage() {
       {/* Why Choose Us */}
       <section className="px-4 sm:px-6 lg:px-8 py-28">
         <div className="max-w-7xl mx-auto">
-          <p
-            className="text-xs uppercase tracking-widest font-semibold mb-16"
-            style={{ color: colors.accent }}
+          <h2
+            className="text-4xl md:text-5xl font-bold mb-16 text-center"
+            style={{ color: colors.textPrimary }}
           >
-            ⚡ Why choose us
-          </p>
+            Why choose us
+          </h2>
+
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div
@@ -193,13 +194,6 @@ export default function AboutPage() {
             </div>
 
             <div className="space-y-8">
-              <p
-                className="text-xs uppercase tracking-widest font-semibold"
-                style={{ color: colors.accent }}
-              >
-                ⚡ As you wish
-              </p>
-
               <h2
                 className="text-4xl md:text-5xl font-bold leading-tight"
                 style={{ color: colors.textPrimary }}
