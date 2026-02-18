@@ -158,6 +158,10 @@ export default function RegistrationFees() {
         <SectionHeading>Registration Fees</SectionHeading>
         <div className="space-y-2">
           {(Object.keys(fees) as Tier[]).map((tier) => {
+            console.log(tier)
+            if (tier != "Early Bird Registration") {
+              return null;
+            }
             const amount = fees[tier][feeKey][teamType];
             const { label, color, bg, border, dot } = tierMeta[tier];
             return (

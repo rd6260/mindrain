@@ -259,15 +259,9 @@ export default function CompetitionPage() {
         <section className="py-28 px-4 sm:px-6 lg:px-8 relative">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16 animate-fade-in-up">
-              <h2 className="text-5xl md:text-6xl font-bold mb-6 gradient-text">
+              <h2 className="text-5xl md:text-6xl font-bold mb-6 ">
                 Prize Pool
               </h2>
-              <div
-                className="w-32 h-1.5 mx-auto rounded-full"
-                style={{
-                  background: `linear-gradient(90deg, transparent, ${colors.accent}, transparent)`
-                }}
-              />
             </div>
 
             <div className="grid md:grid-cols-2 gap-10">
@@ -277,8 +271,7 @@ export default function CompetitionPage() {
                 style={{ backgroundColor: colors.white, borderColor: colors.borderLight }}
               >
                 <h3
-                  className="text-3xl font-bold mb-8 pb-4 border-b-2"
-                  style={{ color: colors.accent, borderColor: colors.accent }}
+                  className="text-xl font-bold mb-8 pb-4 border-b-2"
                 >
                   Category 1 (1st & 2nd Year)
                 </h3>
@@ -307,8 +300,7 @@ export default function CompetitionPage() {
                 style={{ backgroundColor: colors.white, borderColor: colors.borderLight, animationDelay: '0.2s' }}
               >
                 <h3
-                  className="text-3xl font-bold mb-8 pb-4 border-b-2"
-                  style={{ color: colors.accent, borderColor: colors.accent }}
+                  className="text-xl font-bold mb-8 pb-4 border-b-2"
                 >
                   Category 2 (3rd, 4th & 5th Year)
                 </h3>

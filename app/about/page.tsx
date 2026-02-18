@@ -185,7 +185,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="rounded-2xl overflow-hidden shadow-xl" style={{ aspectRatio: '4/3' }}>
               <img
-                src="https://images.unsplash.com/photo-1479839672679-a46483c0e7c8?w=800&q=80"
+                src="/about-us-01.png"
                 alt="Architecture competition"
                 className="w-full h-full object-cover"
               />
