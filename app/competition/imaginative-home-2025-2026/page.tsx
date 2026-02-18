@@ -8,6 +8,7 @@ import { ImportantDate } from '@/types';
 import DownloadBriefModal, { BriefFile } from '@/app/components/DownloadModal';
 import { useEffect, useState } from 'react';
 import Navigation from '@/app/components/Navigation';
+import RegistrationFees from '@/app/components/RegistrationFees';
 
 
 const TUHBriefFiles: BriefFile[] = [
@@ -287,7 +288,7 @@ export default function CompetitionPage() {
 
         {/* Registration Fees */}
         <section id="register" className="py-20 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-4xl mx-auto">
             <h2
               className="text-4xl md:text-5xl font-bold text-center mb-12"
               style={{ color: colors.textPrimary }}
@@ -295,173 +296,9 @@ export default function CompetitionPage() {
               Registration Fees
             </h2>
 
-            <div className="space-y-8">
-              {/* Early Bird */}
-              <div
-                className="rounded-2xl p-8"
-                style={{ backgroundColor: colors.white }}
-              >
-                <h3
-                  className="text-2xl font-bold mb-6"
-                  style={{ color: colors.accent }}
-                >
-                  Early Bird Registration
-                </h3>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <h4
-                      className="font-semibold mb-3"
-                      style={{ color: colors.textPrimary }}
-                    >
-                      Indian Applications
-                    </h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span style={{ color: colors.textSecondary }}>Solo:</span>
-                        <span className="font-semibold">₹349</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span style={{ color: colors.textSecondary }}>Group:</span>
-                        <span className="font-semibold">₹999</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <h4
-                      className="font-semibold mb-3"
-                      style={{ color: colors.textPrimary }}
-                    >
-                      International Applications
-                    </h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span style={{ color: colors.textSecondary }}>Solo:</span>
-                        <span className="font-semibold">$25</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span style={{ color: colors.textSecondary }}>Group:</span>
-                        <span className="font-semibold">$69</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <RegistrationFees/>
 
-              {/* Advance */}
-              <div
-                className="rounded-2xl p-8"
-                style={{ backgroundColor: colors.white }}
-              >
-                <h3
-                  className="text-2xl font-bold mb-6"
-                  style={{ color: colors.accent }}
-                >
-                  Advance Registration
-                </h3>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <h4
-                      className="font-semibold mb-3"
-                      style={{ color: colors.textPrimary }}
-                    >
-                      Indian Applications
-                    </h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span style={{ color: colors.textSecondary }}>Solo:</span>
-                        <span className="font-semibold">₹699</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span style={{ color: colors.textSecondary }}>Group:</span>
-                        <span className="font-semibold">₹1,499</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <h4
-                      className="font-semibold mb-3"
-                      style={{ color: colors.textPrimary }}
-                    >
-                      International Applications
-                    </h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span style={{ color: colors.textSecondary }}>Solo:</span>
-                        <span className="font-semibold">$35</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span style={{ color: colors.textSecondary }}>Group:</span>
-                        <span className="font-semibold">$99</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
 
-              {/* Late */}
-              <div
-                className="rounded-2xl p-8"
-                style={{ backgroundColor: colors.white }}
-              >
-                <h3
-                  className="text-2xl font-bold mb-6"
-                  style={{ color: colors.accent }}
-                >
-                  Late Minute Registration
-                </h3>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <h4
-                      className="font-semibold mb-3"
-                      style={{ color: colors.textPrimary }}
-                    >
-                      Indian Applications
-                    </h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span style={{ color: colors.textSecondary }}>Solo:</span>
-                        <span className="font-semibold">₹999</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span style={{ color: colors.textSecondary }}>Group:</span>
-                        <span className="font-semibold">₹1,999</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <h4
-                      className="font-semibold mb-3"
-                      style={{ color: colors.textPrimary }}
-                    >
-                      International Applications
-                    </h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span style={{ color: colors.textSecondary }}>Solo:</span>
-                        <span className="font-semibold">$49</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span style={{ color: colors.textSecondary }}>Group:</span>
-                        <span className="font-semibold">$129</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="text-center mt-8">
-              <a
-                href="/registration?event_id=3f123e78-60d6-494d-b307-18c5b4c8ab7f"
-                className="mt-16 px-16 py-5 rounded-full text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow inline-block text-center"
-                style={{
-                  background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
-                }}
-                data-testid="register-now-button"
-              >
-                Register Now →
-              </a>
-            </div>
           </div>
         </section>
 
