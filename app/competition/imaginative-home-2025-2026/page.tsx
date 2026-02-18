@@ -572,7 +572,7 @@ export default function CompetitionPage() {
       <DownloadBriefModal
         isOpen={isPressDownloadOpen}
         onClose={() => setIsPressDownloadOpen(false)}
-        title="Download Brief"
+        title="Download Press"
         subtitle="The Unreal House — select files to download"
         files={TUHBriefFiles}
       />
