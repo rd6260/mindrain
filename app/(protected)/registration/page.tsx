@@ -492,7 +492,7 @@ function RegistrationContent() {
                 India
               </ToggleBtn>
               <ToggleBtn active={countryType === 'Other'} onClick={() => setCountryType('Other')} disabled={isLoading}>
-                Other
+                Others
               </ToggleBtn>
             </div>
             {countryType === 'Other' && (
@@ -514,7 +514,7 @@ function RegistrationContent() {
                 Group A — Monetary Award
               </ToggleBtn>
               <ToggleBtn active={group === 'B'} onClick={() => setGroup('B')} disabled={isLoading}>
-                Group B — No Award
+                Group B — No Monetary Award
               </ToggleBtn>
             </div>
           </div>
