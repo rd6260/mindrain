@@ -574,7 +574,7 @@ export default function CompetitionPage() {
         onClose={() => setIsPressDownloadOpen(false)}
         title="Download Press"
         subtitle="The Unreal House — select files to download"
-        files={TUHBriefFiles}
+        files={TUHPressKitFiles}
       />
 
     </>
