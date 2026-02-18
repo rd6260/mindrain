@@ -6,7 +6,8 @@ import Footer from '@/components/Footer';
 import Timeline from '@/components/Timeline';
 import { ImportantDate } from '@/types';
 import DownloadBriefModal, { BriefFile } from '@/components/DownloadModal';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import Navigation from '@/components/Navigation';
 
 
 const TUHBriefFiles: BriefFile[] = [
@@ -64,9 +65,36 @@ const importantDates: ImportantDate[] = [
 export default function CompetitionPage() {
   const [isBriefDownloadOpen, setIsBriefDownloadOpen] = useState(false);
   const [isPressDownloadOpen, setIsPressDownloadOpen] = useState(false);
+  const [navOpacity, setNavOpacity] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const fadeStart = 40;
+      const fadeEnd = 200;
+      const opacity = Math.min(Math.max((scrollY - fadeStart) / (fadeEnd - fadeStart), 0), 1);
+      setNavOpacity(opacity);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <>
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 50,
+          opacity: navOpacity,
+          transition: 'opacity 0.15s linear',
+          pointerEvents: navOpacity < 0.1 ? 'none' : 'auto',
+        }}
+      >
+        <Navigation />
+      </div>
       <div style={{ backgroundColor: colors.background }} className="min-h-screen relative overflow-hidden">
         {/* Decorative background elements */}
         <div
