@@ -1,6 +1,6 @@
 import { colors } from '@/utils/colors';
-import Footer from '@/components/Footer';
-import Navigation from '@/components/Navigation';
+import Footer from '@/app/components/Footer';
+import Navigation from '@/app/components/Navigation';
 
 export default function AboutPage() {
   return (
