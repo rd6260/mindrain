@@ -3,17 +3,15 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Winner } from '@/types';
-import Navigation from '@/components/Navigation';
-import Footer from '@/components/Footer';
+import Navigation from '@/app/components/Navigation';
+import Footer from '@/app/components/Footer';
 import { colors } from '@/utils/colors';
 import { previousWinners } from '@/data/winners';
-import LiveCompetitionCard from '@/components/LiveCompetitionCard';
+import LiveCompetitionCard from '@/app/components/LiveCompetitionCard';
+import localFont from "next/font/local";
 
-import { Changa } from "next/font/google"
-
-const changa = Changa({
-  subsets: ["latin"],
-  weight: ["500"],
+const FEARLogo = localFont({
+  src: "../fonts/FEARLogo-Regular.woff2"
 })
 
 
@@ -143,7 +141,7 @@ export default function HomePage() {
         {/* Hero Text Overlay */}
         <div className="absolute inset-0 flex items-center justify-center px-4">
           <div className="text-center text-white max-w-4xl">
-            <h1 className="text-6xl md:text-8xl font-bold mb-6 tracking-tight">
+            <h1 className={`${FEARLogo.className} text-6xl md:text-8xl mb-6 tracking-tight`}>
               Mind Rain
             </h1>
             <p className="text-xl md:text-2xl mb-8 font-light">

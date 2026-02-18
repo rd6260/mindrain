@@ -26,6 +26,20 @@ body {
   font-style: normal;
 }
 
+/* @font-face { */
+/*   font-family: 'FEAR Logo'; */
+/*   src: url('/fonts/FEARLogo-Regular.woff2') format('woff2'); */
+/*   font-weight: 400; */
+/*   font-display: swap; */
+/*   font-style: normal; */
+/* } */
+
+/* @font-face { */
+/*     font-family: "FEAR Logo"; */
+/*     src: url("https://db.onlinewebfonts.com/t/03a437fb6a2983a432282bd0f383c3fc.woff2")format("woff2"), */
+/* } */
+
+
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-inter), serif;

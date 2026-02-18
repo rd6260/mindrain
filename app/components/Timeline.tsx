@@ -132,12 +132,6 @@ export default function Timeline({ dates = importantDates }: TimelineProps) {
 
                     {/* Content */}
                     <div className="relative pl-4">
-                      <div 
-                        className="text-xs font-bold uppercase tracking-wider mb-2 opacity-60"
-                        style={{ color: colors.accent }}
-                      >
-                        Milestone {index + 1}
-                      </div>
                       <h3 
                         className="text-lg md:text-xl font-bold mb-3 leading-tight"
                         style={{ color: colors.textPrimary }}

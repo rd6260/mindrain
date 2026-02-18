@@ -5,6 +5,12 @@ import { colors } from '@/utils/colors';
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
+import localFont from "next/font/local";
+
+const FEARLogo = localFont({
+  src: "../fonts/FEARLogo-Regular.woff2"
+})
+
 
 const navItems = [
   {
@@ -269,7 +275,7 @@ function MobileNav({ user }: { user: User | null }) {
         >
           <Link
             href="/home"
-            className="text-xl font-bold tracking-tight"
+            className={`${FEARLogo.className} text-xl tracking-tight`}
             style={{ color: colors.accent }}
             onClick={() => setIsOpen(false)}
           >
@@ -465,7 +471,7 @@ export default function Navigation() {
         <div className="flex justify-between items-center h-20">
           <Link
             href="/home"
-            className="text-2xl font-bold tracking-tight transition-all duration-300 hover:scale-105"
+            className={`${FEARLogo.className} text-2xl font-bold tracking-tight transition-all duration-300 hover:scale-105`}
             style={{ color: colors.accent }}
           >
             Mind Rain

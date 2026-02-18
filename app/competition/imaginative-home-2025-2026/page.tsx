@@ -2,12 +2,12 @@
 
 import Image from 'next/image';
 import { colors } from '@/utils/colors';
-import Footer from '@/components/Footer';
-import Timeline from '@/components/Timeline';
+import Footer from '@/app/components/Footer';
+import Timeline from '@/app/components/Timeline';
 import { ImportantDate } from '@/types';
-import DownloadBriefModal, { BriefFile } from '@/components/DownloadModal';
+import DownloadBriefModal, { BriefFile } from '@/app/components/DownloadModal';
 import { useEffect, useState } from 'react';
-import Navigation from '@/components/Navigation';
+import Navigation from '@/app/components/Navigation';
 
 
 const TUHBriefFiles: BriefFile[] = [
