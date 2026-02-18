@@ -5,6 +5,47 @@ import { colors } from '@/utils/colors';
 import Footer from '@/components/Footer';
 import Timeline from '@/components/Timeline';
 import { ImportantDate } from '@/types';
+import DownloadBriefModal, { BriefFile } from '@/components/DownloadModal';
+import { useState } from 'react';
+
+
+const TUHBriefFiles: BriefFile[] = [
+  {
+    name: "Important Dates & Calendar",
+    description: "Key deadlines and schedule",
+    url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/Important%20Dates-Calender.pdf",
+  },
+  {
+    name: "Terms & Conditions",
+    description: "Important rules and regulations",
+    url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/T&C%20(Important).pdf",
+  },
+  {
+    name: "Complete Brief",
+    description: "Full competition brief document",
+    url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/The%20Unreal%20House%20(Complete%20Brief).pdf",
+  },
+  {
+    name: "Brief (Print Format)",
+    description: "Print-ready version of the brief",
+    url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/The%20Unreal%20House%20(print%20format).pdf",
+  },
+];
+
+const TUHPressKitFiles: BriefFile[] = [
+  {
+    name: "A4 A3 Poster",
+    description: "A4 and A3 size Campaign Posters",
+    url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/A4_A3%20campaign%20poster.png",
+  },
+  {
+    name: "Instagram Post",
+    description: "Instragram Post sized posters",
+    url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/instagram%20post%20campaign.png",
+  },
+];
+
+
 
 const importantDates: ImportantDate[] = [
   { label: 'Campaign Start Date', date: '25 January 2026' },
@@ -21,470 +62,493 @@ const importantDates: ImportantDate[] = [
 ];
 
 export default function CompetitionPage() {
+  const [isBriefDownloadOpen, setIsBriefDownloadOpen] = useState(false);
+  const [isPressDownloadOpen, setIsPressDownloadOpen] = useState(false);
 
   return (
-    <div style={{ backgroundColor: colors.background }} className="min-h-screen relative overflow-hidden">
-      {/* Decorative background elements */}
-      <div
-        className="fixed top-0 right-1/4 w-[700px] h-[700px] rounded-full blur-3xl opacity-5 pointer-events-none"
-        style={{ backgroundColor: colors.accent }}
-      />
+    <>
+      <div style={{ backgroundColor: colors.background }} className="min-h-screen relative overflow-hidden">
+        {/* Decorative background elements */}
+        <div
+          className="fixed top-0 right-1/4 w-[700px] h-[700px] rounded-full blur-3xl opacity-5 pointer-events-none"
+          style={{ backgroundColor: colors.accent }}
+        />
 
-      {/* Hero Section with Background Image */}
-      <section className="relative min-h-screen flex items-center justify-start px-4 sm:px-6 lg:px-8">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/competition-hero.jpg"
-            alt="Imaginative Home Competition"
-            fill
-            className="object-cover opacity-100"
-            priority
-          />
-        </div>
-
-        {/* Content */}
-        <div className="relative z-10 ml-24 max-w-5xl text-left text-gray-200 animate-fade-in">
-          <h1 className="space-y-4">
-            <span
-              className="block text-2xl md:text-4xl font-medium tracking-wide"
-            >
-              Architecture Competition
-            </span>
-            <span
-              className="block text-xl md:text-2xl font-light italic"
-            >
-              edition 06
-            </span>
-
-            <span
-              className="font-['Technor-Variable'] block text-6xl md:text-8xl lg:text-9xl font-black my-6 leading-tight"
-            >
-              The Unreal House
-            </span>
-            <span
-              className="block text-2xl md:text-4xl font-medium tracking-wide"
-            >
-              An Imaginary Home Design Challenge
-            </span>
-          </h1>
-
-          <div className="flex gap-8">
-            <a
-              href="/registration?event_id=3f123e78-60d6-494d-b307-18c5b4c8ab7f"
-              className="mt-16 px-16 py-5 rounded-full text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow inline-block text-center"
-              style={{
-                background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
-              }}
-              data-testid="register-now-button"
-            >
-              Register Now →
-            </a>
-            <a
-              className="mt-16 px-16 py-5 rounded-full text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow inline-block text-center"
-              style={{
-                background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
-              }}
-              data-testid="register-now-button"
-            >
-              Download Brief ↓
-            </a>
-            <a
-              className="mt-16 px-16 py-5 rounded-full text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow inline-block text-center"
-              style={{
-                background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
-              }}
-              data-testid="register-now-button"
-            >
-              Press Kit ↓
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Prize Pool Section */}
-      <section className="py-28 px-4 sm:px-6 lg:px-8 relative">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16 animate-fade-in-up">
-            <h2
-              className="text-5xl md:text-6xl font-bold mb-6 gradient-text"
-            >
-              Prize Pool
-            </h2>
-            <div
-              className="w-32 h-1.5 mx-auto rounded-full"
-              style={{
-                background: `linear-gradient(90deg, transparent, ${colors.accent}, transparent)`
-              }}
+        {/* Hero Section with Background Image */}
+        <section className="relative min-h-screen flex items-center justify-start px-4 sm:px-6 lg:px-8">
+          {/* Background Image */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/competition-hero.jpg"
+              alt="Imaginative Home Competition"
+              fill
+              className="object-cover opacity-100"
+              priority
             />
           </div>
 
-
-          <div className="grid md:grid-cols-2 gap-10">
-            {/* Category 1 */}
-            <div
-              className="rounded-3xl p-10 shadow-xl hover-lift animate-fade-in-up border-2"
-              style={{
-                backgroundColor: colors.white,
-                borderColor: colors.borderLight
-              }}
-            >
-              <h3
-                className="text-3xl font-bold mb-8 pb-4 border-b-2"
-                style={{
-                  color: colors.accent,
-                  borderColor: colors.accent
-                }}
+          {/* Content */}
+          <div className="relative z-10 ml-24 max-w-5xl text-left text-gray-200 animate-fade-in">
+            <h1 className="space-y-4">
+              <span
+                className="block text-2xl md:text-4xl font-medium tracking-wide"
               >
-                Category 1
-              </h3>
-              <div className="space-y-6">
-                {[
-                  { label: '1st Prize', amount: '₹11,000', emoji: '🥇' },
-                  { label: '2nd Prize', amount: '₹8,000', emoji: '🥈' },
-                  { label: '3rd Prize', amount: '₹6,000', emoji: '🥉' },
-                ].map((prize, idx) => (
-                  <div key={idx} className="flex justify-between items-center group p-4 rounded-xl transition-all hover:bg-gray-50">
-                    <span
-                      className="text-xl font-medium flex items-center gap-3"
-                      style={{ color: colors.textSecondary }}
-                    >
-                      <span className="text-3xl">{prize.emoji}</span>
-                      {prize.label}
-                    </span>
-                    <span
-                      className="text-3xl font-black group-hover:scale-110 transition-transform"
-                      style={{ color: colors.textPrimary }}
-                    >
-                      {prize.amount}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Category 2 */}
-            <div
-              className="rounded-3xl p-10 shadow-xl hover-lift animate-fade-in-up border-2"
-              style={{
-                backgroundColor: colors.white,
-                borderColor: colors.borderLight,
-                animationDelay: '0.2s'
-              }}
-            >
-              <h3
-                className="text-3xl font-bold mb-8 pb-4 border-b-2"
-                style={{
-                  color: colors.accent,
-                  borderColor: colors.accent
-                }}
+                Architecture Competition
+              </span>
+              <span
+                className="block text-xl md:text-2xl font-light italic"
               >
-                Category 2
-              </h3>
-              <div className="space-y-6">
-                {[
-                  { label: '1st Prize', amount: '₹11,000', emoji: '🥇' },
-                  { label: '2nd Prize', amount: '₹8,000', emoji: '🥈' },
-                  { label: '3rd Prize', amount: '₹6,000', emoji: '🥉' },
-                ].map((prize, idx) => (
-                  <div key={idx} className="flex justify-between items-center group p-4 rounded-xl transition-all hover:bg-gray-50">
-                    <span
-                      className="text-xl font-medium flex items-center gap-3"
-                      style={{ color: colors.textSecondary }}
-                    >
-                      <span className="text-3xl">{prize.emoji}</span>
-                      {prize.label}
-                    </span>
-                    <span
-                      className="text-3xl font-black group-hover:scale-110 transition-transform"
-                      style={{ color: colors.textPrimary }}
-                    >
-                      {prize.amount}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+                edition 06
+              </span>
 
-      {/* Important Dates Timeline */}
-      <section id="timeline" className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto">
-          <h2
-            className="text-4xl md:text-5xl font-bold text-center mb-16"
-            style={{ color: colors.textPrimary }}
-          >
-            Important Dates
-          </h2>
-          <Timeline dates={importantDates} />
-        </div>
-      </section>
-
-      {/* Registration Fees */}
-      <section id="register" className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <h2
-            className="text-4xl md:text-5xl font-bold text-center mb-12"
-            style={{ color: colors.textPrimary }}
-          >
-            Registration Fees
-          </h2>
-
-          <div className="space-y-8">
-            {/* Early Bird */}
-            <div
-              className="rounded-2xl p-8"
-              style={{ backgroundColor: colors.white }}
-            >
-              <h3
-                className="text-2xl font-bold mb-6"
-                style={{ color: colors.accent }}
+              <span
+                className="font-['Technor-Variable'] block text-6xl md:text-8xl lg:text-9xl font-black my-6 leading-tight"
               >
-                Early Bird Registration
-              </h3>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h4
-                    className="font-semibold mb-3"
-                    style={{ color: colors.textPrimary }}
-                  >
-                    Indian Applications
-                  </h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span style={{ color: colors.textSecondary }}>Solo:</span>
-                      <span className="font-semibold">₹349</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span style={{ color: colors.textSecondary }}>Group:</span>
-                      <span className="font-semibold">₹999</span>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <h4
-                    className="font-semibold mb-3"
-                    style={{ color: colors.textPrimary }}
-                  >
-                    International Applications
-                  </h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span style={{ color: colors.textSecondary }}>Solo:</span>
-                      <span className="font-semibold">$25</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span style={{ color: colors.textSecondary }}>Group:</span>
-                      <span className="font-semibold">$69</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Advance */}
-            <div
-              className="rounded-2xl p-8"
-              style={{ backgroundColor: colors.white }}
-            >
-              <h3
-                className="text-2xl font-bold mb-6"
-                style={{ color: colors.accent }}
+                The Unreal House
+              </span>
+              <span
+                className="block text-2xl md:text-4xl font-medium tracking-wide"
               >
-                Advance Registration
-              </h3>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h4
-                    className="font-semibold mb-3"
-                    style={{ color: colors.textPrimary }}
-                  >
-                    Indian Applications
-                  </h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span style={{ color: colors.textSecondary }}>Solo:</span>
-                      <span className="font-semibold">₹699</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span style={{ color: colors.textSecondary }}>Group:</span>
-                      <span className="font-semibold">₹1,499</span>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <h4
-                    className="font-semibold mb-3"
-                    style={{ color: colors.textPrimary }}
-                  >
-                    International Applications
-                  </h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span style={{ color: colors.textSecondary }}>Solo:</span>
-                      <span className="font-semibold">$35</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span style={{ color: colors.textSecondary }}>Group:</span>
-                      <span className="font-semibold">$99</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+                An Imaginary Home Design Challenge
+              </span>
+            </h1>
 
-            {/* Late */}
-            <div
-              className="rounded-2xl p-8"
-              style={{ backgroundColor: colors.white }}
-            >
-              <h3
-                className="text-2xl font-bold mb-6"
-                style={{ color: colors.accent }}
-              >
-                Late Minute Registration
-              </h3>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h4
-                    className="font-semibold mb-3"
-                    style={{ color: colors.textPrimary }}
-                  >
-                    Indian Applications
-                  </h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span style={{ color: colors.textSecondary }}>Solo:</span>
-                      <span className="font-semibold">₹999</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span style={{ color: colors.textSecondary }}>Group:</span>
-                      <span className="font-semibold">₹1,999</span>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <h4
-                    className="font-semibold mb-3"
-                    style={{ color: colors.textPrimary }}
-                  >
-                    International Applications
-                  </h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span style={{ color: colors.textSecondary }}>Solo:</span>
-                      <span className="font-semibold">$49</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span style={{ color: colors.textSecondary }}>Group:</span>
-                      <span className="font-semibold">$129</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="text-center mt-8">
-            <a
-              href="/registration?event_id=3f123e78-60d6-494d-b307-18c5b4c8ab7f"
-              className="mt-16 px-16 py-5 rounded-full text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow inline-block text-center"
-              style={{
-                background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
-              }}
-              data-testid="register-now-button"
-            >
-              Register Now →
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Discount Information */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          <h2
-            className="text-4xl md:text-5xl font-bold text-center mb-12"
-            style={{ color: colors.textPrimary }}
-          >
-            Student Discounts
-          </h2>
-
-          <div
-            className="rounded-2xl p-8 md:p-12"
-            style={{ backgroundColor: colors.white }}
-          >
-            <p
-              className="text-lg mb-6 leading-relaxed"
-              style={{ color: colors.textSecondary }}
-            >
-              Participate and avail discount <span className="font-bold">Flat 35%</span>
-            </p>
-            <p
-              className="text-lg mb-6 leading-relaxed"
-              style={{ color: colors.textSecondary }}
-            >
-              The Mind Rain Competition Team welcomes participation from universities, colleges, and design schools
-              across the world.
-            </p>
-
-            <p
-              className="text-lg mb-6 leading-relaxed"
-              style={{ color: colors.textSecondary }}
-            >
-              Students can avail exclusive discounts through group registration offers (valid for <span className="font-bold">30 or more</span> participants
-              registering from the same institution).
-            </p>
-
-            <p
-              className="text-lg mb-8 leading-relaxed"
-              style={{ color: colors.textSecondary }}
-            >
-              This is a great opportunity for faculty and mentors to encourage students to think creatively and explore
-              imaginative architecture beyond textbooks.
-            </p>
-
-            <div
-              className="rounded-xl p-6 mb-6"
-              style={{ backgroundColor: colors.cardBackground }}
-            >
-              <h3
-                className="text-xl font-semibold mb-4"
-                style={{ color: colors.textPrimary }}
-              >
-                To apply for student discounts:
-              </h3>
-              <ul className="space-y-2 list-disc list-inside">
-                <li style={{ color: colors.textSecondary }}>
-                  Email us from your official university e-mail ID
-                </li>
-                <li style={{ color: colors.textSecondary }}>
-                  Include your university name, your role, and number of participants
-                </li>
-                <li style={{ color: colors.textSecondary }}>
-                  Only recognized university representatives (professors/staff) are eligible to request discounted access on behalf of students
-                </li>
-              </ul>
-            </div>
-
-            <div className="text-center">
+            <div className="flex gap-8">
               <a
-                href="mailto:contact@mindrain.org"
-                className="inline-block px-8 py-3 rounded-full text-white font-medium transition-all hover:opacity-90"
-                style={{ backgroundColor: colors.accent }}
-                data-testid="discount-email-link"
+                href="/registration?event_id=3f123e78-60d6-494d-b307-18c5b4c8ab7f"
+                className="mt-16 px-16 py-5 rounded-full text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow inline-block text-center"
+                style={{
+                  background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
+                }}
+                data-testid="register-now-button"
               >
-                Contact for Group Discounts
+                Register Now →
+              </a>
+              <button
+                className="mt-16 px-16 py-5 rounded-full text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow"
+                style={{
+                  background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
+                }}
+                data-testid="download-brief-button"
+                onClick={() => setIsBriefDownloadOpen(true)}
+              >
+                Download Brief ↓
+              </button>
+              <button
+                className="mt-16 px-16 py-5 rounded-full text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow"
+                style={{
+                  background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
+                }}
+                data-testid="press-kit-button"
+                onClick={() => setIsPressDownloadOpen(true)}
+              >
+                Press Kit ↓
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Prize Pool Section */}
+        <section className="py-28 px-4 sm:px-6 lg:px-8 relative">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16 animate-fade-in-up">
+              <h2
+                className="text-5xl md:text-6xl font-bold mb-6 gradient-text"
+              >
+                Prize Pool
+              </h2>
+              <div
+                className="w-32 h-1.5 mx-auto rounded-full"
+                style={{
+                  background: `linear-gradient(90deg, transparent, ${colors.accent}, transparent)`
+                }}
+              />
+            </div>
+
+
+            <div className="grid md:grid-cols-2 gap-10">
+              {/* Category 1 */}
+              <div
+                className="rounded-3xl p-10 shadow-xl hover-lift animate-fade-in-up border-2"
+                style={{
+                  backgroundColor: colors.white,
+                  borderColor: colors.borderLight
+                }}
+              >
+                <h3
+                  className="text-3xl font-bold mb-8 pb-4 border-b-2"
+                  style={{
+                    color: colors.accent,
+                    borderColor: colors.accent
+                  }}
+                >
+                  Category 1
+                </h3>
+                <div className="space-y-6">
+                  {[
+                    { label: '1st Prize', amount: '₹11,000', emoji: '🥇' },
+                    { label: '2nd Prize', amount: '₹8,000', emoji: '🥈' },
+                    { label: '3rd Prize', amount: '₹6,000', emoji: '🥉' },
+                  ].map((prize, idx) => (
+                    <div key={idx} className="flex justify-between items-center group p-4 rounded-xl transition-all hover:bg-gray-50">
+                      <span
+                        className="text-xl font-medium flex items-center gap-3"
+                        style={{ color: colors.textSecondary }}
+                      >
+                        <span className="text-3xl">{prize.emoji}</span>
+                        {prize.label}
+                      </span>
+                      <span
+                        className="text-3xl font-black group-hover:scale-110 transition-transform"
+                        style={{ color: colors.textPrimary }}
+                      >
+                        {prize.amount}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Category 2 */}
+              <div
+                className="rounded-3xl p-10 shadow-xl hover-lift animate-fade-in-up border-2"
+                style={{
+                  backgroundColor: colors.white,
+                  borderColor: colors.borderLight,
+                  animationDelay: '0.2s'
+                }}
+              >
+                <h3
+                  className="text-3xl font-bold mb-8 pb-4 border-b-2"
+                  style={{
+                    color: colors.accent,
+                    borderColor: colors.accent
+                  }}
+                >
+                  Category 2
+                </h3>
+                <div className="space-y-6">
+                  {[
+                    { label: '1st Prize', amount: '₹11,000', emoji: '🥇' },
+                    { label: '2nd Prize', amount: '₹8,000', emoji: '🥈' },
+                    { label: '3rd Prize', amount: '₹6,000', emoji: '🥉' },
+                  ].map((prize, idx) => (
+                    <div key={idx} className="flex justify-between items-center group p-4 rounded-xl transition-all hover:bg-gray-50">
+                      <span
+                        className="text-xl font-medium flex items-center gap-3"
+                        style={{ color: colors.textSecondary }}
+                      >
+                        <span className="text-3xl">{prize.emoji}</span>
+                        {prize.label}
+                      </span>
+                      <span
+                        className="text-3xl font-black group-hover:scale-110 transition-transform"
+                        style={{ color: colors.textPrimary }}
+                      >
+                        {prize.amount}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Important Dates Timeline */}
+        <section id="timeline" className="py-20 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-5xl mx-auto">
+            <h2
+              className="text-4xl md:text-5xl font-bold text-center mb-16"
+              style={{ color: colors.textPrimary }}
+            >
+              Important Dates
+            </h2>
+            <Timeline dates={importantDates} />
+          </div>
+        </section>
+
+        {/* Registration Fees */}
+        <section id="register" className="py-20 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto">
+            <h2
+              className="text-4xl md:text-5xl font-bold text-center mb-12"
+              style={{ color: colors.textPrimary }}
+            >
+              Registration Fees
+            </h2>
+
+            <div className="space-y-8">
+              {/* Early Bird */}
+              <div
+                className="rounded-2xl p-8"
+                style={{ backgroundColor: colors.white }}
+              >
+                <h3
+                  className="text-2xl font-bold mb-6"
+                  style={{ color: colors.accent }}
+                >
+                  Early Bird Registration
+                </h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <h4
+                      className="font-semibold mb-3"
+                      style={{ color: colors.textPrimary }}
+                    >
+                      Indian Applications
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span style={{ color: colors.textSecondary }}>Solo:</span>
+                        <span className="font-semibold">₹349</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span style={{ color: colors.textSecondary }}>Group:</span>
+                        <span className="font-semibold">₹999</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <h4
+                      className="font-semibold mb-3"
+                      style={{ color: colors.textPrimary }}
+                    >
+                      International Applications
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span style={{ color: colors.textSecondary }}>Solo:</span>
+                        <span className="font-semibold">$25</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span style={{ color: colors.textSecondary }}>Group:</span>
+                        <span className="font-semibold">$69</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Advance */}
+              <div
+                className="rounded-2xl p-8"
+                style={{ backgroundColor: colors.white }}
+              >
+                <h3
+                  className="text-2xl font-bold mb-6"
+                  style={{ color: colors.accent }}
+                >
+                  Advance Registration
+                </h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <h4
+                      className="font-semibold mb-3"
+                      style={{ color: colors.textPrimary }}
+                    >
+                      Indian Applications
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span style={{ color: colors.textSecondary }}>Solo:</span>
+                        <span className="font-semibold">₹699</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span style={{ color: colors.textSecondary }}>Group:</span>
+                        <span className="font-semibold">₹1,499</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <h4
+                      className="font-semibold mb-3"
+                      style={{ color: colors.textPrimary }}
+                    >
+                      International Applications
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span style={{ color: colors.textSecondary }}>Solo:</span>
+                        <span className="font-semibold">$35</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span style={{ color: colors.textSecondary }}>Group:</span>
+                        <span className="font-semibold">$99</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Late */}
+              <div
+                className="rounded-2xl p-8"
+                style={{ backgroundColor: colors.white }}
+              >
+                <h3
+                  className="text-2xl font-bold mb-6"
+                  style={{ color: colors.accent }}
+                >
+                  Late Minute Registration
+                </h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <h4
+                      className="font-semibold mb-3"
+                      style={{ color: colors.textPrimary }}
+                    >
+                      Indian Applications
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span style={{ color: colors.textSecondary }}>Solo:</span>
+                        <span className="font-semibold">₹999</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span style={{ color: colors.textSecondary }}>Group:</span>
+                        <span className="font-semibold">₹1,999</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <h4
+                      className="font-semibold mb-3"
+                      style={{ color: colors.textPrimary }}
+                    >
+                      International Applications
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span style={{ color: colors.textSecondary }}>Solo:</span>
+                        <span className="font-semibold">$49</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span style={{ color: colors.textSecondary }}>Group:</span>
+                        <span className="font-semibold">$129</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center mt-8">
+              <a
+                href="/registration?event_id=3f123e78-60d6-494d-b307-18c5b4c8ab7f"
+                className="mt-16 px-16 py-5 rounded-full text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow inline-block text-center"
+                style={{
+                  background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
+                }}
+                data-testid="register-now-button"
+              >
+                Register Now →
               </a>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <Footer />
+        {/* Discount Information */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto">
+            <h2
+              className="text-4xl md:text-5xl font-bold text-center mb-12"
+              style={{ color: colors.textPrimary }}
+            >
+              Student Discounts
+            </h2>
 
-    </div>
+            <div
+              className="rounded-2xl p-8 md:p-12"
+              style={{ backgroundColor: colors.white }}
+            >
+              <p
+                className="text-lg mb-6 leading-relaxed"
+                style={{ color: colors.textSecondary }}
+              >
+                Participate and avail discount <span className="font-bold">Flat 35%</span>
+              </p>
+              <p
+                className="text-lg mb-6 leading-relaxed"
+                style={{ color: colors.textSecondary }}
+              >
+                The Mind Rain Competition Team welcomes participation from universities, colleges, and design schools
+                across the world.
+              </p>
+
+              <p
+                className="text-lg mb-6 leading-relaxed"
+                style={{ color: colors.textSecondary }}
+              >
+                Students can avail exclusive discounts through group registration offers (valid for <span className="font-bold">30 or more</span> participants
+                registering from the same institution).
+              </p>
+
+              <p
+                className="text-lg mb-8 leading-relaxed"
+                style={{ color: colors.textSecondary }}
+              >
+                This is a great opportunity for faculty and mentors to encourage students to think creatively and explore
+                imaginative architecture beyond textbooks.
+              </p>
+
+              <div
+                className="rounded-xl p-6 mb-6"
+                style={{ backgroundColor: colors.cardBackground }}
+              >
+                <h3
+                  className="text-xl font-semibold mb-4"
+                  style={{ color: colors.textPrimary }}
+                >
+                  To apply for student discounts:
+                </h3>
+                <ul className="space-y-2 list-disc list-inside">
+                  <li style={{ color: colors.textSecondary }}>
+                    Email us from your official university e-mail ID
+                  </li>
+                  <li style={{ color: colors.textSecondary }}>
+                    Include your university name, your role, and number of participants
+                  </li>
+                  <li style={{ color: colors.textSecondary }}>
+                    Only recognized university representatives (professors/staff) are eligible to request discounted access on behalf of students
+                  </li>
+                </ul>
+              </div>
+
+              <div className="text-center">
+                <a
+                  href="mailto:contact@mindrain.org"
+                  className="inline-block px-8 py-3 rounded-full text-white font-medium transition-all hover:opacity-90"
+                  style={{ backgroundColor: colors.accent }}
+                  data-testid="discount-email-link"
+                >
+                  Contact for Group Discounts
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <Footer />
+
+      </div>
+
+      <DownloadBriefModal
+        isOpen={isBriefDownloadOpen}
+        onClose={() => setIsBriefDownloadOpen(false)}
+        title="Download Brief"
+        subtitle="The Unreal House — select files to download"
+        files={TUHBriefFiles}
+      />
+
+      <DownloadBriefModal
+        isOpen={isPressDownloadOpen}
+        onClose={() => setIsPressDownloadOpen(false)}
+        title="Download Brief"
+        subtitle="The Unreal House — select files to download"
+        files={TUHBriefFiles}
+      />
+
+    </>
   );
 }
