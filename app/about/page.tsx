@@ -96,7 +96,7 @@ export default function AboutPage() {
       <section className="px-4 sm:px-6 lg:px-8 py-28">
         <div className="max-w-7xl mx-auto">
           <h2
-            className="text-4xl md:text-5xl font-bold mb-16 text-center"
+            className="text-4xl md:text-5xl font-bold mb-16 text-left"
             style={{ color: colors.textPrimary }}
           >
             Why choose us
@@ -137,7 +137,7 @@ export default function AboutPage() {
       <section className="px-4 sm:px-6 lg:px-8 pb-28">
         <div className="max-w-7xl mx-auto">
           <h2
-            className="text-4xl md:text-5xl font-bold mb-16 text-center"
+            className="text-4xl md:text-5xl font-bold mb-16 text-left"
             style={{ color: colors.textPrimary }}
           >
             What we offer

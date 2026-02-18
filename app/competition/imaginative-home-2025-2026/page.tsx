@@ -81,18 +81,7 @@ export default function CompetitionPage() {
 
   return (
     <>
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 50,
-          opacity: navOpacity,
-          transition: 'opacity 0.15s linear',
-          pointerEvents: navOpacity < 0.1 ? 'none' : 'auto',
-        }}
-      >
+      <div className="fixed top-0 left-0 right-0 z-50">
         <Navigation />
       </div>
       <div style={{ backgroundColor: colors.background }} className="min-h-screen relative overflow-hidden">
@@ -116,7 +105,7 @@ export default function CompetitionPage() {
           </div>
 
           {/* Content */}
-          <div className="relative z-10 ml-24 max-w-5xl text-left text-gray-200 animate-fade-in">
+          <div className="relative z-10 ml-24 mt-10 max-w-5xl text-left text-gray-200 animate-fade-in">
             <h1 className="space-y-4">
               <span
                 className="block text-2xl md:text-4xl font-medium tracking-wide"
@@ -144,7 +133,7 @@ export default function CompetitionPage() {
             <div className="flex gap-8">
               <a
                 href="/registration?event_id=3f123e78-60d6-494d-b307-18c5b4c8ab7f"
-                className="mt-16 px-16 py-5 rounded-full text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow inline-block text-center"
+                className="mt-16 px-16 py-5 rounded-lg text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow inline-block text-center"
                 style={{
                   background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
                 }}
@@ -153,7 +142,7 @@ export default function CompetitionPage() {
                 Register Now →
               </a>
               <button
-                className="mt-16 px-16 py-5 rounded-full text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow"
+                className="mt-16 px-16 py-5 rounded-lg text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow"
                 style={{
                   background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
                 }}
@@ -162,16 +151,16 @@ export default function CompetitionPage() {
               >
                 Download Brief ↓
               </button>
-              <button
-                className="mt-16 px-16 py-5 rounded-full text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow"
-                style={{
-                  background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
-                }}
-                data-testid="press-kit-button"
-                onClick={() => setIsPressDownloadOpen(true)}
+              <button className="group relative overflow-hidden border border-black mt-16 px-16 py-5 rounded-lg font-bold text-xl shadow-2xl cursor-pointer" onClick={() => setIsPressDownloadOpen(true)}
               >
-                Press Kit ↓
+                <span className="absolute inset-0 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]" style={{
+                  background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
+                }} />
+                <span className="relative z-10 uppercase text-black group-hover:text-white transition-colors duration-500">
+                  Press Kit ↓
+                </span>
               </button>
+
             </div>
           </div>
         </section>

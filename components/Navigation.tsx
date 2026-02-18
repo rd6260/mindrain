@@ -202,7 +202,25 @@ function MobileNav({ user }: { user: User | null }) {
   };
 
   return (
-    <div className="lg:hidden">
+    <div className="lg:hidden flex items-center gap-2">
+      {/* Auth Button */}
+      {user ? (
+        <Link
+          href="/profile"
+          className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:opacity-90"
+          style={{ backgroundColor: colors.accent, color: colors.background }}
+        >
+          Profile
+        </Link>
+      ) : (
+        <Link
+          href="/login"
+          className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:opacity-90"
+          style={{ backgroundColor: colors.accent, color: colors.background }}
+        >
+          Login
+        </Link>
+      )}
       {/* Hamburger Button */}
       <button
         className="p-2 rounded-lg transition-colors hover:bg-white/50"
