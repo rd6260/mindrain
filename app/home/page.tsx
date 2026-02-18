@@ -157,7 +157,7 @@ export default function HomePage() {
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <h2
-            className={`${changa.className} text-5xl md:text-6xl font-bold`}
+            className="text-5xl md:text-6xl font-bold"
             style={{ color: colors.textPrimary }}
           >
             Live Competitions

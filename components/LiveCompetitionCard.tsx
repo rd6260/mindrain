@@ -55,22 +55,22 @@ export default function LiveCompetitionCard() {
   return (
     <>
       <div
-        className="flex flex-row w-full font-sans rounded-lg"
+        className="flex flex-col lg:flex-row w-full font-sans rounded-lg"
         style={{ backgroundColor: colors.borderLight }}
       >
-        {/* Left Image */}
-        <div className="w-[425px] min-w-[425px] h-[475px] relative overflow-hidden flex-shrink-0">
+        {/* Top / Left Image */}
+        <div className="w-full lg:w-[425px] lg:min-w-[425px] h-[260px] sm:h-[340px] lg:h-[475px] relative overflow-hidden flex-shrink-0">
           <Image
             src="/the-unreal-house/TUH-cover.jpg"
             alt="The Next House: USA"
             fill
-            className="object-cover rounded-lg"
+            className="object-cover rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none"
           />
         </div>
 
-        {/* Right Content */}
-        <div className="flex flex-col justify-center px-10 py-8 gap-2">
-          <h1 className={`${changa.className} text-5xl font-black leading-tight tracking-tight text-gray-950 uppercase`}>
+        {/* Bottom / Right Content */}
+        <div className="flex flex-col justify-center px-6 sm:px-10 py-8 gap-2">
+          <h1 className={`${changa.className} text-4xl sm:text-5xl font-black leading-tight tracking-tight text-gray-950 uppercase`}>
             THE UNREAL HOUSE
           </h1>
 
@@ -103,7 +103,6 @@ export default function LiveCompetitionCard() {
 
           <div className="flex flex-row items-center gap-5 mt-3">
             <a
-
               href="/competition/imaginative-home-2025-2026"
               className="flex items-center gap-2 text-white text-sm font-medium px-5 py-3 hover:opacity-80 transition-opacity"
               style={{ backgroundColor: colors.accent }}
