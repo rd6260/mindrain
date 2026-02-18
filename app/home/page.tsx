@@ -136,19 +136,19 @@ export default function HomePage() {
         <div className="flex items-center px-8 md:px-24 mt-40">
           <div className="max-w-6xl text-left">
             <h1 className="font-bold text-6xl md:text-8xl mb-6 tracking-tight">
-              Where Every Mind Gets Its Moment
+              Where Every Mind Gets Its Moment.
             </h1>
             <p className="text-xl md:text-2xl mb-8 font-light">
-              Mind Rain is the only competition platform that separates junior and senior
-              categories — ensuring fair competition based on skill, not seniority.
+              <span className={`${FEARLogo.className}`}> Mind Rain </span> is the only competition platform that separates junior and senior
+              categories – ensuring fair competition based on skill, not seniority.
             </p>
           </div>
         </div>
 
         {/* Stats */}
-        <div className="flex items-center justify-center mt-30">
-          <div className="max-w-7xl mx-auto border-t border-neutral-400">
-            <div className="grid grid-cols-1 md:grid-cols-3">
+        <div className="flex items-center justify-center mt-20">
+          <div className="max-w-[90%] mx-auto border-t border-neutral-400">
+            <div className="grid grid-cols-1 md:grid-cols-4">
               <div className="px-10 py-14 border-b md:border-b-0 md:border-r border-neutral-400 last:border-r-0">
                 <h2 className="text-5xl md:text-6xl font-semibold text-black mb-4">
                   9+
@@ -177,6 +177,16 @@ export default function HomePage() {
                   Winners & Honorable Mentions Announced
                 </p>
               </div>
+
+
+              <div className="px-10 py-14 border-b md:border-b-0 md:border-r border-neutral-400 last:border-r-0">
+                <h2 className="text-5xl md:text-6xl font-semibold text-black mb-4">
+                  8+
+                </h2>
+                <p className="text-neutral-600 text-base leading-relaxed max-w-xs">
+                  successful competitions conducted
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -186,18 +196,64 @@ export default function HomePage() {
       {/* Competition Details Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
-          <h2
-            className="text-5xl md:text-6xl font-bold"
-            style={{ color: colors.textPrimary }}
-          >
-            Live Competitions
-          </h2>
+          <div className="flex items-center gap-6">
+
+            {/* node with pulse effect */}
+            <div className="ml-2">
+              <div className="relative">
+                {/* Pulsing ring */}
+                <div
+                  className="absolute inset-0 rounded-full animate-ping"
+                  style={{
+                    backgroundColor: "red",
+                    opacity: 0.3
+                  }}
+                />
+                {/* Outer glow ring */}
+                <div
+                  className="absolute -inset-2 rounded-full blur-md"
+                  style={{
+                    backgroundColor: "red",
+                    opacity: 0.4
+                  }}
+                />
+                {/* Main dot */}
+                <div
+                  className="relative w-5 h-5 rounded-full border-4 transition-all duration-300 hover:scale-150"
+                  style={{
+                    backgroundColor: colors.white,
+                    borderColor: "#990000",
+                    boxShadow: `0 0 15px ${colors.accent}80`
+                  }}
+                >
+                  {/* Inner dot */}
+                  <div
+                    className="absolute inset-1.5 rounded-full"
+                    style={{ backgroundColor: colors.accent }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <h2
+              className="text-3xl md:text-5xl"
+              style={{ color: colors.textPrimary }}
+            >
+              Live Events
+            </h2>
+          </div>
           <div
             className="h-px flex-1 bg-black mt-4 mb-16"
           />
 
 
           <LiveCompetitionCard />
+
+          <div className='flex justify-center items-center py-4 text-sm'>
+            <span>
+              More Events coming soon. Stay tuned!
+            </span>
+          </div>
 
 
         </div>
@@ -206,13 +262,16 @@ export default function HomePage() {
       {/* Previous Winners Section */}
       < section className="py-24 px-4 sm:px-6 lg:px-8" >
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="mb-16">
             <h2
-              className="text-5xl md:text-6xl font-bold mb-4"
+              className="text-5xl md:text-6xl font-bold"
               style={{ color: colors.textPrimary }}
             >
               Previous Competition Winners
             </h2>
+
+            <div className="h-px flex-1 bg-black mt-2 mb-2" />
+
             <p
               className="text-xl"
               style={{ color: colors.textSecondary }}

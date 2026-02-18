@@ -12,6 +12,7 @@ interface UserInfo {
   role: string;
   institute: string;
   academic_year: number;
+  academic_level: string | null;
 }
 
 interface Event {
@@ -46,7 +47,6 @@ const ProfilePage = () => {
 
   const fetchUserData = async () => {
     try {
-      // Get current user
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       if (!currentUser) {
         window.location.href = '/login';
@@ -54,7 +54,6 @@ const ProfilePage = () => {
       }
       setUser(currentUser);
 
-      // Get user info
       const { data: userInfoData, error: userInfoError } = await supabase
         .from('user_info')
         .select('*')
@@ -64,7 +63,6 @@ const ProfilePage = () => {
       if (userInfoError) throw userInfoError;
       setUserInfo(userInfoData);
 
-      // Get registrations with event details
       const { data: registrationsData, error: registrationsError } = await supabase
         .from('registrations')
         .select(`
@@ -80,7 +78,6 @@ const ProfilePage = () => {
       if (registrationsError) throw registrationsError;
       setRegistrations(registrationsData || []);
 
-      // Get unique events user has participated in
       const uniqueEvents = registrationsData?.reduce((acc: Event[], reg) => {
         const event = reg.events as unknown as Event;
         if (event && !acc.find(e => e.id === event.id)) {
@@ -88,7 +85,7 @@ const ProfilePage = () => {
         }
         return acc;
       }, []) || [];
-      
+
       setParticipatedEvents(uniqueEvents);
 
     } catch (error) {
@@ -104,6 +101,12 @@ const ProfilePage = () => {
   };
 
   const hasPendingPayments = registrations.some(reg => !reg.paid);
+
+  const formatAcademicLevel = (level: string | null) => {
+    if (level === 'UG') return 'Under Graduate';
+    if (level === 'PG') return 'Post Graduate';
+    return null;
+  };
 
   if (loading) {
     return (
@@ -141,7 +144,7 @@ const ProfilePage = () => {
           <button
             onClick={handleLogout}
             className="px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg"
-            style={{ 
+            style={{
               backgroundColor: '#2C5F5F',
               color: '#FFFFFF'
             }}
@@ -154,9 +157,9 @@ const ProfilePage = () => {
 
         {/* Warning Banner */}
         {hasPendingPayments && (
-          <div 
+          <div
             className="mb-6 p-4 rounded-lg border-l-4 flex items-center gap-3"
-            style={{ 
+            style={{
               backgroundColor: '#F8F7F2',
               borderColor: '#D97757',
               borderLeftWidth: '4px'
@@ -179,17 +182,17 @@ const ProfilePage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* User Info Card */}
           <div className="lg:col-span-1">
-            <div 
+            <div
               className="rounded-xl shadow-md p-6 border"
-              style={{ 
+              style={{
                 backgroundColor: '#F8F7F2',
                 borderColor: '#D0CEC2'
               }}
             >
               <div className="flex items-center justify-center mb-6">
-                <div 
+                <div
                   className="w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold"
-                  style={{ 
+                  style={{
                     backgroundColor: '#2C5F5F',
                     color: '#FFFFFF'
                   }}
@@ -197,38 +200,42 @@ const ProfilePage = () => {
                   {userInfo.name.charAt(0).toUpperCase()}
                 </div>
               </div>
-              
+
               <h2 className="text-2xl font-bold text-center mb-6" style={{ color: '#1A1A1A' }}>
                 {userInfo.name}
               </h2>
 
               <div className="space-y-4">
+                {userInfo.institute && (
+                  <div>
+                    <p className="text-sm font-medium mb-1" style={{ color: '#6B6B6B' }}>
+                      Institution
+                    </p>
+                    <p className="font-semibold" style={{ color: '#1A1A1A' }}>
+                      {userInfo.institute}
+                    </p>
+                  </div>
+                )}
+
                 <div>
                   <p className="text-sm font-medium mb-1" style={{ color: '#6B6B6B' }}>
-                    Role
+                    Profession
                   </p>
                   <p className="font-semibold" style={{ color: '#1A1A1A' }}>
                     {userInfo.role}
                   </p>
                 </div>
 
-                <div>
-                  <p className="text-sm font-medium mb-1" style={{ color: '#6B6B6B' }}>
-                    Institution
-                  </p>
-                  <p className="font-semibold" style={{ color: '#1A1A1A' }}>
-                    {userInfo.institute}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium mb-1" style={{ color: '#6B6B6B' }}>
-                    Academic Year
-                  </p>
-                  <p className="font-semibold" style={{ color: '#1A1A1A' }}>
-                    Year {userInfo.academic_year}
-                  </p>
-                </div>
+                {userInfo.academic_year && userInfo.academic_level && (
+                  <div>
+                    <p className="text-sm font-medium mb-1" style={{ color: '#6B6B6B' }}>
+                      {formatAcademicLevel(userInfo.academic_level)}
+                    </p>
+                    <p className="font-semibold" style={{ color: '#1A1A1A' }}>
+                      Year {userInfo.academic_year}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -236,9 +243,9 @@ const ProfilePage = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Registrations Section */}
-            <div 
+            <div
               className="rounded-xl shadow-md p-6 border"
-              style={{ 
+              style={{
                 backgroundColor: '#F8F7F2',
                 borderColor: '#D0CEC2'
               }}
@@ -246,7 +253,7 @@ const ProfilePage = () => {
               <h3 className="text-2xl font-bold mb-4" style={{ color: '#1A1A1A' }}>
                 My Registrations
               </h3>
-              
+
               {registrations.length === 0 ? (
                 <p style={{ color: '#6B6B6B' }}>
                   You haven't registered for any events yet.
@@ -257,7 +264,7 @@ const ProfilePage = () => {
                     <div
                       key={registration.id}
                       className="rounded-lg p-4 border"
-                      style={{ 
+                      style={{
                         backgroundColor: '#FFFFFF',
                         borderColor: registration.paid ? '#D0CEC2' : '#D97757'
                       }}
@@ -271,15 +278,31 @@ const ProfilePage = () => {
                             Code: {registration.events.code_name}
                           </p>
                         </div>
-                        <span
-                          className="px-3 py-1 rounded-full text-xs font-semibold"
-                          style={{
-                            backgroundColor: registration.paid ? '#2D5F4F' : '#D97757',
-                            color: '#FFFFFF'
-                          }}
-                        >
-                          {registration.paid ? 'Paid' : 'Payment Pending'}
-                        </span>
+                        <div className="flex flex-col items-end gap-2">
+                          <span
+                            className="px-3 py-1 rounded-full text-xs font-semibold"
+                            style={{
+                              backgroundColor: registration.paid ? '#2D5F4F' : '#D97757',
+                              color: '#FFFFFF'
+                            }}
+                          >
+                            {registration.paid ? 'Paid' : 'Payment Pending'}
+                          </span>
+                          {!registration.paid && (
+                            <a
+                              href={`/payment?registration_id=${registration.id}`}
+                              className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:shadow-md"
+                              style={{
+                                backgroundColor: '#2C5F5F',
+                                color: '#FFFFFF',
+                              }}
+                              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#1A4D4D')}
+                              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#2C5F5F')}
+                            >
+                              Complete Payment →
+                            </a>
+                          )}
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-3 text-sm">
@@ -315,9 +338,9 @@ const ProfilePage = () => {
             </div>
 
             {/* Participated Events Section */}
-            <div 
+            <div
               className="rounded-xl shadow-md p-6 border"
-              style={{ 
+              style={{
                 backgroundColor: '#F8F7F2',
                 borderColor: '#D0CEC2'
               }}
@@ -325,7 +348,7 @@ const ProfilePage = () => {
               <h3 className="text-2xl font-bold mb-4" style={{ color: '#1A1A1A' }}>
                 Events Participated
               </h3>
-              
+
               {participatedEvents.length === 0 ? (
                 <p style={{ color: '#6B6B6B' }}>
                   You haven't participated in any events yet.
@@ -336,7 +359,7 @@ const ProfilePage = () => {
                     <div
                       key={event.id}
                       className="rounded-lg p-4 border transition-all duration-200 hover:shadow-md"
-                      style={{ 
+                      style={{
                         backgroundColor: '#FFFFFF',
                         borderColor: '#D0CEC2'
                       }}
@@ -344,9 +367,9 @@ const ProfilePage = () => {
                       <h4 className="font-bold mb-2" style={{ color: '#1A1A1A' }}>
                         {event.title}
                       </h4>
-                      <p 
+                      <p
                         className="text-sm px-3 py-1 rounded inline-block"
-                        style={{ 
+                        style={{
                           backgroundColor: '#EDEBDF',
                           color: '#2C5F5F',
                           fontWeight: 600

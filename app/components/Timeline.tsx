@@ -3,7 +3,6 @@ import { ImportantDate } from '@/types';
 
 // Timeline data
 const importantDates: ImportantDate[] = [
-  { label: 'Campaign Start Date', date: '25 January 2026' },
   { label: 'Competition Starts', date: '2 February 2026' },
   { label: 'Early Bird Registration Starts', date: '2 February 2026' },
   { label: 'Early Bird Registration Ends', date: '28 February 2026' },
@@ -100,7 +99,7 @@ export default function Timeline({ dates = importantDates }: TimelineProps) {
                 >
                   {/* Hover glow effect */}
                   <div 
-                    className="absolute -inset-1 rounded-3xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500"
+                    className="absolute -inset-1 rounded-lg opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500"
                     style={{ 
                       background: `linear-gradient(135deg, ${colors.accent}40, ${colors.accentHover}40)`
                     }}
@@ -108,7 +107,7 @@ export default function Timeline({ dates = importantDates }: TimelineProps) {
                   
                   {/* Card */}
                   <div 
-                    className="relative rounded-3xl p-6 md:p-8 transition-all duration-300 group-hover:translate-y-[-4px] overflow-hidden"
+                    className="relative rounded-lg p-6 md:p-8 transition-all duration-300 group-hover:translate-y-[-4px] overflow-hidden"
                     style={{ 
                       backgroundColor: colors.white,
                       boxShadow: `0 10px 40px ${colors.accent}15`
@@ -169,31 +168,29 @@ export default function Timeline({ dates = importantDates }: TimelineProps) {
       </div>
 
       {/* End marker */}
-      {/*
       <div className="flex justify-center mt-12">
         <div 
           className="relative"
         >
           <div 
-            className="absolute inset-0 rounded-full blur-xl animate-pulse"
+            className="absolute inset-0 rounded-lg blur-xl animate-pulse"
             style={{ 
               backgroundColor: colors.accent,
               opacity: 0.3
             }}
           />
           <div 
-            className="relative px-8 py-4 rounded-full font-bold text-sm uppercase tracking-wider"
+            className="relative px-8 py-4 rounded-lg font-bold text-sm uppercase tracking-wider"
             style={{ 
               backgroundColor: colors.accent,
               color: colors.white,
               boxShadow: `0 10px 30px ${colors.accent}40`
             }}
           >
-            Journey Complete
+            Competition End
           </div>
         </div>
       </div>
-      */}
     </div>
   );
 }

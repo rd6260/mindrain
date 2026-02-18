@@ -4,16 +4,32 @@ import { useState, FormEvent, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 
+const ROLES = ['Student', 'Educator', 'Architect', 'Professional', 'Enthusiast', 'Other'];
+const ROLES_WITH_INSTITUTE = ['Student', 'Educator'];
+
 export default function OnboardingPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState<string>('');
+  const [customRole, setCustomRole] = useState<string>('');
   const [selectedYear, setSelectedYear] = useState<string>('');
+  const [academicLevel, setAcademicLevel] = useState<string>(''); // 'UG' or 'PG'
   const [name, setName] = useState<string>('');
   const [institute, setInstitute] = useState<string>('');
   const [isChecking, setIsChecking] = useState(true);
   const router = useRouter();
   const supabase = createClient();
+
+  // Reset year when academic level changes
+  useEffect(() => {
+    setSelectedYear('');
+  }, [academicLevel]);
+
+  // Reset academic fields when role changes
+  useEffect(() => {
+    setSelectedYear('');
+    setAcademicLevel('');
+  }, [selectedRole]);
 
   useEffect(() => {
     const checkUserAndData = async () => {
@@ -23,7 +39,6 @@ export default function OnboardingPage() {
         return;
       }
 
-      // Check if user_info already exists
       const { data: userInfo, error: fetchError } = await supabase
         .from('user_info')
         .select('*')
@@ -31,20 +46,19 @@ export default function OnboardingPage() {
         .single();
 
       if (fetchError && fetchError.code !== 'PGRST116') {
-        // PGRST116 is "no rows returned" - any other error is a problem
         console.error('Error fetching user info:', fetchError);
       }
 
       if (userInfo) {
-        // Data exists, redirect to home
         router.push('/home');
       } else {
-        // No data exists, allow form to show
         setIsChecking(false);
       }
     };
     checkUserAndData();
   }, [router, supabase]);
+
+  const yearOptions = academicLevel === 'PG' ? [1, 2, 3] : [1, 2, 3, 4, 5];
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -57,7 +71,19 @@ export default function OnboardingPage() {
       return;
     }
 
-    if (selectedRole === 'student' && !selectedYear) {
+    if (selectedRole === 'Other' && !customRole.trim()) {
+      setError('Please enter your profession');
+      setIsLoading(false);
+      return;
+    }
+
+    if (selectedRole === 'Student' && !academicLevel) {
+      setError('Please select an academic level');
+      setIsLoading(false);
+      return;
+    }
+
+    if (selectedRole === 'Student' && !selectedYear) {
       setError('Please select an academic year');
       setIsLoading(false);
       return;
@@ -65,21 +91,23 @@ export default function OnboardingPage() {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      
       if (!user) throw new Error('No user found');
+
+      const finalRole = selectedRole === 'Other' ? customRole.trim() : selectedRole;
 
       const { error: insertError } = await supabase
         .from('user_info')
         .insert({
           id: user.id,
           name,
-          role: selectedRole,
-          institute,
-          academic_year: selectedRole === 'student' ? parseInt(selectedYear) : null,
+          role: finalRole,
+          institute: ROLES_WITH_INSTITUTE.includes(selectedRole) ? institute : null,
+          academic_year: selectedRole === 'Student' ? parseInt(selectedYear) : null,
+          academic_level: selectedRole === 'Student' ? academicLevel : null,
         });
 
       if (insertError) throw insertError;
-      
+
       router.push('/home');
       router.refresh();
     } catch (err) {
@@ -91,14 +119,10 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#edebdf' }}>
-      {/* Loading State */}
       {isChecking && (
-        <div className="text-2xl font-black text-[#323232]">
-          Loading...
-        </div>
+        <div className="text-2xl font-black text-[#323232]">Loading...</div>
       )}
 
-      {/* Error Toast */}
       {error && (
         <div className="fixed top-5 right-5 px-5 py-4 bg-red-500 text-white rounded-md border-2 border-[#323232] shadow-[4px_4px_0_0_#323232] z-50 animate-slide-in">
           {error}
@@ -106,7 +130,7 @@ export default function OnboardingPage() {
       )}
 
       {!isChecking && (
-        <div className="w-[400px] p-8 bg-[lightgrey] rounded-md border-2 border-[#323232] shadow-[4px_4px_0_0_#323232]">
+        <div className="w-[440px] p-8 bg-[lightgrey] rounded-md border-2 border-[#323232] shadow-[4px_4px_0_0_#323232]">
           <div className="mb-8 text-3xl font-black text-center text-[#323232]">
             Welcome! Let's set up your account
           </div>
@@ -114,9 +138,7 @@ export default function OnboardingPage() {
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             {/* Full Name */}
             <div className="flex flex-col gap-2">
-              <label className="text-[15px] font-semibold text-[#323232]">
-                Full Name
-              </label>
+              <label className="text-[15px] font-semibold text-[#323232]">Full Name</label>
               <input
                 type="text"
                 placeholder="Full Name"
@@ -130,67 +152,83 @@ export default function OnboardingPage() {
 
             {/* Role Selection */}
             <div className="flex flex-col gap-2">
-              <label className="text-[15px] font-semibold text-[#323232]">
-                Role
-              </label>
-              <div className="flex gap-3">
-                {['student', 'faculty'].map((role) => (
-                  <button
-                    key={role}
-                    type="button"
-                    onClick={() => setSelectedRole(role)}
-                    className={`flex-1 h-10 rounded-md border-2 border-[#323232] shadow-[4px_4px_0_0_#323232] text-[15px] font-semibold cursor-pointer transition-all active:shadow-none active:translate-x-[3px] active:translate-y-[3px] disabled:opacity-60 disabled:cursor-not-allowed ${
-                      selectedRole === role
-                        ? 'bg-[#2d8cf0] text-white'
-                        : 'bg-white text-[#323232]'
-                    }`}
-                    disabled={isLoading}
-                  >
-                    {role.charAt(0).toUpperCase() + role.slice(1)}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Institute */}
-            <div className="flex flex-col gap-2">
-              <label className="text-[15px] font-semibold text-[#323232]">
-                Institute
-              </label>
-              <input
-                type="text"
-                placeholder="University Name"
-                value={institute}
-                onChange={(e) => setInstitute(e.target.value)}
-                className="w-full h-10 rounded-md border-2 border-[#323232] bg-white shadow-[4px_4px_0_0_#323232] text-[15px] font-semibold text-[#323232] px-2.5 outline-none placeholder:text-[#666] placeholder:opacity-80 focus:border-[#2d8cf0] disabled:opacity-60 disabled:cursor-not-allowed"
-                required
+              <label className="text-[15px] font-semibold text-[#323232]">Profession</label>
+              <select
+                value={selectedRole}
+                onChange={(e) => setSelectedRole(e.target.value)}
+                className="w-full h-10 rounded-md border-2 border-[#323232] bg-white shadow-[4px_4px_0_0_#323232] text-[15px] font-semibold text-[#323232] px-2.5 outline-none focus:border-[#2d8cf0] disabled:opacity-60 disabled:cursor-not-allowed"
                 disabled={isLoading}
-              />
+              >
+                <option value="" disabled>Select a profession</option>
+                {ROLES.map((role) => (
+                  <option key={role} value={role}>{role}</option>
+                ))}
+              </select>
             </div>
 
-            {/* Academic Year (only for students) */}
-            {selectedRole === 'student' && (
+            {/* Custom Role (if Other) */}
+            {selectedRole === 'Other' && (
               <div className="flex flex-col gap-2">
-                <label className="text-[15px] font-semibold text-[#323232]">
-                  Academic Year
-                </label>
-                <div className="grid grid-cols-5 gap-2">
-                  {[1, 2, 3, 4, 5].map((year) => (
-                    <button
-                      key={year}
-                      type="button"
-                      onClick={() => setSelectedYear(year.toString())}
-                      className={`h-10 rounded-md border-2 border-[#323232] shadow-[4px_4px_0_0_#323232] text-[15px] font-semibold cursor-pointer transition-all active:shadow-none active:translate-x-[3px] active:translate-y-[3px] disabled:opacity-60 disabled:cursor-not-allowed ${
-                        selectedYear === year.toString()
-                          ? 'bg-[#2d8cf0] text-white'
-                          : 'bg-white text-[#323232]'
-                      }`}
-                      disabled={isLoading}
-                    >
-                      {year}
-                    </button>
+                <label className="text-[15px] font-semibold text-[#323232]">Your Profession</label>
+                <input
+                  type="text"
+                  placeholder="Enter your profession"
+                  value={customRole}
+                  onChange={(e) => setCustomRole(e.target.value)}
+                  className="w-full h-10 rounded-md border-2 border-[#323232] bg-white shadow-[4px_4px_0_0_#323232] text-[15px] font-semibold text-[#323232] px-2.5 outline-none placeholder:text-[#666] placeholder:opacity-80 focus:border-[#2d8cf0] disabled:opacity-60 disabled:cursor-not-allowed"
+                  disabled={isLoading}
+                />
+              </div>
+            )}
+
+            {/* Institute (Student or Educator) */}
+            {ROLES_WITH_INSTITUTE.includes(selectedRole) && (
+              <div className="flex flex-col gap-2">
+                <label className="text-[15px] font-semibold text-[#323232]">Institute</label>
+                <input
+                  type="text"
+                  placeholder="University / Institution Name"
+                  value={institute}
+                  onChange={(e) => setInstitute(e.target.value)}
+                  className="w-full h-10 rounded-md border-2 border-[#323232] bg-white shadow-[4px_4px_0_0_#323232] text-[15px] font-semibold text-[#323232] px-2.5 outline-none placeholder:text-[#666] placeholder:opacity-80 focus:border-[#2d8cf0] disabled:opacity-60 disabled:cursor-not-allowed"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+            )}
+
+            {/* Academic Level (Student only) */}
+            {selectedRole === 'Student' && (
+              <div className="flex flex-col gap-2">
+                <label className="text-[15px] font-semibold text-[#323232]">Academic Level</label>
+                <select
+                  value={academicLevel}
+                  onChange={(e) => setAcademicLevel(e.target.value)}
+                  className="w-full h-10 rounded-md border-2 border-[#323232] bg-white shadow-[4px_4px_0_0_#323232] text-[15px] font-semibold text-[#323232] px-2.5 outline-none focus:border-[#2d8cf0] disabled:opacity-60 disabled:cursor-not-allowed"
+                  disabled={isLoading}
+                >
+                  <option value="" disabled>Select academic level</option>
+                  <option value="UG">Under Graduate</option>
+                  <option value="PG">Post Graduate</option>
+                </select>
+              </div>
+            )}
+
+            {/* Academic Year (Student only, after level is selected) */}
+            {selectedRole === 'Student' && academicLevel && (
+              <div className="flex flex-col gap-2">
+                <label className="text-[15px] font-semibold text-[#323232]">Academic Year</label>
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value)}
+                  className="w-full h-10 rounded-md border-2 border-[#323232] bg-white shadow-[4px_4px_0_0_#323232] text-[15px] font-semibold text-[#323232] px-2.5 outline-none focus:border-[#2d8cf0] disabled:opacity-60 disabled:cursor-not-allowed"
+                  disabled={isLoading}
+                >
+                  <option value="" disabled>Select year</option>
+                  {yearOptions.map((year) => (
+                    <option key={year} value={year.toString()}>Year {year}</option>
                   ))}
-                </div>
+                </select>
               </div>
             )}
 

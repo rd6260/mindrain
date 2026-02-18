@@ -35,7 +35,7 @@ const navItems = [
     ],
   },
   { label: 'Workshops', href: '#' },
-  { label: 'Past Winners', href: '#' },
+  { label: 'Past Winners', href: '/pastWinners' },
   { label: 'About us', href: '/about' },
   { label: 'Contact', href: '#' },
 ];
@@ -467,7 +467,7 @@ export default function Navigation() {
         borderColor: colors.border,
       }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[90%] mx-auto px-2 ">
         <div className="flex justify-between items-center h-20">
           <Link
             href="/home"

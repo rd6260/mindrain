@@ -77,7 +77,7 @@ export default function LiveCompetitionCard() {
               <span className="text-gray-600">Prize</span>{" "}Monetary award
             </p>
             <p>
-              <span className="text-gray-600">Eligibility</span>{" "}open to all undergraduate students
+              <span className="text-gray-600">Eligibility</span>{" "}Open to all undergraduate students
             </p>
           </div>
 

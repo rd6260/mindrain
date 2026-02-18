@@ -9,6 +9,7 @@ import DownloadBriefModal, { BriefFile } from '@/app/components/DownloadModal';
 import { useEffect, useState } from 'react';
 import Navigation from '@/app/components/Navigation';
 import RegistrationFees from '@/app/components/RegistrationFees';
+import { createClient } from '@/lib/supabase/client';
 
 
 const TUHBriefFiles: BriefFile[] = [
@@ -47,26 +48,109 @@ const TUHPressKitFiles: BriefFile[] = [
   },
 ];
 
-
-
 const importantDates: ImportantDate[] = [
-  { label: 'Campaign Start Date', date: '25 January 2026' },
-  { label: 'Competition Starts', date: '2 February 2026' },
-  { label: 'Early Bird Registration Starts', date: '2 February 2026' },
-  { label: 'Early Bird Registration Ends', date: '28 February 2026' },
-  { label: 'Advance Registration Starts', date: '1 March 2026' },
+  { label: 'Competition Starts', date: '19 February 2026' },
+  { label: 'Early Bird Registration Starts', date: '19 February 2026' },
+  { label: 'Early Bird Registration Ends', date: '15 March 2026' },
+  { label: 'Advance Registration Starts', date: '16 March 2026' },
   { label: 'Final Submission Starts', date: '1 April 2026' },
   { label: 'Advance Registration Ends', date: '31 May 2026' },
   { label: 'Late Registration Starts', date: '1 June 2026' },
   { label: 'Late Registration Ends', date: '25 June 2026' },
   { label: 'Final Submission Ends', date: '30 June 2026' },
-  { label: 'Announcement of Result', date: '27 July 2026' },
+  { label: 'Announcement of Result', date: '1 August 2026' },
 ];
 
+// --- Login Required Modal ---
+function LoginRequiredModal({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+      style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
+      onClick={onClose}
+    >
+      <div
+        className="relative rounded-2xl p-8 max-w-sm w-full shadow-2xl text-center"
+        style={{ backgroundColor: colors.white }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors text-2xl leading-none"
+          aria-label="Close"
+        >
+          &times;
+        </button>
+
+        <h3
+          className="text-2xl font-bold mb-2"
+          style={{ color: colors.textPrimary }}
+        >
+          Login Required
+        </h3>
+        <p
+          className="text-base mb-8 leading-relaxed"
+          style={{ color: colors.textSecondary }}
+        >
+          You need to be logged in to download the brief and press kit files.
+        </p>
+
+        <div className="flex flex-col gap-3">
+          <a
+            href="/login"
+            className="block w-full px-6 py-3 rounded-lg text-white font-semibold text-base transition-all duration-200 hover:opacity-90 hover:scale-[1.02]"
+            style={{
+              background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`,
+            }}
+          >
+            Go to Login →
+          </a>
+          <button
+            onClick={onClose}
+            className="w-full px-6 py-3 rounded-lg font-semibold text-base border transition-all duration-200 hover:bg-gray-50"
+            style={{
+              color: colors.textSecondary,
+              borderColor: colors.borderLight,
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// --- Main Page ---
 export default function CompetitionPage() {
   const [isBriefDownloadOpen, setIsBriefDownloadOpen] = useState(false);
   const [isPressDownloadOpen, setIsPressDownloadOpen] = useState(false);
+  const [isLoginPromptOpen, setIsLoginPromptOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null); // null = loading
   const [navOpacity, setNavOpacity] = useState(0);
+
+  // Check auth status on mount
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -79,6 +163,16 @@ export default function CompetitionPage() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Gate handler — opens download modal if logged in, otherwise shows login prompt
+  const handleDownloadClick = (type: 'brief' | 'press') => {
+    if (!isLoggedIn) {
+      setIsLoginPromptOpen(true);
+      return;
+    }
+    if (type === 'brief') setIsBriefDownloadOpen(true);
+    else setIsPressDownloadOpen(true);
+  };
 
   return (
     <>
@@ -108,25 +202,16 @@ export default function CompetitionPage() {
           {/* Content */}
           <div className="relative z-10 ml-24 mt-10 max-w-5xl text-left text-gray-200 animate-fade-in">
             <h1 className="space-y-4">
-              <span
-                className="block text-2xl md:text-4xl font-medium tracking-wide"
-              >
+              <span className="block text-2xl md:text-4xl font-medium tracking-wide">
                 Architecture Competition
               </span>
-              <span
-                className="block text-xl md:text-2xl font-light italic"
-              >
+              <span className="block text-xl md:text-2xl font-light italic">
                 edition 06
               </span>
-
-              <span
-                className="font-['Technor-Variable'] block text-6xl md:text-8xl lg:text-9xl font-black my-6 leading-tight"
-              >
+              <span className="font-['Technor-Variable'] block text-6xl md:text-8xl lg:text-9xl font-black my-6 leading-tight">
                 The Unreal House
               </span>
-              <span
-                className="block text-2xl md:text-4xl font-medium tracking-wide"
-              >
+              <span className="block text-2xl md:text-4xl font-medium tracking-wide">
                 An Imaginary Home Design Challenge
               </span>
             </h1>
@@ -148,20 +233,24 @@ export default function CompetitionPage() {
                   background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
                 }}
                 data-testid="download-brief-button"
-                onClick={() => setIsBriefDownloadOpen(true)}
+                onClick={() => handleDownloadClick('brief')}
               >
                 Download Brief ↓
               </button>
-              <button className="group relative overflow-hidden border border-black mt-16 px-16 py-5 rounded-lg font-bold text-xl shadow-2xl cursor-pointer" onClick={() => setIsPressDownloadOpen(true)}
+              <button
+                className="group relative overflow-hidden border border-white mt-16 px-16 py-5 rounded-lg font-bold text-xl shadow-2xl cursor-pointer"
+                onClick={() => handleDownloadClick('press')}
               >
-                <span className="absolute inset-0 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]" style={{
-                  background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
-                }} />
-                <span className="relative z-10 uppercase text-black group-hover:text-white transition-colors duration-500">
+                <span
+                  className="absolute inset-0 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]"
+                  style={{
+                    background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
+                  }}
+                />
+                <span className="relative z-10 uppercase text-white group-hover:text-white transition-colors duration-500">
                   Press Kit ↓
                 </span>
               </button>
-
             </div>
           </div>
         </section>
@@ -170,9 +259,7 @@ export default function CompetitionPage() {
         <section className="py-28 px-4 sm:px-6 lg:px-8 relative">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16 animate-fade-in-up">
-              <h2
-                className="text-5xl md:text-6xl font-bold mb-6 gradient-text"
-              >
+              <h2 className="text-5xl md:text-6xl font-bold mb-6 gradient-text">
                 Prize Pool
               </h2>
               <div
@@ -183,22 +270,15 @@ export default function CompetitionPage() {
               />
             </div>
 
-
             <div className="grid md:grid-cols-2 gap-10">
               {/* Category 1 */}
               <div
-                className="rounded-3xl p-10 shadow-xl hover-lift animate-fade-in-up border-2"
-                style={{
-                  backgroundColor: colors.white,
-                  borderColor: colors.borderLight
-                }}
+                className="rounded-lg p-10 shadow-xl hover-lift animate-fade-in-up border-2"
+                style={{ backgroundColor: colors.white, borderColor: colors.borderLight }}
               >
                 <h3
                   className="text-3xl font-bold mb-8 pb-4 border-b-2"
-                  style={{
-                    color: colors.accent,
-                    borderColor: colors.accent
-                  }}
+                  style={{ color: colors.accent, borderColor: colors.accent }}
                 >
                   Category 1 (1st & 2nd Year)
                 </h3>
@@ -208,18 +288,12 @@ export default function CompetitionPage() {
                     { label: '2nd Prize', amount: '₹8,000', emoji: '🥈' },
                     { label: '3rd Prize', amount: '₹6,000', emoji: '🥉' },
                   ].map((prize, idx) => (
-                    <div key={idx} className="flex justify-between items-center group p-4 rounded-xl transition-all hover:bg-gray-50">
-                      <span
-                        className="text-xl font-medium flex items-center gap-3"
-                        style={{ color: colors.textSecondary }}
-                      >
+                    <div key={idx} className="flex justify-between items-center group p-4 rounded-xl transition-all">
+                      <span className="text-xl font-medium flex items-center gap-3" style={{ color: colors.textSecondary }}>
                         <span className="text-3xl">{prize.emoji}</span>
                         {prize.label}
                       </span>
-                      <span
-                        className="text-3xl font-black group-hover:scale-110 transition-transform"
-                        style={{ color: colors.textPrimary }}
-                      >
+                      <span className="text-3xl font-black group-hover:scale-110 transition-transform" style={{ color: colors.textPrimary }}>
                         {prize.amount}
                       </span>
                     </div>
@@ -229,19 +303,12 @@ export default function CompetitionPage() {
 
               {/* Category 2 */}
               <div
-                className="rounded-3xl p-10 shadow-xl hover-lift animate-fade-in-up border-2"
-                style={{
-                  backgroundColor: colors.white,
-                  borderColor: colors.borderLight,
-                  animationDelay: '0.2s'
-                }}
+                className="rounded-lg p-10 shadow-xl hover-lift animate-fade-in-up border-2"
+                style={{ backgroundColor: colors.white, borderColor: colors.borderLight, animationDelay: '0.2s' }}
               >
                 <h3
                   className="text-3xl font-bold mb-8 pb-4 border-b-2"
-                  style={{
-                    color: colors.accent,
-                    borderColor: colors.accent
-                  }}
+                  style={{ color: colors.accent, borderColor: colors.accent }}
                 >
                   Category 2 (3rd, 4th & 5th Year)
                 </h3>
@@ -251,18 +318,12 @@ export default function CompetitionPage() {
                     { label: '2nd Prize', amount: '₹8,000', emoji: '🥈' },
                     { label: '3rd Prize', amount: '₹6,000', emoji: '🥉' },
                   ].map((prize, idx) => (
-                    <div key={idx} className="flex justify-between items-center group p-4 rounded-xl transition-all hover:bg-gray-50">
-                      <span
-                        className="text-xl font-medium flex items-center gap-3"
-                        style={{ color: colors.textSecondary }}
-                      >
+                    <div key={idx} className="flex justify-between items-center group p-4 rounded-xl transition-all">
+                      <span className="text-xl font-medium flex items-center gap-3" style={{ color: colors.textSecondary }}>
                         <span className="text-3xl">{prize.emoji}</span>
                         {prize.label}
                       </span>
-                      <span
-                        className="text-3xl font-black group-hover:scale-110 transition-transform"
-                        style={{ color: colors.textPrimary }}
-                      >
+                      <span className="text-3xl font-black group-hover:scale-110 transition-transform" style={{ color: colors.textPrimary }}>
                         {prize.amount}
                       </span>
                     </div>
@@ -295,9 +356,7 @@ export default function CompetitionPage() {
             >
               Registration Fees
             </h2>
-
-            <RegistrationFees/>
-
+            <RegistrationFees />
           </div>
         </section>
 
@@ -311,60 +370,28 @@ export default function CompetitionPage() {
               Student Discounts
             </h2>
 
-            <div
-              className="rounded-lg p-8 md:p-12"
-              style={{ backgroundColor: colors.white }}
-            >
-              <p
-                className="text-lg mb-6 leading-relaxed"
-                style={{ color: colors.textSecondary }}
-              >
+            <div className="rounded-lg p-8 md:p-12" style={{ backgroundColor: colors.white }}>
+              <p className="text-lg mb-6 leading-relaxed" style={{ color: colors.textSecondary }}>
                 Participate and avail discount <span className="font-bold">Flat 35%</span>
               </p>
-              <p
-                className="text-lg mb-6 leading-relaxed"
-                style={{ color: colors.textSecondary }}
-              >
-                The Mind Rain Competition Team welcomes participation from universities, colleges, and design schools
-                across the world.
+              <p className="text-lg mb-6 leading-relaxed" style={{ color: colors.textSecondary }}>
+                The Mind Rain Competition Team welcomes participation from universities, colleges, and design schools across the world.
+              </p>
+              <p className="text-lg mb-6 leading-relaxed" style={{ color: colors.textSecondary }}>
+                Students can avail exclusive discounts through group registration offers (valid for <span className="font-bold">30 or more</span> participants registering from the same institution).
+              </p>
+              <p className="text-lg mb-8 leading-relaxed" style={{ color: colors.textSecondary }}>
+                This is a great opportunity for faculty and mentors to encourage students to think creatively and explore imaginative architecture beyond textbooks.
               </p>
 
-              <p
-                className="text-lg mb-6 leading-relaxed"
-                style={{ color: colors.textSecondary }}
-              >
-                Students can avail exclusive discounts through group registration offers (valid for <span className="font-bold">30 or more</span> participants
-                registering from the same institution).
-              </p>
-
-              <p
-                className="text-lg mb-8 leading-relaxed"
-                style={{ color: colors.textSecondary }}
-              >
-                This is a great opportunity for faculty and mentors to encourage students to think creatively and explore
-                imaginative architecture beyond textbooks.
-              </p>
-
-              <div
-                className="rounded-xl p-6 mb-6"
-                style={{ backgroundColor: colors.cardBackground }}
-              >
-                <h3
-                  className="text-xl font-semibold mb-4"
-                  style={{ color: colors.textPrimary }}
-                >
+              <div className="rounded-xl p-6 mb-6" style={{ backgroundColor: colors.cardBackground }}>
+                <h3 className="text-xl font-semibold mb-4" style={{ color: colors.textPrimary }}>
                   To apply for student discounts:
                 </h3>
                 <ul className="space-y-2 list-disc list-inside">
-                  <li style={{ color: colors.textSecondary }}>
-                    Email us from your official university e-mail ID
-                  </li>
-                  <li style={{ color: colors.textSecondary }}>
-                    Include your university name, your role, and number of participants
-                  </li>
-                  <li style={{ color: colors.textSecondary }}>
-                    Only recognized university representatives (professors/staff) are eligible to request discounted access on behalf of students
-                  </li>
+                  <li style={{ color: colors.textSecondary }}>Email us from your official university e-mail ID</li>
+                  <li style={{ color: colors.textSecondary }}>Include your university name, your role, and number of participants</li>
+                  <li style={{ color: colors.textSecondary }}>Only recognized university representatives (professors/staff) are eligible to request discounted access on behalf of students</li>
                 </ul>
               </div>
 
@@ -383,9 +410,15 @@ export default function CompetitionPage() {
         </section>
 
         <Footer />
-
       </div>
 
+      {/* Login Required Modal */}
+      <LoginRequiredModal
+        isOpen={isLoginPromptOpen}
+        onClose={() => setIsLoginPromptOpen(false)}
+      />
+
+      {/* Download Modals (only reachable when logged in) */}
       <DownloadBriefModal
         isOpen={isBriefDownloadOpen}
         onClose={() => setIsBriefDownloadOpen(false)}
@@ -401,7 +434,6 @@ export default function CompetitionPage() {
         subtitle="The Unreal House — select files to download"
         files={TUHPressKitFiles}
       />
-
     </>
   );
 }
