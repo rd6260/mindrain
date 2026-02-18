@@ -298,7 +298,6 @@ export default function CompetitionPage() {
 
             <RegistrationFees/>
 
-
           </div>
         </section>
 
@@ -313,7 +312,7 @@ export default function CompetitionPage() {
             </h2>
 
             <div
-              className="rounded-2xl p-8 md:p-12"
+              className="rounded-lg p-8 md:p-12"
               style={{ backgroundColor: colors.white }}
             >
               <p

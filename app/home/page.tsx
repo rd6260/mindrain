@@ -129,26 +129,58 @@ export default function HomePage() {
     <div style={{ backgroundColor: colors.background }} className="min-h-screen">
       <Navigation />
 
-      {/* Hero Image Section */}
-      <section className="relative w-full h-[70vh] overflow-hidden">
-        <img
-          src="https://images.unsplash.com/photo-1511818966892-d7d671e672a2?w=2000"
-          alt="Modern Architecture"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-transparent" />
+      {/* Hero Section */}
+      <section className="relative text-black w-full overflow-hidden">
 
-        {/* Hero Text Overlay */}
-        <div className="absolute inset-0 flex items-center justify-center px-4">
-          <div className="text-center text-white max-w-4xl">
-            <h1 className={`${FEARLogo.className} text-6xl md:text-8xl mb-6 tracking-tight`}>
-              Mind Rain
+        {/* hero text */}
+        <div className="flex items-center px-8 md:px-24 mt-40">
+          <div className="max-w-6xl text-left">
+            <h1 className="font-bold text-6xl md:text-8xl mb-6 tracking-tight">
+              Where Every Mind Gets Its Moment
             </h1>
             <p className="text-xl md:text-2xl mb-8 font-light">
-              Architecture Design and Photography Challenges and Events
+              Mind Rain is the only competition platform that separates junior and senior
+              categories — ensuring fair competition based on skill, not seniority.
             </p>
           </div>
         </div>
+
+        {/* Stats */}
+        <div className="flex items-center justify-center mt-30">
+          <div className="max-w-7xl mx-auto border-t border-neutral-400">
+            <div className="grid grid-cols-1 md:grid-cols-3">
+              <div className="px-10 py-14 border-b md:border-b-0 md:border-r border-neutral-400 last:border-r-0">
+                <h2 className="text-5xl md:text-6xl font-semibold text-black mb-4">
+                  9+
+                </h2>
+                <p className="text-neutral-600 text-base leading-relaxed max-w-xs">
+                  Years of experience
+                </p>
+              </div>
+
+
+              <div className="px-10 py-14 border-b md:border-b-0 md:border-r border-neutral-400 last:border-r-0">
+                <h2 className="text-5xl md:text-6xl font-semibold text-black mb-4">
+                  2.3k+
+                </h2>
+                <p className="text-neutral-600 text-base leading-relaxed max-w-xs">
+                  Participants
+                </p>
+              </div>
+
+
+              <div className="px-10 py-14 border-b md:border-b-0 md:border-r border-neutral-400 last:border-r-0">
+                <h2 className="text-5xl md:text-6xl font-semibold text-black mb-4">
+                  110+
+                </h2>
+                <p className="text-neutral-600 text-base leading-relaxed max-w-xs">
+                  Winners & Honorable Mentions Announced
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </section>
 
       {/* Competition Details Section */}

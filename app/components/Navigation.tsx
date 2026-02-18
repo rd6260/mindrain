@@ -275,11 +275,11 @@ function MobileNav({ user }: { user: User | null }) {
         >
           <Link
             href="/home"
-            className={`${FEARLogo.className} text-xl tracking-tight`}
+            className={`${FEARLogo.className} text-xl tracking-tight flex items-center gap-2`}
             style={{ color: colors.accent }}
             onClick={() => setIsOpen(false)}
           >
-            Mind Rain
+            <img src="/logo2.svg" alt="Mind Rain logo" className="h-8" />
           </Link>
           <button
             onClick={() => setIsOpen(false)}
@@ -471,10 +471,10 @@ export default function Navigation() {
         <div className="flex justify-between items-center h-20">
           <Link
             href="/home"
-            className={`${FEARLogo.className} text-2xl font-bold tracking-tight transition-all duration-300 hover:scale-105`}
+            className={`${FEARLogo.className} text-2xl font-bold tracking-tight transition-all duration-300 hover:scale-105 flex items-center gap-2`}
             style={{ color: colors.accent }}
           >
-            Mind Rain
+            <img src="/logo2.svg" alt="Mind Rain logo" className="h-8" />
           </Link>
 
           <DesktopNav user={user} />
