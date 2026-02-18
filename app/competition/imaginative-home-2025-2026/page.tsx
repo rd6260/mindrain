@@ -210,7 +210,7 @@ export default function CompetitionPage() {
                     borderColor: colors.accent
                   }}
                 >
-                  Category 1
+                  Category 1 (1st & 2nd Year)
                 </h3>
                 <div className="space-y-6">
                   {[
@@ -253,7 +253,7 @@ export default function CompetitionPage() {
                     borderColor: colors.accent
                   }}
                 >
-                  Category 2
+                  Category 2 (3rd, 4th & 5th Year)
                 </h3>
                 <div className="space-y-6">
                   {[
