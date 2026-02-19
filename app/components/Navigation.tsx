@@ -37,7 +37,7 @@ const navItems = [
   { label: 'Workshops', href: '#' },
   { label: 'Past Winners', href: '/pastWinners' },
   { label: 'About us', href: '/about' },
-  { label: 'Contact', href: '#' },
+  { label: 'Contact', href: '/contactUs' },
 ];
 
 // ─────────────────────────────────────────────
