@@ -3,8 +3,9 @@
 import Image from "next/image";
 import { colors } from '@/utils/colors';
 import { Changa } from "next/font/google";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DownloadBriefModal, { BriefFile } from "./DownloadModal";
+import { createClient } from '@/lib/supabase/client';
 
 const changa = Changa({
   subsets: ["latin"],
@@ -34,8 +35,89 @@ const files: BriefFile[] = [
   },
 ];
 
+// --- Login Required Modal ---
+function LoginRequiredModal({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+      style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
+      onClick={onClose}
+    >
+      <div
+        className="relative rounded-2xl p-8 max-w-sm w-full shadow-2xl text-center bg-white"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors text-2xl leading-none"
+          aria-label="Close"
+        >
+          &times;
+        </button>
+
+        <h3 className="text-2xl font-bold mb-2 text-gray-900">
+          Login Required
+        </h3>
+        <p className="text-base mb-8 leading-relaxed text-gray-600">
+          You need to be logged in to download the brief and press kit files.
+        </p>
+
+        <div className="flex flex-col gap-3">
+          <a
+            href="/login"
+            className="block w-full px-6 py-3 rounded-lg text-white font-semibold text-base transition-all duration-200 hover:opacity-90 hover:scale-[1.02]"
+            style={{
+              background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`,
+            }}
+          >
+            Go to Login →
+          </a>
+          <button
+            onClick={onClose}
+            className="w-full px-6 py-3 rounded-lg font-semibold text-base border border-gray-200 text-gray-500 transition-all duration-200 hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function LiveCompetitionCard() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoginPromptOpen, setIsLoginPromptOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleDownloadClick = () => {
+    if (!isLoggedIn) {
+      setIsLoginPromptOpen(true);
+      return;
+    }
+    setIsOpen(true);
+  };
 
   return (
     <>
@@ -95,7 +177,7 @@ export default function LiveCompetitionCard() {
               Find out more <span className="text-base leading-none">→</span>
             </a>
             <button
-              onClick={() => setIsOpen(true)}
+              onClick={handleDownloadClick}
               className="flex items-center gap-1.5 text-sm text-gray-800 hover:text-gray-500 transition-colors cursor-pointer"
             >
               Download brief
@@ -113,6 +195,11 @@ export default function LiveCompetitionCard() {
           </div>
         </div>
       </div>
+
+      <LoginRequiredModal
+        isOpen={isLoginPromptOpen}
+        onClose={() => setIsLoginPromptOpen(false)}
+      />
 
       <DownloadBriefModal
         isOpen={isOpen}

@@ -257,9 +257,9 @@ export default function CompetitionPage() {
 
         {/* Prize Pool Section */}
         <section className="py-28 px-4 sm:px-6 lg:px-8 relative">
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-6xl mx-auto text-center">
             <div className="text-center mb-16 animate-fade-in-up">
-              <h2 className="text-5xl md:text-6xl font-bold mb-6 ">
+              <h2 className="text-3xl md:text-5xl font-bold mb-6 ">
                 Prize Pool
               </h2>
             </div>
@@ -283,10 +283,10 @@ export default function CompetitionPage() {
                   ].map((prize, idx) => (
                     <div key={idx} className="flex justify-between items-center group p-4 rounded-xl transition-all">
                       <span className="text-xl font-medium flex items-center gap-3" style={{ color: colors.textSecondary }}>
-                        <span className="text-3xl">{prize.emoji}</span>
+                        <span className="text-2xl">{prize.emoji}</span>
                         {prize.label}
                       </span>
-                      <span className="text-3xl font-black group-hover:scale-110 transition-transform" style={{ color: colors.textPrimary }}>
+                      <span className="text-2xl font-black" style={{ color: colors.textPrimary }}>
                         {prize.amount}
                       </span>
                     </div>
@@ -312,16 +312,22 @@ export default function CompetitionPage() {
                   ].map((prize, idx) => (
                     <div key={idx} className="flex justify-between items-center group p-4 rounded-xl transition-all">
                       <span className="text-xl font-medium flex items-center gap-3" style={{ color: colors.textSecondary }}>
-                        <span className="text-3xl">{prize.emoji}</span>
+                        <span className="text-2xl">{prize.emoji}</span>
                         {prize.label}
                       </span>
-                      <span className="text-3xl font-black group-hover:scale-110 transition-transform" style={{ color: colors.textPrimary }}>
+                      <span className="text-2xl font-black" style={{ color: colors.textPrimary }}>
                         {prize.amount}
                       </span>
                     </div>
                   ))}
                 </div>
               </div>
+            </div>
+
+            <div className="mt-12">
+              <span className="">
+                *This Monetary Awards will be given to Group A Participants only, Read full brief and *T&C Documents carefully for more information.
+              </span>
             </div>
           </div>
         </section>
