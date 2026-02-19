@@ -474,7 +474,7 @@ export default function Navigation() {
             className={`${FEARLogo.className} text-2xl font-bold tracking-tight transition-all duration-300 hover:scale-105 flex items-center gap-2`}
             style={{ color: colors.accent }}
           >
-            <img src="/logo2.svg" alt="Mind Rain logo" className="h-8" />
+            <img src="/logo2.svg" alt="Mind Rain logo" className="h-6 lg:h-8" />
           </Link>
 
           <DesktopNav user={user} />

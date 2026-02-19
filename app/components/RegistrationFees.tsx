@@ -186,6 +186,19 @@ export default function RegistrationFees() {
             : 'International applicants'}
         </p>
       </div>
+
+      <div className="flex items-center justify-center">
+        <a
+          href="/registration?event_id=3f123e78-60d6-494d-b307-18c5b4c8ab7f"
+          className="px-12 py-3.5 rounded-lg text-white font-bold text-sm transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow inline-block text-center"
+          style={{
+            background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
+          }}
+          data-testid="register-now-button"
+        >
+          Register Now →
+        </a>
+      </div>
     </div>
   );
 }

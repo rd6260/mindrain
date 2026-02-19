@@ -11,12 +11,13 @@ interface RegistrationData {
   country: string;
   team_type: 'solo' | 'group';
   registration_by: string;
+  group: 'A' | 'B'; // A = monetary award, B = non-monetary
 }
 
 interface FeeCalculation {
   amount: number;
   currency: string;
-  registrationType: 'Early Bird' | 'Advance' | 'Late Minute';
+  registrationType: 'Early Bird' | 'Regular' | 'Last Minute';
   mindrain_fee: number;
 }
 
@@ -34,74 +35,84 @@ function PaymentContent() {
 
   const supabase = createClient();
 
-  // Fee structure
+  // Fee structure (amounts as numbers, stripped of symbols/commas)
   const getFeeStructure = () => {
     return {
       earlyBird: {
-        indian: { solo: 349, group: 999 },
-        international: { solo: 25, group: 69 },
+        india_monetary:    { solo: 549,  group: 999  },
+        india_no_monetary: { solo: 275,  group: 559  },
+        international:     { solo: 35,   group: 79   },
       },
-      advance: {
-        indian: { solo: 699, group: 1499 },
-        international: { solo: 35, group: 99 },
+      regular: {
+        india_monetary:    { solo: 699,  group: 1499 },
+        india_no_monetary: { solo: 275,  group: 559  },
+        international:     { solo: 45,   group: 99   },
       },
-      lateMinute: {
-        indian: { solo: 999, group: 1999 },
-        international: { solo: 49, group: 129 },
+      lastMinute: {
+        india_monetary:    { solo: 999,  group: 1999 },
+        india_no_monetary: { solo: 375,  group: 819  },
+        international:     { solo: 69,   group: 149  },
       },
     };
   };
 
   // Determine registration type based on current date
-  const getRegistrationType = (): 'Early Bird' | 'Advance' | 'Late Minute' => {
+  const getRegistrationType = (): 'Early Bird' | 'Regular' | 'Last Minute' => {
     const currentDate = new Date();
-    
-    // Early Bird: Feb 2 - Feb 28, 2026
-    const earlyBirdStart = new Date('2026-02-02');
-    const earlyBirdEnd = new Date('2026-02-28T23:59:59');
-    
-    // Advance: Mar 1 - May 31, 2026
-    const advanceStart = new Date('2026-03-01');
-    const advanceEnd = new Date('2026-05-31T23:59:59');
-    
-    // Late: Jun 1 - Jun 25, 2026
-    const lateStart = new Date('2026-06-01');
-    const lateEnd = new Date('2026-06-25T23:59:59');
+
+    // Early Bird: Feb 19 – Mar 15, 2026
+    const earlyBirdStart = new Date('2026-02-19');
+    const earlyBirdEnd   = new Date('2026-03-15T23:59:59');
+
+    // Regular (Advance): Mar 16 – May 31, 2026
+    const regularStart = new Date('2026-03-16');
+    const regularEnd   = new Date('2026-05-31T23:59:59');
+
+    // Last Minute (Late): Jun 1 – Jun 25, 2026
+    const lastMinuteStart = new Date('2026-06-01');
+    const lastMinuteEnd   = new Date('2026-06-25T23:59:59');
 
     if (currentDate >= earlyBirdStart && currentDate <= earlyBirdEnd) {
       return 'Early Bird';
-    } else if (currentDate >= advanceStart && currentDate <= advanceEnd) {
-      return 'Advance';
-    } else if (currentDate >= lateStart && currentDate <= lateEnd) {
-      return 'Late Minute';
+    } else if (currentDate >= regularStart && currentDate <= regularEnd) {
+      return 'Regular';
+    } else if (currentDate >= lastMinuteStart && currentDate <= lastMinuteEnd) {
+      return 'Last Minute';
     } else {
-      // Default to advance if outside all ranges
-      return 'Advance';
+      // Default fallback
+      return 'Regular';
     }
   };
 
-  // Calculate fee based on country, team type, and current date
-  const calculateFee = (country: string, teamType: 'solo' | 'group'): FeeCalculation => {
+  // Calculate fee based on country, award group, team type, and current date
+  const calculateFee = (
+    country: string,
+    awardGroup: 'A' | 'B',
+    teamType: 'solo' | 'group'
+  ): FeeCalculation => {
     const feeStructure = getFeeStructure();
     const registrationType = getRegistrationType();
     const isIndian = country.toLowerCase() === 'india';
     const currency = isIndian ? 'INR' : 'USD';
 
-    let amount = 0;
+    let tierFees: { solo: number; group: number };
 
-    if (registrationType === 'Early Bird') {
-      amount = isIndian 
-        ? feeStructure.earlyBird.indian[teamType]
-        : feeStructure.earlyBird.international[teamType];
-    } else if (registrationType === 'Advance') {
-      amount = isIndian 
-        ? feeStructure.advance.indian[teamType]
-        : feeStructure.advance.international[teamType];
+    const tier =
+      registrationType === 'Early Bird'
+        ? feeStructure.earlyBird
+        : registrationType === 'Regular'
+        ? feeStructure.regular
+        : feeStructure.lastMinute;
+
+    if (!isIndian) {
+      tierFees = tier.international;
+    } else if (awardGroup === 'A') {
+      tierFees = tier.india_monetary;
     } else {
-      amount = isIndian 
-        ? feeStructure.lateMinute.indian[teamType]
-        : feeStructure.lateMinute.international[teamType];
+      tierFees = tier.india_no_monetary;
     }
+
+    const amount = tierFees[teamType];
 
     return {
       amount,
@@ -128,10 +139,10 @@ function PaymentContent() {
           return;
         }
 
-        // Fetch registration data
+        // Fetch registration data — now includes `group` field
         const { data: regData, error: regError } = await supabase
           .from('registrations')
-          .select('id, country, team_type, registration_by, paid')
+          .select('id, country, team_type, registration_by, group, paid')
           .eq('id', registrationId)
           .single();
 
@@ -141,14 +152,12 @@ function PaymentContent() {
           return;
         }
 
-        // Check if user owns this registration
         if (regData.registration_by !== user.id) {
           setError('Unauthorized access to this registration');
           setIsLoading(false);
           return;
         }
 
-        // Check if already paid
         if (regData.paid) {
           setError('This registration has already been paid');
           setIsLoading(false);
@@ -157,8 +166,7 @@ function PaymentContent() {
 
         setRegistration(regData);
 
-        // Calculate fee
-        const fee = calculateFee(regData.country, regData.team_type);
+        const fee = calculateFee(regData.country, regData.group, regData.team_type);
         setFeeDetails(fee);
 
         setIsLoading(false);
@@ -179,12 +187,11 @@ function PaymentContent() {
     setError(null);
 
     try {
-      // Create order via API
       const res = await fetch('/api/createOrder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: feeDetails.amount * 100, // Convert to paise/cents
+          amount: feeDetails.amount * 100, // paise / cents
           currency: feeDetails.currency,
           registration_id: registrationId,
         }),
@@ -196,7 +203,6 @@ function PaymentContent() {
         throw new Error(data.error || 'Failed to create order');
       }
 
-      // Initialize Razorpay payment
       const paymentData = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         order_id: data.razorpay_order_id,
@@ -206,7 +212,6 @@ function PaymentContent() {
         description: `${feeDetails.registrationType} Registration - ${registration.team_type}`,
         handler: async function (response: any) {
           try {
-            // Verify payment
             const verifyRes = await fetch('/api/verifyOrder', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -223,7 +228,6 @@ function PaymentContent() {
 
             if (verifyData.isOk) {
               setShowSuccessDialog(true);
-              // Redirect after 3 seconds
               setTimeout(() => {
                 router.push('/profile');
               }, 3000);
@@ -257,7 +261,6 @@ function PaymentContent() {
     }
   };
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#e8e6db] flex items-center justify-center">
@@ -266,7 +269,6 @@ function PaymentContent() {
     );
   }
 
-  // Error state
   if (error && !feeDetails) {
     return (
       <div className="min-h-screen bg-[#e8e6db] flex items-center justify-center p-6">
@@ -310,40 +312,46 @@ function PaymentContent() {
           )}
 
           <div className="p-6 space-y-6">
-            {/* Registration Details */}
             {registration && feeDetails && (
               <>
                 <div className="bg-[#edebdf] rounded-lg border-2 border-[#323232] shadow-[2px_2px_0_0_#323232] p-6">
                   <h3 className="text-xl font-black text-[#323232] mb-4">Registration Summary</h3>
-                  
+
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="text-[#666] font-semibold">Registration Type:</span>
                       <span className="text-[#323232] font-bold">{feeDetails.registrationType}</span>
                     </div>
-                    
+
                     <div className="flex justify-between items-center">
                       <span className="text-[#666] font-semibold">Team Type:</span>
                       <span className="text-[#323232] font-bold capitalize">{registration.team_type}</span>
                     </div>
-                    
+
                     <div className="flex justify-between items-center">
                       <span className="text-[#666] font-semibold">Country:</span>
                       <span className="text-[#323232] font-bold">{registration.country}</span>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-[#666] font-semibold">Award Category:</span>
+                      <span className="text-[#323232] font-bold">
+                        {registration.group === 'A' ? 'Monetary Award' : 'Non-Monetary Award'}
+                      </span>
                     </div>
 
                     <div className="border-t-2 border-[#323232] pt-3 mt-3">
                       <div className="flex justify-between items-center">
                         <span className="text-[#323232] font-bold text-lg">Total Amount:</span>
                         <span className="text-[#2d8cf0] font-black text-2xl">
-                          {feeDetails.currency === 'INR' ? '₹' : '$'}{feeDetails.amount}
+                          {feeDetails.currency === 'INR' ? '₹' : '$'}{feeDetails.amount.toLocaleString()}
                         </span>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Registration Period Info */}
+                {/* Info banner */}
                 <div className="bg-blue-50 rounded-lg border-2 border-[#2d8cf0] p-4">
                   <div className="flex items-start gap-3">
                     <div className="w-6 h-6 rounded-full bg-[#2d8cf0] flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -352,7 +360,7 @@ function PaymentContent() {
                     <div>
                       <h4 className="font-bold text-[#323232] mb-1">Payment Information</h4>
                       <p className="text-sm text-[#666]">
-                        You are registering during the <strong>{feeDetails.registrationType}</strong> period. 
+                        You are registering during the <strong>{feeDetails.registrationType}</strong> period.
                         The registration fee is non-refundable.
                       </p>
                     </div>
@@ -369,11 +377,13 @@ function PaymentContent() {
                       : 'bg-green-500 hover:bg-green-600'
                   }`}
                 >
-                  {isProcessing ? 'Processing...' : `Pay ${feeDetails.currency === 'INR' ? '₹' : '$'}${feeDetails.amount}`}
+                  {isProcessing
+                    ? 'Processing...'
+                    : `Pay ${feeDetails.currency === 'INR' ? '₹' : '$'}${feeDetails.amount.toLocaleString()}`}
                 </button>
 
                 <p className="text-xs text-center text-[#666]">
-                  By proceeding with payment, you agree to our terms and conditions. 
+                  By proceeding with payment, you agree to our terms and conditions.
                   Your payment will be securely processed through Razorpay.
                 </p>
               </>
@@ -388,32 +398,15 @@ function PaymentContent() {
           <div className="bg-white rounded-lg border-2 border-[#323232] shadow-[8px_8px_0_0_#323232] max-w-md w-full p-8">
             <div className="text-center">
               <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg 
-                  className="w-10 h-10 text-white" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={3} 
-                    d="M5 13l4 4L19 7" 
-                  />
+                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              
-              <h3 className="text-2xl font-black text-[#323232] mb-2">
-                Payment Successful!
-              </h3>
-              
+              <h3 className="text-2xl font-black text-[#323232] mb-2">Payment Successful!</h3>
               <p className="text-[#666] mb-4">
                 Your payment has been processed successfully. You will be redirected to your profile shortly.
               </p>
-
-              <div className="animate-pulse text-[#2d8cf0] font-semibold">
-                Redirecting...
-              </div>
+              <div className="animate-pulse text-[#2d8cf0] font-semibold">Redirecting...</div>
             </div>
           </div>
         </div>
@@ -421,8 +414,6 @@ function PaymentContent() {
     </div>
   );
 }
-
-
 
 export default function PaymentPage() {
   return (

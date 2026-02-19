@@ -257,7 +257,7 @@ export default function CompetitionPage() {
 
         {/* Prize Pool Section */}
         <section className="py-28 px-4 sm:px-6 lg:px-8 relative">
-          <div className="max-w-6xl mx-auto text-center">
+          <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16 animate-fade-in-up">
               <h2 className="text-3xl md:text-5xl font-bold mb-6 ">
                 Prize Pool
@@ -324,9 +324,9 @@ export default function CompetitionPage() {
               </div>
             </div>
 
-            <div className="mt-12">
+            <div className="mt-8">
               <span className="">
-                *This Monetary Awards will be given to Group A Participants only, Read full brief and *T&C Documents carefully for more information.
+                <sup>*</sup>This Monetary Awards will be given to Group A Participants only, Read full brief and <sup>*</sup>T&C Documents carefully for more information.
               </span>
             </div>
           </div>
@@ -396,7 +396,7 @@ export default function CompetitionPage() {
               <div className="text-center">
                 <a
                   href="mailto:contact@mindrain.org"
-                  className="inline-block px-8 py-3 rounded-full text-white font-medium transition-all hover:opacity-90"
+                  className="inline-block px-8 py-3 rounded-lg text-white font-medium transition-all hover:opacity-90"
                   style={{ backgroundColor: colors.accent }}
                   data-testid="discount-email-link"
                 >
