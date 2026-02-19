@@ -10,6 +10,11 @@ import { useEffect, useState } from 'react';
 import Navigation from '@/app/components/Navigation';
 import RegistrationFees from '@/app/components/RegistrationFees';
 import { createClient } from '@/lib/supabase/client';
+import localFont from "next/font/local";
+
+const TechnorFont = localFont({
+  src: "../../fonts/Technor-Variable.woff2"
+})
 
 
 const TUHBriefFiles: BriefFile[] = [
@@ -209,7 +214,7 @@ export default function CompetitionPage() {
             <span className="block text-sm font-light italic text-gray-400 mb-4">
               edition 06
             </span>
-            <h1 className="font-['Technor-Variable'] text-6xl font-black leading-none mb-3">
+            <h1 className={`${TechnorFont.className} text-6xl font-black leading-none mb-3`}>
               The Unreal<br />House
             </h1>
             <p className="text-base font-medium tracking-wide text-gray-300 mb-10">
