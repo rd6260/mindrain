@@ -395,7 +395,7 @@ export default function CompetitionPage() {
 
               <div className="text-center">
                 <a
-                  href="mailto:contact@mindrain.org"
+                  href="mailto:support@mindrain.org"
                   className="inline-block px-8 py-3 rounded-lg text-white font-medium transition-all hover:opacity-90"
                   style={{ backgroundColor: colors.accent }}
                   data-testid="discount-email-link"

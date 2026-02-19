@@ -164,8 +164,8 @@ export default function LiveCompetitionCard() {
           </div>
 
           <p className="text-sm text-gray-600 mt-1 mb-4">
-            Advance registration deadline{" "}
-            <span className="font-semibold text-gray-900">28 February 2026</span>
+            Early bird registration deadline{" "}
+            <span className="font-semibold text-gray-900">15 March 2026</span>
           </p>
 
           <div className="flex flex-row items-center gap-5 mt-3">

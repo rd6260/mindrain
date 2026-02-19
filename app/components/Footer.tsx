@@ -40,7 +40,7 @@ export default function Footer() {
             Have questions about our competitions? We'd love to hear from you.
           </p>
           <a
-            href="mailto:contact@mindrain.org"
+            href="mailto:support@mindrain.org"
             className="inline-block px-12 py-5 rounded-full text-white font-semibold text-lg transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-2xl"
             style={{ 
               background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})` 

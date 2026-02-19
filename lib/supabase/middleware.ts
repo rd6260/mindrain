@@ -1,7 +1,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
+export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -57,7 +57,17 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   // Protect routes
-  if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
+  const protectedRoutes = [
+    '/dashboard',
+    '/onboarding',
+    '/profile',
+    '/admin',
+    '/payment',
+    '/registration'
+  ]
+
+
+  if (!user && protectedRoutes.some(route => request.nextUrl.pathname.startsWith(route))) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
@@ -68,8 +78,8 @@ export async function middleware(request: NextRequest) {
   return response
 }
 
-export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
-}
+// export const config = {
+//   matcher: [
+//     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+//   ],
+// }
