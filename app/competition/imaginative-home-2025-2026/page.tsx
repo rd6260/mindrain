@@ -186,10 +186,71 @@ export default function CompetitionPage() {
           style={{ backgroundColor: colors.accent }}
         />
 
-        {/* Hero Section with Background Image */}
-        <section className="relative min-h-screen flex items-center justify-start px-4 sm:px-6 lg:px-8">
+        {/* Mobile Hero Section */}
+        <section className="relative h-dvh flex flex-col items-center justify-end pb-16 px-6 md:hidden">
           {/* Background Image */}
           <div className="absolute inset-0 z-0">
+            <Image
+              src="/the-unreal-house/TUH-cover.jpg"
+              alt="The Unreal House"
+              fill
+              className="object-cover object-center"
+              priority
+            />
+            {/* Gradient overlay for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+          </div>
+
+          {/* Content */}
+          <div className="relative z-10 w-full text-center text-white animate-fade-in">
+            <span className="block text-sm font-medium tracking-[0.2em] uppercase text-gray-300 mb-1">
+              Architecture Competition
+            </span>
+            <span className="block text-sm font-light italic text-gray-400 mb-4">
+              edition 06
+            </span>
+            <h1 className="font-['Technor-Variable'] text-6xl font-black leading-none mb-3">
+              The Unreal<br />House
+            </h1>
+            <p className="text-base font-medium tracking-wide text-gray-300 mb-10">
+              An Imaginary Home Design Challenge
+            </p>
+
+            <div className="flex flex-col gap-3 w-full max-w-xs mx-auto">
+              <a
+
+                href="/registration?event_id=3f123e78-60d6-494d-b307-18c5b4c8ab7f"
+                className="w-full px-6 py-4 rounded-lg text-white font-bold text-base transition-all duration-300 active:scale-95 shadow-xl text-center"
+                style={{
+                  background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
+                }}
+              >
+                Register Now →
+              </a>
+              <button
+                className="w-full px-6 py-4 rounded-lg text-white font-bold text-base transition-all duration-300 active:scale-95 shadow-xl"
+                style={{
+                  background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
+                }}
+                onClick={() => handleDownloadClick('brief')}
+              >
+                Download Brief ↓
+              </button>
+              <button
+                className="w-full px-6 py-4 rounded-lg font-bold text-base border border-white text-white transition-all duration-300 active:scale-95 shadow-xl"
+                style={{ background: 'rgba(255,255,255,0.08)' }}
+                onClick={() => handleDownloadClick('press')}
+              >
+                Press Kit ↓
+              </button>
+            </div>
+          </div>
+        </section >
+
+        {/* Hero Section with Background Image — Desktop only */}
+        <section className="relative min-h-screen hidden md:flex items-center justify-start px-4 sm:px-6 lg:px-8">
+          {/* Background Image */}
+          < div className="absolute inset-0 z-0" >
             <Image
               src="/competition-hero.jpg"
               alt="Imaginative Home Competition"
@@ -197,10 +258,10 @@ export default function CompetitionPage() {
               className="object-cover opacity-100"
               priority
             />
-          </div>
+          </div >
 
           {/* Content */}
-          <div className="relative z-10 ml-24 mt-10 max-w-5xl text-left text-gray-200 animate-fade-in">
+          < div className="relative z-10 ml-24 mt-10 max-w-5xl text-left text-gray-200 animate-fade-in" >
             <h1 className="space-y-4">
               <span className="block text-2xl md:text-4xl font-medium tracking-wide">
                 Architecture Competition
@@ -252,11 +313,11 @@ export default function CompetitionPage() {
                 </span>
               </button>
             </div>
-          </div>
-        </section>
+          </div >
+        </section >
 
         {/* Prize Pool Section */}
-        <section className="py-28 px-4 sm:px-6 lg:px-8 relative">
+        < section className="py-28 px-4 sm:px-6 lg:px-8 relative" >
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16 animate-fade-in-up">
               <h2 className="text-3xl md:text-5xl font-bold mb-6 ">
@@ -330,10 +391,10 @@ export default function CompetitionPage() {
               </span>
             </div>
           </div>
-        </section>
+        </section >
 
         {/* Important Dates Timeline */}
-        <section id="timeline" className="py-20 px-4 sm:px-6 lg:px-8">
+        < section id="timeline" className="py-20 px-4 sm:px-6 lg:px-8" >
           <div className="max-w-5xl mx-auto">
             <h2
               className="text-4xl md:text-5xl font-bold text-center mb-16"
@@ -343,10 +404,10 @@ export default function CompetitionPage() {
             </h2>
             <Timeline dates={importantDates} />
           </div>
-        </section>
+        </section >
 
         {/* Registration Fees */}
-        <section id="register" className="py-20 px-4 sm:px-6 lg:px-8">
+        < section id="register" className="py-20 px-4 sm:px-6 lg:px-8" >
           <div className="max-w-4xl mx-auto">
             <h2
               className="text-4xl md:text-5xl font-bold text-center mb-12"
@@ -356,10 +417,10 @@ export default function CompetitionPage() {
             </h2>
             <RegistrationFees />
           </div>
-        </section>
+        </section >
 
         {/* Discount Information */}
-        <section className="py-20 px-4 sm:px-6 lg:px-8">
+        < section className="py-20 px-4 sm:px-6 lg:px-8" >
           <div className="max-w-4xl mx-auto">
             <h2
               className="text-4xl md:text-5xl font-bold text-center mb-12"
@@ -405,15 +466,16 @@ export default function CompetitionPage() {
               </div>
             </div>
           </div>
-        </section>
+        </section >
 
         <Footer />
-      </div>
+      </div >
 
       {/* Login Required Modal */}
-      <LoginRequiredModal
+      < LoginRequiredModal
         isOpen={isLoginPromptOpen}
-        onClose={() => setIsLoginPromptOpen(false)}
+        onClose={() => setIsLoginPromptOpen(false)
+        }
       />
 
       {/* Download Modals (only reachable when logged in) */}
