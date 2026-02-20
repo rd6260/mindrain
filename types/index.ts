@@ -29,6 +29,37 @@ export interface Competition {
   honorableMentions?: Winner[];
 }
 
+// (start) Interfaces for the new past winners data
+export interface Entry {
+  big: string;
+  small: string;
+}
+
+export interface Member {
+  name: string;
+  pfp: string;
+}
+
+export interface NewWinner {
+  position: string;
+  institute: string;
+  description: string;
+  entry: Entry;
+  members: Member[];
+}
+
+export interface NewCategory {
+  category: string;
+  winners: NewWinner[];
+}
+
+export interface PastWinners {
+  name: string;
+  year: string;
+  categories: NewCategory[];
+}
+// (end) Interfaces for the new past winners data
+
 export interface PrizePool {
   total: string;
   category1: CategoryPrizes;

@@ -6,7 +6,7 @@ import { Winner } from '@/types';
 import Navigation from '@/app/components/Navigation';
 import Footer from '@/app/components/Footer';
 import { colors } from '@/utils/colors';
-import { previousWinners } from '@/data/winners';
+import { previousWinners2019 } from '@/data/winners';
 import LiveCompetitionCard from '@/app/components/LiveCompetitionCard';
 import localFont from "next/font/local";
 
@@ -111,19 +111,19 @@ interface WinnerWithPosition extends Winner {
 
 export default function HomePage() {
   const category1Winners: WinnerWithPosition[] = [
-    ...(previousWinners.categories[0].winners.first?.map((w) => ({ ...w, position: '1st Prize' })) || []),
-    ...(previousWinners.categories[0].winners.second?.map((w) => ({ ...w, position: '2nd Prize' })) || []),
-    ...(previousWinners.categories[0].winners.third?.map((w) => ({ ...w, position: '3rd Prize' })) || []),
+    ...(previousWinners2019.categories[0].winners.first?.map((w) => ({ ...w, position: '1st Prize' })) || []),
+    ...(previousWinners2019.categories[0].winners.second?.map((w) => ({ ...w, position: '2nd Prize' })) || []),
+    ...(previousWinners2019.categories[0].winners.third?.map((w) => ({ ...w, position: '3rd Prize' })) || []),
   ];
 
   const category2Winners: WinnerWithPosition[] = [
-    ...(previousWinners.categories[1].winners.first?.map((w) => ({ ...w, position: '1st Prize' })) || []),
-    ...(previousWinners.categories[1].winners.second?.map((w) => ({ ...w, position: '2nd Prize' })) || []),
-    ...(previousWinners.categories[1].winners.third?.map((w) => ({ ...w, position: '3rd Prize' })) || []),
+    ...(previousWinners2019.categories[1].winners.first?.map((w) => ({ ...w, position: '1st Prize' })) || []),
+    ...(previousWinners2019.categories[1].winners.second?.map((w) => ({ ...w, position: '2nd Prize' })) || []),
+    ...(previousWinners2019.categories[1].winners.third?.map((w) => ({ ...w, position: '3rd Prize' })) || []),
   ];
 
   const honorableMentions: WinnerWithPosition[] =
-    previousWinners.honorableMentions?.map((w) => ({ ...w, position: 'Honorable Mention' })) || [];
+    previousWinners2019.honorableMentions?.map((w) => ({ ...w, position: 'Honorable Mention' })) || [];
 
   return (
     <div style={{ backgroundColor: colors.background }} className="min-h-screen">
@@ -276,7 +276,7 @@ export default function HomePage() {
               className="text-xl"
               style={{ color: colors.textSecondary }}
             >
-              {previousWinners.name} • {previousWinners.year}
+              {previousWinners2019.name} • {previousWinners2019.year}
             </p>
           </div>
 

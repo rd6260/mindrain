@@ -1,6 +1,6 @@
-import { Competition } from '@/types';
+import { Competition, PastWinners } from '@/types';
 
-export const previousWinners: Competition = {
+export const previousWinners2019: Competition = {
   name: 'Dali House Competition',
   year: '2019',
   categories: [
@@ -119,3 +119,192 @@ export const previousWinners: Competition = {
     },
   ],
 };
+
+export const previousWinners2018: PastWinners = {
+  name: 'SUPERHERO HOUSE',
+  year: '2018',
+  categories: [
+    {
+      category: 'Category 1 (1st & 2nd years)',
+      winners: [
+        {
+          position: '1st Prize',
+          institute: 'MEASI Academy of Architecture & AMS Academy of Architecture, Chennai',
+          description: 'This project was a sheer delight! The Superhero was imaginative and we loved the idea that she could be ‘formless’ while resting or may take a human form. This approach must have given a great liberty to the design and a lot of freedom from the basic conventions followed. The design approach also shows interesting and active thought process with a good involvement of mind instead of digital softwares.',
+          entry: {
+            big: '/past-winners/entry/big/2018-1st-prize.jpg',
+            small: '/past-winners/entry/small/2018-1st-prize.jpg'
+          },
+          members: [
+            {
+              name: 'Divyalakshmi .B',
+              pfp: '/past-winners/pfp/2018-divyalakshmi-b.jpg'
+            },
+            {
+              name: 'Ahmed Nihamathullah',
+              pfp: '/past-winners/pfp/2018-ahmed-nihamathullah.jpg'
+            },
+            {
+              name: 'Aishwarya .K',
+              pfp: '/past-winners/pfp/2018-aishwarya-k.jpg'
+            },
+          ]
+        },
+        {
+          position: '2nd Prize',
+          institute: 'Faculty of Architecture, AKTU, Lucknow',
+          description: 'We loved your attention to detail to create the spaces for the design. The whole design seemed to come from letting the mind free to create an overall form and design and then detailing each part by giving it good thought. The dynamic and yet soothing character of the design was a plus-point. Once again, it was a relief to see a project with a completely human approach and very little use of softwares, without letting them override the design.',
+          entry: {
+            big: '/past-winners/entry/big/2018-2nd-prize.jpg',
+            small: '/past-winners/entry/small/2018-2nd-prize.jpg'
+          },
+          members: [
+            {
+              name: 'Anushka Patel',
+              pfp: '/past-winners/pfp/2018-anushka-patel.jpg'
+            },
+          ]
+        },
+        {
+          position: '3rd Prize',
+          institute: 'School of Planning and Architecture ,Vijayawada',
+          description: 'This project was quite imaginative and exciting. The idea of using lenses to throw images and illusions would create a surreal and dream-like atmosphere without using any major scientific mumbo-jumbo. The simple approach and the use Optics to create something that would look quite complicated was interesting to observe.',
+          entry: {
+            big: '',
+            small: 'public/past-winners/entry/small/2018-3rd-prize.jpg'
+          },
+          members: [
+            {
+              name: 'Pavan Kumar Sai',
+              pfp: '/past-winners/pfp/2018-pavan-kumar-sai.jpg'
+            },
+          ]
+        },
+      ]
+    },
+    {
+      category: 'honorable Mentions',
+      winners: [
+        {
+          position: '',
+          institute: 'Aligarh Muslim University, Aligarh',
+          description: '',
+          entry: {
+            big: '/past-winners/entry/big/2018-honorable-01.jpg',
+            small: '/past-winners/entry/small/2018-honorable-01.jpg'
+          },
+          members: [
+            {
+              name: 'Aashna Mittal',
+              pfp: ''
+            },
+            {
+              name: 'Umme Kulsum',
+              pfp: ''
+            },
+          ]
+        },
+        {
+          position: '',
+          institute: 'Birla Institute of Technology, Mesra',
+          description: '',
+          entry: {
+            big: '/past-winners/entry/big/2018-honorable-02.jpg',
+            small: '/past-winners/entry/small/2018-honorable-02.jpg'
+          },
+          members: [
+            {
+              name: 'Shibli Afaq',
+              pfp: ''
+            },
+            {
+              name: 'Shreya Bhagat',
+              pfp: ''
+            },
+            {
+              name: 'Pragya Maheshwari',
+              pfp: ''
+            },
+          ]
+        },
+        {
+          position: '',
+          institute: 'MM School of Architecture, Ambala',
+          description: '',
+          entry: {
+            big: '',
+            small: '/past-winners/entry/small/2018-honorable-03.jpg'
+          },
+          members: [
+            {
+              name: 'Aniket Kumar',
+              pfp: ''
+            },
+          ]
+        },
+        {
+          position: '',
+          institute: 'Lovely Professional University, Phagwara',
+          description: '',
+          entry: {
+            big: '',
+            small: '/past-winners/entry/small/2018-honorable-04.jpg'
+          },
+          members: [
+            {
+              name: 'Rahul Aeron',
+              pfp: ''
+            },
+          ]
+        },
+        {
+          position: '',
+          institute: 'SMEF Brick School of Architecture, Pune',
+          description: '',
+          entry: {
+            big: '',
+            small: '/past-winners/entry/small/2018-honorable-05.jpg'
+          },
+          members: [
+            {
+              name: 'Ajinkya Kashid',
+              pfp: ''
+            },
+            {
+              name: 'Rushikesh Naikwadi',
+              pfp: ''
+            },
+            {
+              name: 'Vijay Gaikwad',
+              pfp: ''
+            },
+          ]
+        },
+        {
+          position: '',
+          institute: 'Universitas Indonesia, Jakarta',
+          description: '',
+          entry: {
+            big: '',
+            small: '/past-winners/entry/small/2018-honorable-06.jpg'
+          },
+          members: [
+            {
+              name: 'Amirah Hasna Ersaid Lasabuda',
+              pfp: ''
+            },
+            {
+              name: 'Chairunnisa Luthfya Nurifana',
+              pfp: ''
+            },
+            {
+              name: 'Pradhnya Anindya Dewanti',
+              pfp: ''
+            },
+          ]
+        },
+      ]
+    }
+  ],
+};
+
