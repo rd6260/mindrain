@@ -56,6 +56,7 @@ function PaymentContent() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [alreadyPaid, setAlreadyPaid] = useState(false);
 
   const supabase = createClient();
 
@@ -118,7 +119,12 @@ function PaymentContent() {
 
         if (regError || !regData) { setError('Registration not found'); setIsLoading(false); return; }
         if (regData.registration_by !== user.id) { setError('Unauthorized access'); setIsLoading(false); return; }
-        if (regData.paid) { setError('This registration has already been paid'); setIsLoading(false); return; }
+
+        if (regData.paid) {
+          setAlreadyPaid(true);
+          setIsLoading(false);
+          return;
+        }
 
         setRegistration(regData);
         setFeeDetails(calculateFee(regData.country, regData.group, regData.team_type));
@@ -208,7 +214,32 @@ function PaymentContent() {
     );
   }
 
-  // Fatal error (no fee details)
+  // Already paid screen
+  if (alreadyPaid) {
+    return (
+      <div className="min-h-screen bg-[#EDEBDF] flex items-center justify-center p-6">
+        <div className="w-full max-w-sm bg-[#F8F7F2] rounded-2xl border border-[#D0CEC2] p-8 text-center shadow-xl">
+          <div className="w-14 h-14 bg-[#2D5F4F] rounded-full flex items-center justify-center mx-auto mb-5">
+            <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-bold text-[#1A1A1A] mb-2">Payment Complete</h2>
+          <p className="text-sm text-[#6B6B6B] mb-7 leading-relaxed">
+            Your registration has already been paid and confirmed. No further action is needed.
+          </p>
+          <button
+            onClick={() => router.push('/')}
+            className="w-full py-3.5 rounded-xl bg-[#2C5F5F] text-white text-sm font-bold hover:bg-[#1A4D4D] transition-colors shadow-lg shadow-[#2C5F5F]/20"
+          >
+            Go to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Fatal error
   if (error && !feeDetails) {
     return (
       <div className="min-h-screen bg-[#EDEBDF] flex items-center justify-center p-6">
