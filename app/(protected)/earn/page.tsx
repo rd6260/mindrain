@@ -19,7 +19,16 @@ const perks = [
       </svg>
     ),
     label: '10% per referral',
-    sub: 'Of the full registration fee',
+    sub: 'On successful registration',
+  },
+  {
+    icon: (
+      <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 14.25l6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0c1.1.128 1.907 1.077 1.907 2.185z" />
+      </svg>
+    ),
+    label: '5% off for your referral',
+    sub: 'Your friend saves on registration too',
   },
   {
     icon: (
@@ -92,7 +101,7 @@ export default function EarnPage() {
         {/* ── What You Earn ── */}
         <section>
           <h2 className="text-2xl font-bold mb-6" style={{ color: '#1A1A1A' }}>What You Earn</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {perks.map((p) => (
               <div
                 key={p.label}
@@ -169,21 +178,21 @@ export default function EarnPage() {
               <h3 className="text-lg font-bold" style={{ color: '#1A1A1A' }}>Payout Policy</h3>
             </div>
             <ul className="space-y-3 text-sm" style={{ color: '#3A3A3A' }}>
-              <li className="flex items-start gap-2">
-                <span className="mt-1 w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: '#2C5F5F' }} />
-                Minimum wallet balance to withdraw: <strong>₹1,500</strong>
+              <li className="flex items-baseline gap-2">
+                <span className="w-1.5 h-1.5 rounded-full shrink-0 translate-y-[3px]" style={{ backgroundColor: '#2C5F5F' }} />
+                <span>Minimum wallet balance to withdraw: <strong>₹1,500</strong></span>
               </li>
-              <li className="flex items-start gap-2">
-                <span className="mt-1 w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: '#2C5F5F' }} />
-                Payout via <strong>UPI transfer.</strong> apply anytime once threshold is met
+              <li className="flex items-baseline gap-2">
+                <span className="w-1.5 h-1.5 rounded-full shrink-0 translate-y-[3px]" style={{ backgroundColor: '#2C5F5F' }} />
+                <span>Payout via <strong>UPI transfer</strong> — apply anytime once threshold is met</span>
               </li>
-              <li className="flex items-start gap-2">
-                <span className="mt-1 w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: '#2C5F5F' }} />
-                Processing time: <strong>24 hours to 7 working days</strong> after withdrawal request
+              <li className="flex items-baseline gap-2">
+                <span className="w-1.5 h-1.5 rounded-full shrink-0 translate-y-[3px]" style={{ backgroundColor: '#2C5F5F' }} />
+                <span>Processing time: <strong>24 hours to 7 working days</strong> after withdrawal request</span>
               </li>
-              <li className="flex items-start gap-2">
-                <span className="mt-1 w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: '#2C5F5F' }} />
-                A referral counts only after the referred participant completes <strong>full payment</strong>
+              <li className="flex items-baseline gap-2">
+                <span className="w-1.5 h-1.5 rounded-full shrink-0 translate-y-[3px]" style={{ backgroundColor: '#2C5F5F' }} />
+                <span>A referral counts only after the referred participant completes <strong>full payment</strong></span>
               </li>
             </ul>
           </div>
