@@ -1,6 +1,6 @@
 
 
-export deafault function EarnDashboard() {
+export default function EarnDashboard() {
   return (
     <div>
       <h1>Under construction</h1>

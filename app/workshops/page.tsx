@@ -1,7 +1,7 @@
 
 
 
-export default async function DashboardPage() {
+export default function DashboardPage() {
 
 
   return (
