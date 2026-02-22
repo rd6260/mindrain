@@ -15,11 +15,13 @@ function FloatingInput({
   type = 'text',
   name,
   disabled,
+  onChange,
 }: {
   label: string;
   type?: string;
   name: string;
   disabled?: boolean;
+  onChange?: (value: string) => void;
 }) {
   return (
     <label className="relative block w-full group">
@@ -29,6 +31,7 @@ function FloatingInput({
         placeholder=" "
         required
         disabled={disabled}
+        onChange={onChange ? (e) => onChange(e.target.value) : undefined}
         className="
           peer w-full px-4 pt-6 pb-2 text-[#1A1A1A] bg-[#F8F7F2]
           border border-[#D0CEC2] rounded-xl outline-none
@@ -58,6 +61,8 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSignup, setIsSignup] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const router = useRouter();
   const supabase = createClient();
 
@@ -91,8 +96,14 @@ export default function LoginPage() {
 
   const handleSignup = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsLoading(true);
     setError(null);
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    setIsLoading(true);
     const formData = new FormData(e.currentTarget);
     try {
       const { error } = await supabase.auth.signUp({
@@ -108,6 +119,8 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
+
+  const passwordMismatch = isSignup && confirmPassword.length > 0 && password !== confirmPassword;
 
   return (
     <div className="min-h-screen bg-[#EDEBDF] flex items-center justify-center px-4">
@@ -170,7 +183,7 @@ export default function LoginPage() {
           <div className="flex bg-[#EDEBDF] rounded-xl p-1 gap-1">
             <button
               type="button"
-              onClick={() => { setIsSignup(false); setError(null); }}
+              onClick={() => { setIsSignup(false); setError(null); setPassword(''); setConfirmPassword(''); }}
               className={`
                 flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200
                 ${!isSignup
@@ -183,7 +196,7 @@ export default function LoginPage() {
             </button>
             <button
               type="button"
-              onClick={() => { setIsSignup(true); setError(null); }}
+              onClick={() => { setIsSignup(true); setError(null); setPassword(''); setConfirmPassword(''); }}
               className={`
                 flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200
                 ${isSignup
@@ -203,15 +216,67 @@ export default function LoginPage() {
             className="space-y-3"
           >
             <FloatingInput label="Email address" type="email" name="email" disabled={isLoading} />
-            <FloatingInput label="Password" type="password" name="password" disabled={isLoading} />
+            <FloatingInput
+              label="Password"
+              type="password"
+              name="password"
+              disabled={isLoading}
+              onChange={isSignup ? setPassword : undefined}
+            />
+
+            {/* Confirm password — signup only */}
+            {isSignup && (
+              <div className="relative">
+                <label className="relative block w-full group">
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    placeholder=" "
+                    required
+                    disabled={isLoading}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className={`
+                      peer w-full px-4 pt-6 pb-2 text-[#1A1A1A] bg-[#F8F7F2]
+                      border rounded-xl outline-none
+                      text-sm font-medium
+                      transition-all duration-200
+                      disabled:opacity-50 disabled:cursor-not-allowed
+                      ${passwordMismatch
+                        ? 'border-[#C85D3E] focus:border-[#C85D3E] focus:ring-2 focus:ring-[#C85D3E]/10'
+                        : 'border-[#D0CEC2] focus:border-[#2C5F5F] focus:ring-2 focus:ring-[#2C5F5F]/10'
+                      }
+                    `}
+                  />
+                  <span className={`
+                    absolute left-4 top-4 text-sm
+                    transition-all duration-200 pointer-events-none
+                    peer-focus:top-2 peer-focus:text-xs peer-focus:font-semibold
+                    peer-[&:not(:placeholder-shown)]:top-2
+                    peer-[&:not(:placeholder-shown)]:text-xs
+                    peer-[&:not(:placeholder-shown)]:font-semibold
+                    ${passwordMismatch
+                      ? 'text-[#C85D3E] peer-focus:text-[#C85D3E] peer-[&:not(:placeholder-shown)]:text-[#C85D3E]'
+                      : 'text-[#8B8B8B] peer-focus:text-[#2C5F5F] peer-[&:not(:placeholder-shown)]:text-[#6B6B6B]'
+                    }
+                  `}>
+                    Confirm password
+                  </span>
+                </label>
+                {passwordMismatch && (
+                  <p className="mt-1.5 text-xs text-[#C85D3E] font-medium pl-1">
+                    Passwords do not match
+                  </p>
+                )}
+              </div>
+            )}
 
             <div className="pt-2">
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || passwordMismatch}
                 className={`
                   w-full py-4 rounded-xl text-sm font-bold tracking-wide transition-all duration-200
-                  ${isLoading
+                  ${isLoading || passwordMismatch
                     ? 'bg-[#D0CEC2] text-[#8B8B8B] cursor-not-allowed'
                     : 'bg-[#2C5F5F] text-white hover:bg-[#1A4D4D] shadow-lg shadow-[#2C5F5F]/20 hover:shadow-xl hover:shadow-[#2C5F5F]/30 hover:-translate-y-0.5'
                   }
@@ -236,7 +301,7 @@ export default function LoginPage() {
             }
             <button
               type="button"
-              onClick={() => { setIsSignup(!isSignup); setError(null); }}
+              onClick={() => { setIsSignup(!isSignup); setError(null); setPassword(''); setConfirmPassword(''); }}
               className="text-[#2C5F5F] font-semibold hover:underline"
             >
               {isSignup ? 'Log in' : 'Sign up'}

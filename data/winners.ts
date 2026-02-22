@@ -170,8 +170,8 @@ export const previousWinners2018: PastWinners = {
           institute: 'School of Planning and Architecture ,Vijayawada',
           description: 'This project was quite imaginative and exciting. The idea of using lenses to throw images and illusions would create a surreal and dream-like atmosphere without using any major scientific mumbo-jumbo. The simple approach and the use Optics to create something that would look quite complicated was interesting to observe.',
           entry: {
-            big: '',
-            small: 'public/past-winners/entry/small/2018-3rd-prize.jpg'
+            big: '/past-winners/entry/big/2018-3rd-prize.jpg',
+            small: '/past-winners/entry/small/2018-3rd-prize.jpg'
           },
           members: [
             {
@@ -232,7 +232,7 @@ export const previousWinners2018: PastWinners = {
           institute: 'MM School of Architecture, Ambala',
           description: '',
           entry: {
-            big: '',
+            big: '/past-winners/entry/big/2018-honorable-03.jpg',
             small: '/past-winners/entry/small/2018-honorable-03.jpg'
           },
           members: [
@@ -247,7 +247,7 @@ export const previousWinners2018: PastWinners = {
           institute: 'Lovely Professional University, Phagwara',
           description: '',
           entry: {
-            big: '',
+            big: '/past-winners/entry/big/2018-honorable-04.jpg',
             small: '/past-winners/entry/small/2018-honorable-04.jpg'
           },
           members: [
@@ -262,7 +262,7 @@ export const previousWinners2018: PastWinners = {
           institute: 'SMEF Brick School of Architecture, Pune',
           description: '',
           entry: {
-            big: '',
+            big: '/past-winners/entry/big/2018-honorable-05.jpg',
             small: '/past-winners/entry/small/2018-honorable-05.jpg'
           },
           members: [
@@ -285,7 +285,7 @@ export const previousWinners2018: PastWinners = {
           institute: 'Universitas Indonesia, Jakarta',
           description: '',
           entry: {
-            big: '',
+            big: '/past-winners/entry/big/2018-honorable-06.jpg',
             small: '/past-winners/entry/small/2018-honorable-06.jpg'
           },
           members: [
@@ -299,6 +299,262 @@ export const previousWinners2018: PastWinners = {
             },
             {
               name: 'Pradhnya Anindya Dewanti',
+              pfp: ''
+            },
+          ]
+        },
+      ]
+    }
+  ],
+};
+
+
+
+export const previousWinners2017: PastWinners = {
+  name: 'art gallery design',
+  year: '2017',
+  categories: [
+    {
+      category: 'Category 1 (1st & 2nd years)',
+      winners: [
+        {
+          position: '1st Prize',
+          institute: 'VIT’s PVP College Of Architecture, PUNE',
+          description: '',
+          entry: {
+            big: '/past-winners/entry/big/2017-1st-prize.jpg',
+            small: ''
+          },
+          members: [
+            {
+              name: 'Atharva Ghogale',
+              pfp: '/past-winners/pfp/2017-atharva-ghogale.jpg'
+            },
+            {
+              name: 'Janhavi Kamthe',
+              pfp: '/past-winners/pfp/2017-janhavi-kamthe.jpg'
+            },
+            {
+              name: 'Ravi Varma',
+              pfp: '/past-winners/pfp/2017-ravi-varma.jpg'
+            },
+          ]
+        },
+        {
+          position: '2nd Prize',
+          institute: 'IPS Academy, Indore',
+          description: '',
+          entry: {
+            big: '/past-winners/entry/big/2017-2nd-prize.jpg',
+            small: ''
+          },
+          members: [
+            {
+              name: 'Rushmika Malik',
+              pfp: '/past-winners/pfp/2017-rushmika-malik.jpg'
+            },
+          ]
+        },
+        {
+          position: '3rd Prize',
+          institute: 'Lovely Professional University, Phagwara ',
+          description: '',
+          entry: {
+            big: '/past-winners/entry/big/2017-3rd-prize.jpg',
+            small: ''
+          },
+          members: [
+            {
+              name: 'Shoaib Ul Islam',
+              pfp: '/past-winners/pfp/2017-shoaib-ul-Islam.jpg'
+            },
+          ]
+        },
+      ]
+    },
+    {
+      category: 'Category 2 (3rd, 4th and 5th years)',
+      winners: [
+        {
+          position: '1st Prize',
+          institute: 'BMS College of Engineering, Bengaluru',
+          description: '',
+          entry: {
+            big: '/past-winners/entry/big/2017-cat-2-1st-prize.jpg',
+            small: ''
+          },
+          members: [
+            {
+              name: 'Prakruthi.M.P',
+              pfp: '/past-winners/pfp/2017-prakruthi-m-p.jpg'
+            },
+            {
+              name: 'Nishitha.N.Jain',
+              pfp: '/past-winners/pfp/2017-nishitha-n-jain.jpg'
+            },
+          ]
+        },
+        {
+          position: '2nd Prize',
+          institute: 'Gogte Institute Of Technology Udyambag, Belgum, Karnataka',
+          description: '',
+          entry: {
+            big: '/past-winners/entry/big/2017-cat-2-2nd-prize.jpg',
+            small: ''
+          },
+          members: [
+            {
+              name: 'Ramya Bhat',
+              pfp: '/past-winners/pfp/2017-ramya-bhat.jpg'
+            },
+            {
+              name: 'Riya Raikar',
+              pfp: '/past-winners/pfp/2017-riya-raikar.jpg'
+            },
+            {
+              name: 'Prateeka Bandiwadekar',
+              pfp: '/past-winners/pfp/2017-prateeka-bandiwadekar.jpg'
+            },
+          ]
+        },
+        {
+          position: '3rd Prize',
+          institute: 'Nirma University, Ahmedabad',
+          description: '',
+          entry: {
+            big: '/past-winners/entry/big/2017-cat-2-3rd-prize.jpg',
+            small: ''
+          },
+          members: [
+            {
+              name: 'Aditi Kaushik',
+              pfp: '/past-winners/pfp/2017-aditi-kaushik.jpg'
+            },
+            {
+              name: 'Himanshu Agrawal',
+              pfp: '/past-winners/pfp/2017-himanshu-agrawal.jpg'
+            },
+          ]
+        },
+      ]
+    },
+    {
+      category: 'Honourable Mentions (1st and 2nd Year Category)',
+      winners: [
+        {
+          position: '',
+          institute: 'Lovely Professional University, Phagwara',
+          description: '',
+          entry: {
+            big: '/past-winners/entry/big/2017-cat-1-honorable-1.jpg',
+            small: ''
+          },
+          members: [
+            {
+              name: 'MD Mofazzal Hoq',
+              pfp: ''
+            },
+          ]
+        },
+        {
+          position: '',
+          institute: 'Mrunal Manoj Chavhan',
+          description: '',
+          entry: {
+            big: '/past-winners/entry/big/2017-cat-1-honorable-2.jpg',
+            small: ''
+          },
+          members: [
+            {
+              name: 'Radhikatai Pandav college of architecture, Nagpur',
+              pfp: ''
+            },
+          ]
+        },
+        {
+          position: '',
+          institute: 'Gateway college of architecture and design, Haryana',
+          description: '',
+          entry: {
+            big: '/past-winners/entry/big/2017-cat-1-honorable-3.jpg',
+            small: ''
+          },
+          members: [
+            {
+              name: 'Ayush kumar sharma',
+              pfp: ''
+            },
+          ]
+        },
+        {
+          position: '',
+          institute: 'Birla Institute Of Technology, Mesra',
+          description: '',
+          entry: {
+            big: '',
+            small: ''
+          },
+          members: [
+            {
+              name: 'Saket Sagar',
+              pfp: ''
+            },
+            {
+              name: 'Rohit Tirkey',
+              pfp: ''
+            },
+            {
+              name: 'Ankit Kumar',
+              pfp: ''
+            },
+          ]
+        },
+        {
+          position: '',
+          institute: '',
+          description: '',
+          entry: {
+            big: '',
+            small: ''
+          },
+          members: [
+            {
+              name: '',
+              pfp: ''
+            },
+          ]
+        },
+        {
+          position: '',
+          institute: '',
+          description: '',
+          entry: {
+            big: '',
+            small: ''
+          },
+          members: [
+            {
+              name: '',
+              pfp: ''
+            },
+          ]
+        },
+      ]
+    },
+    {
+      category: '',
+      winners: [
+        {
+          position: '',
+          institute: '',
+          description: '',
+          entry: {
+            big: '',
+            small: ''
+          },
+          members: [
+            {
+              name: '',
               pfp: ''
             },
           ]

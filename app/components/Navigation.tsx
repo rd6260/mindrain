@@ -14,7 +14,7 @@ const FEARLogo = localFont({
 
 const navItems = [
   {
-    label: 'Current Competitions',
+    label: 'Competitions',
     href: '#',
     subItems: [
       {
@@ -35,7 +35,8 @@ const navItems = [
     ],
   },
   { label: 'Workshops', href: '#' },
-  { label: 'Past Winners', href: '/pastWinners' },
+  { label: 'Winners', href: '/pastWinners' },
+  { label: 'Earn with Us', href: '/earn' },
   { label: 'About us', href: '/about' },
   { label: 'Contact', href: '/contactUs' },
 ];
