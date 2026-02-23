@@ -136,9 +136,8 @@ function RegistrationStatusDialog({
     <div className="fixed inset-0 bg-[#1A1A1A]/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-[#F8F7F2] rounded-2xl border border-[#D0CEC2] w-full max-w-sm p-8 text-center shadow-2xl">
         <div
-          className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-5 ${
-            isPaid ? 'bg-[#2D5F4F]' : 'bg-[#D97757]'
-          }`}
+          className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-5 ${isPaid ? 'bg-[#2D5F4F]' : 'bg-[#D97757]'
+            }`}
         >
           {isPaid ? (
             <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -660,7 +659,7 @@ function RegistrationContent() {
               <ToggleBtn active={countryType === 'India'} onClick={() => { setCountryType('India'); setCountry('India'); }} disabled={isLoading || isPaid}>
                 India
               </ToggleBtn>
-              <ToggleBtn active={countryType === 'Other'} onClick={() => setCountryType('Other')} disabled={isLoading || isPaid}>
+              <ToggleBtn active={countryType === 'Other'} onClick={() => { setCountryType('Other'); setGroup('A'); }} disabled={isLoading || isPaid}>
                 Others
               </ToggleBtn>
             </div>
@@ -675,17 +674,19 @@ function RegistrationContent() {
           </div>
 
           {/* Group */}
-          <div>
-            <SectionHeading>Group</SectionHeading>
-            <div className="flex gap-2">
-              <ToggleBtn active={group === 'A'} onClick={() => setGroup('A')} disabled={isLoading || isPaid}>
-                Group A — Monetary Award
-              </ToggleBtn>
-              <ToggleBtn active={group === 'B'} onClick={() => setGroup('B')} disabled={isLoading || isPaid}>
-                Group B — No Monetary Award
-              </ToggleBtn>
+          {countryType === 'India' && (
+            <div>
+              <SectionHeading>Group</SectionHeading>
+              <div className="flex gap-2">
+                <ToggleBtn active={group === 'A'} onClick={() => setGroup('A')} disabled={isLoading || isPaid}>
+                  Group A — Monetary Award
+                </ToggleBtn>
+                <ToggleBtn active={group === 'B'} onClick={() => setGroup('B')} disabled={isLoading || isPaid}>
+                  Group B — No Monetary Award
+                </ToggleBtn>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Category */}
           <div>
@@ -821,9 +822,9 @@ function RegistrationContent() {
               >
                 {isLoading
                   ? <span className="flex items-center justify-center gap-2">
-                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      {isEditMode ? 'Updating...' : 'Registering...'}
-                    </span>
+                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    {isEditMode ? 'Updating...' : 'Registering...'}
+                  </span>
                   : isEditMode ? 'Update Registration' : 'Complete Registration'
                 }
               </button>
