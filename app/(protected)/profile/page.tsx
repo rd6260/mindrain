@@ -414,7 +414,7 @@ const ProfilePage = () => {
                 }}
               >
                 <h3 className="text-2xl font-bold mb-4" style={{ color: '#1A1A1A' }}>
-                  Events Participated
+                  Events Participation History
                 </h3>
 
                 {participatedEvents.length === 0 ? (
