@@ -25,7 +25,6 @@ interface Event {
 interface Member {
   id: string;
   name: string;
-  code: string;
 }
 
 interface Registration {
@@ -34,6 +33,7 @@ interface Registration {
   group: 'A' | 'B';
   category: '1' | '2';
   team_type: 'solo' | 'group';
+  team_id: string;
   paid: boolean;
   event_id: string;
   events: Event;
@@ -82,8 +82,7 @@ const ProfilePage = () => {
           ),
           members (
             id,
-            name,
-            code
+            name
           )
         `)
         .eq('registration_by', currentUser.id);
@@ -310,16 +309,17 @@ const ProfilePage = () => {
                               {registration.events.title}
                             </h4>
                             <p className="text-xs font-semibold mt-0.5" style={{ color: '#6B6B6B' }}>
-                              Event ID:{' '}
+                              Team ID:{' '}
                               <span
-                                className="px-1.5 py-0.5 rounded"
+                                className="px-1.5 py-0.5 rounded font-mono"
                                 style={{ backgroundColor: '#EDEBDF', color: '#2C5F5F' }}
                               >
-                                {registration.events.code_name}
+                                {registration.team_id}
                               </span>
                             </p>
                           </div>
                           <div className="flex flex-col items-end gap-2">
+                            {/* 
                             <span
                               className="px-3 py-1 rounded-full text-xs font-semibold"
                               style={{
@@ -329,6 +329,7 @@ const ProfilePage = () => {
                             >
                               {registration.paid ? 'Paid' : 'Payment Pending'}
                             </span>
+                            */}
                             {!registration.paid && (
                               <a
                                 href={`/payment?registration_id=${registration.id}`}
@@ -387,17 +388,11 @@ const ProfilePage = () => {
                               {registration.members.map((member) => (
                                 <div
                                   key={member.id}
-                                  className="flex items-center justify-between rounded-md px-3 py-2"
+                                  className="rounded-md px-3 py-2"
                                   style={{ backgroundColor: '#F8F7F2' }}
                                 >
                                   <p className="text-sm font-semibold" style={{ color: '#1A1A1A' }}>
                                     {member.name}
-                                  </p>
-                                  <p
-                                    className="text-xs font-mono font-semibold px-2 py-0.5 rounded"
-                                    style={{ backgroundColor: '#EDEBDF', color: '#2C5F5F' }}
-                                  >
-                                    {member.code}
                                   </p>
                                 </div>
                               ))}

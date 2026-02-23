@@ -86,7 +86,7 @@ export default function EarnPage() {
               Share your referral code, invite participants, and receive a direct cash reward for every confirmed registration you bring in.
             </p>
             <Link
-              href="/earn/create"
+              href="/earn/onboarding"
               className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-bold text-sm transition-all duration-200 hover:shadow-xl hover:scale-[1.02]"
               style={{ backgroundColor: '#D97757', color: '#FFFFFF' }}
             >

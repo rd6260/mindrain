@@ -396,20 +396,16 @@ function RegistrationContent() {
     // If member has a DB id, delete from DB and storage
     if (member.id) {
       try {
-        // Delete from storage if we have a URL
-        // URL format: https://xxx.supabase.co/storage/v1/object/public/college_id/unreal_home/FILENAME
-        // Bucket = "college_id", path inside bucket = "unreal_home/FILENAME"
         if (member.institute_id_url) {
           const marker = '/object/public/college_id/';
           const markerIndex = member.institute_id_url.indexOf(marker);
           if (markerIndex !== -1) {
             const storagePath = member.institute_id_url
               .slice(markerIndex + marker.length)
-              .split('?')[0]; // strip any query params → "unreal_home/filename.jpg"
+              .split('?')[0];
             await supabase.storage.from('college_id').remove([storagePath]);
           }
         }
-        // Delete from DB
         await supabase.from('members').delete().eq('id', member.id);
       } catch (err) {
         console.error('Error removing member:', err);
@@ -419,30 +415,52 @@ function RegistrationContent() {
     setMembers(members.filter((_, i) => i !== index));
   };
 
-  const generateNextCode = async (retryCount = 0): Promise<number> => {
+  /**
+   * Generate the next team_id for the given event.
+   * Fetches all existing team_ids for that event, finds the max trailing number,
+   * and returns (max + 1). Retries on failure to handle race conditions.
+   *
+   * Format: {eventPreCode}-{group}-{categoryPart}-{teamPart}-{paddedNumber}
+   * e.g. EVT-A-I-IND-0001
+   */
+  const generateTeamId = async (
+    eventId: string,
+    codeName: string,
+    grp: string,
+    cat: string,
+    tType: string,
+    retryCount = 0
+  ): Promise<string> => {
     const maxRetries = 5;
     try {
-      const { data: existingRegistrations, error: fetchError } = await supabase
-        .from('registrations').select('id').eq('event_id', selectedEventId);
+      // Fetch all team_ids for this event
+      const { data: existingRegs, error: fetchError } = await supabase
+        .from('registrations')
+        .select('team_id')
+        .eq('event_id', eventId);
+
       if (fetchError) throw fetchError;
-      if (!existingRegistrations || existingRegistrations.length === 0) return 1;
-      const registrationIds = existingRegistrations.map(r => r.id);
-      const { data: existingMembers, error: membersError } = await supabase
-        .from('members').select('code').in('registration_id', registrationIds);
-      if (membersError) throw membersError;
+
       let maxNumber = 0;
-      if (existingMembers && existingMembers.length > 0) {
-        existingMembers.forEach(member => {
-          const parts = member.code.split('-');
-          const numberPart = parseInt(parts[parts.length - 1]);
-          if (numberPart > maxNumber) maxNumber = numberPart;
+      if (existingRegs && existingRegs.length > 0) {
+        existingRegs.forEach(reg => {
+          if (!reg.team_id) return;
+          const parts = reg.team_id.split('-');
+          const numberPart = parseInt(parts[parts.length - 1], 10);
+          if (!isNaN(numberPart) && numberPart > maxNumber) maxNumber = numberPart;
         });
       }
-      return maxNumber + 1;
+
+      const nextNumber = maxNumber + 1;
+      const paddedNumber = nextNumber.toString().padStart(4, '0');
+      const categoryPart = cat === '1' ? 'I' : 'II';
+      const teamPart = tType === 'solo' ? 'IND' : 'GRP';
+
+      return `${codeName}-${grp}-${categoryPart}-${teamPart}-${paddedNumber}`;
     } catch (err) {
       if (retryCount < maxRetries) {
         await new Promise(resolve => setTimeout(resolve, 100 * (retryCount + 1)));
-        return generateNextCode(retryCount + 1);
+        return generateTeamId(eventId, codeName, grp, cat, tType, retryCount + 1);
       }
       throw err;
     }
@@ -464,64 +482,93 @@ function RegistrationContent() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
+
       let registrationId = existingRegistrationId;
 
       if (isEditMode && existingRegistrationId) {
+        // Update registration (keep existing team_id)
         const { error: updateError } = await supabase.from('registrations')
           .update({ country, group, category, team_type: teamType })
           .eq('id', existingRegistrationId);
         if (updateError) throw updateError;
+
+        // Delete existing members to re-insert fresh
         const { error: deleteError } = await supabase.from('members').delete().eq('registration_id', existingRegistrationId);
         if (deleteError) throw deleteError;
       } else {
-        const { data: registration, error: regError } = await supabase.from('registrations')
-          .insert({ registration_by: user.id, event_id: selectedEventId, country, group, category, team_type: teamType })
-          .select().single();
-        if (regError) throw regError;
-        registrationId = registration.id;
-        setExistingRegistrationId(registration.id);
-      }
+        // Generate team_id for this new registration with retry on unique constraint violation
+        let teamId: string | null = null;
+        let insertSuccess = false;
+        let insertRetry = 0;
 
-      const startingNumber = await generateNextCode();
-      for (let i = 0; i < members.length; i++) {
-        const member = members[i];
-        const currentNumber = startingNumber + i;
-        const paddedNumber = currentNumber.toString().padStart(4, '0');
-        const categoryPart = category === '1' ? 'I' : 'II';
-        const teamPart = teamType === 'solo' ? 'IND' : 'GRP';
-        let code = `${eventPreCode}-${group}-${categoryPart}-${teamPart}-${paddedNumber}`;
-        let instituteIdUrl = member.institute_id_url || '';
-        if (member.institute_id_file) {
-          try { instituteIdUrl = await uploadInstituteId(member.institute_id_file, user.id, i); }
-          catch (uploadErr) { throw new Error(`Failed to upload institute ID for ${member.name}`); }
-        }
-        let insertSuccess = false, retryCount = 0;
-        while (!insertSuccess && retryCount < 5) {
+        while (!insertSuccess && insertRetry < 5) {
           try {
-            const { error: memberError } = await supabase.from('members').insert({
-              created_by: user.id, registration_id: registrationId, code,
-              name: member.name, email: member.email, phone: member.phone,
-              institute: member.institute, academic_year: member.academic_year,
-              institute_id: instituteIdUrl,
-            });
-            if (memberError) {
-              if (memberError.code === '23505') {
-                retryCount++;
-                const newNumber = await generateNextCode();
-                const newPaddedNumber = (newNumber + i).toString().padStart(4, '0');
-                code = `${eventPreCode}-${group}-${categoryPart}-${teamPart}-${newPaddedNumber}`;
+            teamId = await generateTeamId(selectedEventId!, eventPreCode, group, category, teamType);
+
+            const { data: registration, error: regError } = await supabase.from('registrations')
+              .insert({
+                registration_by: user.id,
+                event_id: selectedEventId,
+                country,
+                group,
+                category,
+                team_type: teamType,
+                team_id: teamId,
+              })
+              .select()
+              .single();
+
+            if (regError) {
+              // 23505 = unique_violation — another registration grabbed this team_id simultaneously
+              if (regError.code === '23505') {
+                insertRetry++;
+                await new Promise(resolve => setTimeout(resolve, 100 * insertRetry));
                 continue;
               }
-              throw memberError;
+              throw regError;
             }
+
+            registrationId = registration.id;
+            setExistingRegistrationId(registration.id);
             insertSuccess = true;
-          } catch (err) {
-            if (retryCount >= 4) throw err;
-            retryCount++;
-            await new Promise(resolve => setTimeout(resolve, 100 * retryCount));
+          } catch (err: any) {
+            if (err?.code === '23505' && insertRetry < 4) {
+              insertRetry++;
+              await new Promise(resolve => setTimeout(resolve, 100 * insertRetry));
+            } else {
+              throw err;
+            }
           }
         }
+
+        if (!insertSuccess) throw new Error('Failed to generate a unique team ID. Please try again.');
       }
+
+      // Insert members
+      for (let i = 0; i < members.length; i++) {
+        const member = members[i];
+        let instituteIdUrl = member.institute_id_url || '';
+        if (member.institute_id_file) {
+          try {
+            instituteIdUrl = await uploadInstituteId(member.institute_id_file, user.id, i);
+          } catch (uploadErr) {
+            throw new Error(`Failed to upload institute ID for ${member.name}`);
+          }
+        }
+        const { error: memberError } = await supabase.from('members').insert({
+          created_by: user.id,
+          registration_id: registrationId,
+          name: member.name,
+          code: "haha code",
+          email: member.email,
+          phone: member.phone,
+          institute: member.institute,
+          academic_year: member.academic_year,
+          institute_id: instituteIdUrl,
+        });
+        if (memberError) throw memberError;
+      }
+
       setIsEditMode(true);
       setShowPaymentDialog(true);
     } catch (err) {
@@ -627,7 +674,6 @@ function RegistrationContent() {
             )}
           </div>
 
-
           {/* Group */}
           <div>
             <SectionHeading>Group</SectionHeading>
@@ -640,7 +686,6 @@ function RegistrationContent() {
               </ToggleBtn>
             </div>
           </div>
-
 
           {/* Category */}
           <div>
@@ -656,7 +701,6 @@ function RegistrationContent() {
               </ToggleBtn>
             </div>
           </div>
-
 
           {/* Team type */}
           <div>
