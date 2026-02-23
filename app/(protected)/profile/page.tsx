@@ -26,7 +26,7 @@ interface Registration {
   id: string;
   country: string;
   group: 'A' | 'B';
-  category: 1 | 2;
+  category: '1' | '2';
   team_type: 'solo' | 'group';
   paid: boolean;
   event_id: string;
@@ -349,7 +349,7 @@ const ProfilePage = () => {
                           <div>
                             <p style={{ color: '#6B6B6B' }}>Category</p>
                             <p className="font-semibold" style={{ color: '#1A1A1A' }}>
-                              {registration.category === 1 ? 'Category 1 (Year 1-2)' : 'Category 2 (Year 3-5)'}
+                              {registration.category === '1' ? 'Category 1 (Year 1-2)' : 'Category 2 (Year 3-5)'}
                             </p>
                           </div>
                         </div>
