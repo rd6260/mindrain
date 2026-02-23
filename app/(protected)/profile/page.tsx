@@ -309,12 +309,12 @@ const ProfilePage = () => {
                               {registration.events.title}
                             </h4>
                             <p className="text-xs font-semibold mt-0.5" style={{ color: '#6B6B6B' }}>
-                              Team ID:{' '}
+                              Mind ID:{' '}
                               <span
                                 className="px-1.5 py-0.5 rounded font-mono"
-                                style={{ backgroundColor: '#EDEBDF', color: '#2C5F5F' }}
+                                style={{ backgroundColor: '#EDEBDF', color: registration.paid ? '#2C5F5F' : '#8B8B8B' }}
                               >
-                                {registration.team_id}
+                                {registration.paid ? registration.team_id : 'Not applicable'}
                               </span>
                             </p>
                           </div>
