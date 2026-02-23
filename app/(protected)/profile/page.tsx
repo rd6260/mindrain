@@ -22,6 +22,12 @@ interface Event {
   code_name: string;
 }
 
+interface Member {
+  id: string;
+  name: string;
+  code: string;
+}
+
 interface Registration {
   id: string;
   country: string;
@@ -31,6 +37,7 @@ interface Registration {
   paid: boolean;
   event_id: string;
   events: Event;
+  members?: Member[];
 }
 
 const ProfilePage = () => {
@@ -72,6 +79,11 @@ const ProfilePage = () => {
             id,
             title,
             code_name
+          ),
+          members (
+            id,
+            name,
+            code
           )
         `)
         .eq('registration_by', currentUser.id);
@@ -234,7 +246,7 @@ const ProfilePage = () => {
                   )}
                 </div>
 
-                {/* Logout Button — lives naturally at the bottom of the profile card */}
+                {/* Logout Button */}
                 <div className="mt-8 pt-6 border-t" style={{ borderColor: '#D0CEC2' }}>
                   <button
                     onClick={handleLogout}
@@ -291,13 +303,20 @@ const ProfilePage = () => {
                           borderColor: registration.paid ? '#D0CEC2' : '#D97757'
                         }}
                       >
-                        <div className="flex justify-between items-start mb-3">
+                        {/* Card Header */}
+                        <div className="flex justify-between items-start mb-4">
                           <div>
                             <h4 className="text-lg font-bold" style={{ color: '#1A1A1A' }}>
                               {registration.events.title}
                             </h4>
-                            <p className="text-sm" style={{ color: '#6B6B6B' }}>
-                              Code: {registration.events.code_name}
+                            <p className="text-xs font-semibold mt-0.5" style={{ color: '#6B6B6B' }}>
+                              Event ID:{' '}
+                              <span
+                                className="px-1.5 py-0.5 rounded"
+                                style={{ backgroundColor: '#EDEBDF', color: '#2C5F5F' }}
+                              >
+                                {registration.events.code_name}
+                              </span>
                             </p>
                           </div>
                           <div className="flex flex-col items-end gap-2">
@@ -327,7 +346,8 @@ const ProfilePage = () => {
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3 text-sm">
+                        {/* Registration Details */}
+                        <div className="grid grid-cols-2 gap-3 text-sm mb-4">
                           <div>
                             <p style={{ color: '#6B6B6B' }}>Country</p>
                             <p className="font-semibold" style={{ color: '#1A1A1A' }}>
@@ -353,6 +373,37 @@ const ProfilePage = () => {
                             </p>
                           </div>
                         </div>
+
+                        {/* Members */}
+                        {registration.members && registration.members.length > 0 && (
+                          <div
+                            className="pt-3 border-t"
+                            style={{ borderColor: '#EDEBDF' }}
+                          >
+                            <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: '#6B6B6B' }}>
+                              Team Members
+                            </p>
+                            <div className="flex flex-col gap-1.5">
+                              {registration.members.map((member) => (
+                                <div
+                                  key={member.id}
+                                  className="flex items-center justify-between rounded-md px-3 py-2"
+                                  style={{ backgroundColor: '#F8F7F2' }}
+                                >
+                                  <p className="text-sm font-semibold" style={{ color: '#1A1A1A' }}>
+                                    {member.name}
+                                  </p>
+                                  <p
+                                    className="text-xs font-mono font-semibold px-2 py-0.5 rounded"
+                                    style={{ backgroundColor: '#EDEBDF', color: '#2C5F5F' }}
+                                  >
+                                    {member.code}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
