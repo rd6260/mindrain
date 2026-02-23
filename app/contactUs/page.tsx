@@ -222,9 +222,9 @@ export default function ContactPage() {
                   iconColor="#25D366"
                   iconBg="#25D36618"
                   label="WhatsApp"
-                  value="+91 99888 68783"
-                  copyText="+919988868783"
-                  href="https://wa.me/919988868783"
+                  value="+91 99888 22776"
+                  copyText="+919988822776"
+                  href="https://wa.me/919988822776"
                   hint="Available during business hours"
                 />
               </div>
@@ -292,7 +292,7 @@ export default function ContactPage() {
             <p className="text-xs text-center text-[#A8A89A] pb-4">
               For the fastest response, reach us on{' '}
               <a
-                href="https://wa.me/919988868783"
+                href="https://wa.me/919988822776"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[#2C5F5F] font-semibold hover:underline"
