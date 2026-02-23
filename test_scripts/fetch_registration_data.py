@@ -89,6 +89,7 @@ def print_registrations():
         print(f"Registration #{i}  (ID: {reg['id']})")
         print(f"{'='*60}")
         print(f"  Event          : {event.get('title', 'N/A')}")
+        print(f"  Team ID        : {reg.get('team_id', 'N/A')}")
         print(f"  Registered By  : {registered_by.get('name', 'N/A')}")
         print(f"  Country        : {reg.get('country', 'N/A')}")
         print(f"  Group          : {group_display}")
@@ -101,8 +102,7 @@ def print_registrations():
             print(f"  Members ({len(members)}):")
             for j, m in enumerate(members, 1):
                 print(f"    ── Member {j} ──────────────────────────")
-                print(f"      Member Name    : {m.get('name', 'N/A')}")
-                print(f"      Event ID       : {m.get('code', 'N/A')}")
+                print(f"      Name           : {m.get('name', 'N/A')}")
                 print(f"      Email          : {m.get('email', 'N/A')}")
                 print(f"      Phone          : {m.get('phone', 'N/A')}")
                 print(f"      Institute      : {m.get('institute', 'N/A')}")
