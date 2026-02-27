@@ -34,10 +34,10 @@ const navItems = [
       },
     ],
   },
-  { label: 'FAQs', href: '/faqs' },
   { label: 'Winners', href: '/pastWinners' },
   { label: 'Earn with Us', href: '/earn' },
   { label: 'About us', href: '/about' },
+  { label: 'FAQs', href: '/faqs' },
   { label: 'Contact', href: '/contactUs' },
 ];
 
