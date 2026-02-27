@@ -9,6 +9,7 @@ import { colors } from '@/utils/colors';
 import { previousWinners2019 } from '@/data/winners';
 import LiveCompetitionCard from '@/app/components/LiveCompetitionCard';
 import localFont from "next/font/local";
+import GuestJury from '../components/GuestJuryComponent';
 
 const FEARLogo = localFont({
   src: "../fonts/FEARLogo-Regular.woff2"
@@ -380,6 +381,8 @@ export default function HomePage() {
 
         </div>
       </section >
+
+      <GuestJury/>
 
       <Footer />
     </div >

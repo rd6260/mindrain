@@ -34,7 +34,7 @@ const navItems = [
       },
     ],
   },
-  // { label: 'Workshops', href: '#' },
+  { label: 'FAQs', href: '/faqs' },
   { label: 'Winners', href: '/pastWinners' },
   { label: 'Earn with Us', href: '/earn' },
   { label: 'About us', href: '/about' },
