@@ -112,10 +112,10 @@ export default function LiveCompetitionCard() {
   }, []);
 
   const handleDownloadClick = () => {
-    if (!isLoggedIn) {
-      setIsLoginPromptOpen(true);
-      return;
-    }
+    // if (!isLoggedIn) {
+    //   setIsLoginPromptOpen(true);
+    //   return;
+    // }
     setIsOpen(true);
   };
 

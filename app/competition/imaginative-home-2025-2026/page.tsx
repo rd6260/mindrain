@@ -171,10 +171,10 @@ export default function CompetitionPage() {
 
   // Gate handler — opens download modal if logged in, otherwise shows login prompt
   const handleDownloadClick = (type: 'brief' | 'press') => {
-    if (!isLoggedIn) {
-      setIsLoginPromptOpen(true);
-      return;
-    }
+    // if (!isLoggedIn) {
+    //   setIsLoginPromptOpen(true);
+    //   return;
+    // }
     if (type === 'brief') setIsBriefDownloadOpen(true);
     else setIsPressDownloadOpen(true);
   };
