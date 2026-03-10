@@ -26,6 +26,13 @@ const navItems = [
         ],
       },
       {
+        label: 'Architecture Thesis',
+        href: '#',
+        subSubItems: [
+          { label: 'Thesis Award 2026', href: '/competition/thesis-award-2026' },
+        ],
+      },
+      {
         label: 'Photography',
         href: '#',
         subSubItems: [
