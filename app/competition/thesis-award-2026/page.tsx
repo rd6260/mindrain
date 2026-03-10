@@ -66,6 +66,152 @@ const importantDates: ImportantDate[] = [
   { label: 'Announcement of Result', date: '01 October 2026' },
 ];
 
+// ─── Registration Fees Data ───────────────────────────────────────────────────
+
+const REGISTRATION_EVENT_ID = '3f123e78-60d6-494d-b307-18c5b4c8ab7f';
+const REGISTRATION_URL = `/registration?event_id=${REGISTRATION_EVENT_ID}`;
+
+type Tier = 'Early Bird Registration' | 'Regular Registration' | 'Late Registration';
+type Group = 'group A' | 'group B';
+
+const FEES: Record<Tier, Record<Group, number>> = {
+  'Early Bird Registration': { 'group A': 799, 'group B': 275 },
+  'Regular Registration':    { 'group A': 999, 'group B': 275 },
+  'Late Registration':       { 'group A': 1499, 'group B': 375 },
+};
+
+const TIER_META: Record<Tier, { shortLabel: string; color: string; bg: string; border: string; dot: string; endsOn: string }> = {
+  'Early Bird Registration': {
+    shortLabel: 'Early Bird',
+    color:  'text-[#2D5F4F]',
+    bg:     'bg-[#2D5F4F]/8',
+    border: 'border-[#2D5F4F]/20',
+    dot:    'bg-[#2D5F4F]',
+    endsOn: '31 March 2026',
+  },
+  'Regular Registration': {
+    shortLabel: 'Regular',
+    color:  'text-[#1A1A1A]',
+    bg:     'bg-[#F8F7F2]',
+    border: 'border-[#D0CEC2]',
+    dot:    'bg-[#6B6B6B]',
+    endsOn: '30 June 2026',
+  },
+  'Late Registration': {
+    shortLabel: 'Late',
+    color:  'text-[#D97757]',
+    bg:     'bg-[#D97757]/8',
+    border: 'border-[#D97757]/20',
+    dot:    'bg-[#D97757]',
+    endsOn: '01 September 2026',
+  },
+};
+
+function getCurrentTier(): Tier {
+  const today = new Date();
+  if (today <= new Date('2026-03-31')) return 'Early Bird Registration';
+  if (today <= new Date('2026-06-30')) return 'Regular Registration';
+  return 'Late Registration';
+}
+
+// ─── Small Shared Components ──────────────────────────────────────────────────
+
+function SectionHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-3 mb-3">
+      <div className="relative flex-shrink-0 w-2.5 h-2.5">
+        <span className="absolute inset-0 rounded-full bg-[#2C5F5F]" />
+        <span className="absolute inset-0 rounded-full bg-[#2C5F5F] animate-ping opacity-50" />
+      </div>
+      <h2 className="text-xs font-bold uppercase tracking-widest text-[#2C5F5F]">{children}</h2>
+    </div>
+  );
+}
+
+function ToggleButton({ active, onClick, children }: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`
+        flex-1 py-3 px-4 rounded-xl text-sm font-semibold border transition-all duration-200
+        ${active
+          ? 'bg-[#2C5F5F] text-white border-[#2C5F5F] shadow-md shadow-[#2C5F5F]/20'
+          : 'bg-[#F8F7F2] text-[#6B6B6B] border-[#D0CEC2] hover:border-[#2C5F5F] hover:text-[#2C5F5F]'
+        }
+      `}
+    >
+      {children}
+    </button>
+  );
+}
+
+// ─── Registration Fees Component ──────────────────────────────────────────────
+
+function RegistrationFees() {
+  const [group, setGroup] = useState<Group>('group A');
+
+  const activeTier = getCurrentTier();
+  const { shortLabel, color, bg, border, dot, endsOn } = TIER_META[activeTier];
+
+  const amount = FEES[activeTier][group];
+
+  return (
+    <div className="rounded-lg p-6 space-y-7" style={{ backgroundColor: colors.white }}>
+
+      {/* Group Selection */}
+      <div>
+        <SectionHeading>Select Group</SectionHeading>
+        <div className="flex gap-2">
+          <ToggleButton active={group === 'group A'} onClick={() => setGroup('group A')}>
+            <span className="block text-xs font-bold">Group A</span>
+            <span className="block text-[10px] opacity-70 mt-0.5">Monetary Award</span>
+          </ToggleButton>
+          <ToggleButton active={group === 'group B'} onClick={() => setGroup('group B')}>
+            <span className="block text-xs font-bold">Group B</span>
+            <span className="block text-[10px] opacity-70 mt-0.5">Non-Monetary Award</span>
+          </ToggleButton>
+        </div>
+      </div>
+
+      <div className="border-t border-[#E5E3D7]" />
+
+      {/* Current Fee */}
+      <div>
+        <SectionHeading>Registration Fees</SectionHeading>
+        <div className={`flex items-center justify-between px-4 py-3.5 rounded-xl border ${bg} ${border}`}>
+          <div className="flex items-center gap-3">
+            <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dot}`} />
+            <span className="text-sm text-[#6B6B6B] font-medium">{activeTier}</span>
+          </div>
+          <span className={`text-base font-bold tabular-nums ${color}`}>₹{amount.toLocaleString('en-IN')}</span>
+        </div>
+
+        <p className="text-[10px] text-[#8B8B8B] mt-3 text-center">
+          {shortLabel} pricing · ends{' '}
+          <span className="font-semibold text-[#D97757]">{endsOn}</span>
+          {' '}· {group === 'group A' ? 'Monetary Award' : 'Non-Monetary Award'}
+        </p>
+      </div>
+
+      <div className="flex items-center justify-center">
+        <a
+          href={REGISTRATION_URL}
+          className="px-12 py-3.5 rounded-lg text-white font-bold text-sm transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow inline-block text-center"
+          style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})` }}
+          data-testid="register-now-button"
+        >
+          Register Now →
+        </a>
+      </div>
+    </div>
+  );
+}
+
 // --- Login Required Modal ---
 function LoginRequiredModal({
   isOpen,
