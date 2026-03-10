@@ -8,7 +8,6 @@ import { ImportantDate } from '@/types';
 import DownloadBriefModal, { BriefFile } from '@/app/components/DownloadModal';
 import { useEffect, useState } from 'react';
 import Navigation from '@/app/components/Navigation';
-import RegistrationFees from '@/app/components/RegistrationFees';
 import { createClient } from '@/lib/supabase/client';
 import localFont from "next/font/local";
 
