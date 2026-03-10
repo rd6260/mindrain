@@ -68,7 +68,7 @@ const importantDates: ImportantDate[] = [
 
 // ─── Registration Fees Data ───────────────────────────────────────────────────
 
-const REGISTRATION_EVENT_ID = '3f123e78-60d6-494d-b307-18c5b4c8ab7f';
+const REGISTRATION_EVENT_ID = 'c4a201ae-8bfe-48bc-a526-4ac1288dd937';
 const REGISTRATION_URL = `/registration?event_id=${REGISTRATION_EVENT_ID}`;
 
 type Tier = 'Early Bird Registration' | 'Regular Registration' | 'Late Registration';
