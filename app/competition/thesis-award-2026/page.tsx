@@ -420,13 +420,13 @@ export default function CompetitionPage() {
 
             <div className="rounded-lg p-8 md:p-12" style={{ backgroundColor: colors.white }}>
               <p className="text-lg mb-6 leading-relaxed" style={{ color: colors.textSecondary }}>
-                Participate and avail discount <span className="font-bold">Flat 35%</span>
+                Participate and avail discount <span className="font-bold">Flat 30%</span>
               </p>
               <p className="text-lg mb-6 leading-relaxed" style={{ color: colors.textSecondary }}>
                 The Mind Rain Competition Team welcomes participation from universities, colleges, and design schools across the world.
               </p>
               <p className="text-lg mb-6 leading-relaxed" style={{ color: colors.textSecondary }}>
-                Students can avail exclusive discounts through group registration offers (valid for <span className="font-bold">30 or more</span> participants registering from the same institution).
+                Students can avail exclusive discounts through group registration offers (valid for <span className="font-bold">20 or more</span> participants registering from the same institution).
               </p>
               <p className="text-lg mb-8 leading-relaxed" style={{ color: colors.textSecondary }}>
                 This is a great opportunity for faculty and mentors to encourage students to think creatively and explore imaginative architecture beyond textbooks.
