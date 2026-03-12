@@ -248,7 +248,52 @@ export default function HomePage() {
           />
 
 
-          <LiveCompetitionCard />
+          <LiveCompetitionCard
+            title="THE UNREAL HOUSE"
+            subtitle="An Imaginary Home Design Challenge"
+            imageSrc="/the-unreal-house/TUH-cover.jpg"
+            imageAlt="The Unreal House"
+            prizeLabel={<>Total Prize Pool <span className="font-bold text-sm">₹50,000+</span></>}
+            details={[
+              { label: "Prize", value: "Monetary award" },
+              { label: "Eligibility", value: "Open to all undergraduate students" },
+            ]}
+            deadlineLabel="Early bird registration deadline"
+            deadlineValue="15 March 2026"
+            findOutMoreHref="/competition/imaginative-home-2025-2026"
+            briefFiles={[
+              { name: "Important Dates & Calendar", description: "Key deadlines and schedule", url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/Important%20Dates-Calender.pdf" },
+              { name: "Terms & Conditions", description: "Important rules and regulations", url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/T&C%20(Important).pdf" },
+              { name: "Complete Brief", description: "Full competition brief document", url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/The%20Unreal%20House%20(Complete%20Brief).pdf" },
+              { name: "Brief (Print Format)", description: "Print-ready version of the brief", url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/The%20Unreal%20House%20(print%20format).pdf" },
+            ]}
+            briefModalTitle="Download Brief"
+            briefModalSubtitle="The Unreal House — select files to download"
+          />
+
+          <div className="h-6" />
+
+          <LiveCompetitionCard
+            title="THESIS AWARD 2026"
+            subtitle="India's Premier Thesis Recognition Award"
+            imageSrc="/thesis-award-2026/live-thumbnail.webp"
+            imageAlt="Thesis Award 2026"
+            prizeLabel={<>Thesis Recognition Award <span className="font-bold text-sm">2026</span></>}
+            details={[
+              { label: "Prize", value: "Monetary award (Group A)" },
+              { label: "Eligibility", value: "Open to Indian undergraduate students" },
+            ]}
+            deadlineLabel="Early bird registration deadline"
+            deadlineValue="31 March 2026"
+            findOutMoreHref="/competition/thesis-award-2026"
+            briefFiles={[
+              { name: "MR Thesis Award Detailed PDF", description: "Full competition brief document", url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/thesis_award_26/MindRain%20Thesis%20Award%20(Detailed%20PDF).pdf" },
+              { name: "Important Dates & Calendar", description: "Key deadlines and schedule", url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/thesis_award_26/Important%20Dates-Calender.pdf" },
+              { name: "Terms & Conditions", description: "Important rules and regulations", url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/thesis_award_26/T&C%20doc..pdf" },
+            ]}
+            briefModalTitle="Download Brief"
+            briefModalSubtitle="Thesis Award 2026 — select files to download"
+          />
 
           <div className='flex justify-center items-center py-4 text-sm'>
             <span>
@@ -382,7 +427,7 @@ export default function HomePage() {
         </div>
       </section >
 
-      <GuestJury/>
+      <GuestJury />
 
       <Footer />
     </div >
