@@ -14,7 +14,7 @@ const changa = Changa({
 
 // --- Props interface ---
 export interface CompetitionCardProps {
-  title: string;
+  title: React.ReactNode;
   subtitle: string;
   imageSrc: string;
   imageAlt: string;

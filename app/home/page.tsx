@@ -274,14 +274,14 @@ export default function HomePage() {
           <div className="h-6" />
 
           <LiveCompetitionCard
-            title="MR THESIS AWARD 2026"
+            title={<>MIND RAIN<br />THESIS AWARD 2026</>}
             subtitle="India's Premier Thesis Recognition Award"
             imageSrc="/thesis-award-2026/live-thumbnail.webp"
             imageAlt="Thesis Award 2026"
-            prizeLabel={<>Thesis Recognition Award <span className="font-bold text-sm">2026</span></>}
+            prizeLabel={<>Overall Winner Prize <span className="font-bold text-sm">₹15,000</span></>}
             details={[
-              { label: "Prize", value: "Monetary award (Group A)" },
-              { label: "Eligibility", value: "Open to Indian undergraduate students" },
+              { label: "Origin", value: "India" },
+              { label: "Eligibility", value: "Students Completed UG from 2019-2026" },
             ]}
             deadlineLabel="Early bird registration deadline"
             deadlineValue="31 March 2026"
