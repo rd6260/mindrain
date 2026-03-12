@@ -203,7 +203,7 @@ export const previousWinners2019: PastWinners = {
 };
 
 export const previousWinners2018: PastWinners = {
-  name: 'SUPERHERO HOUSE',
+  name: 'Superhero House',
   year: '2018',
   categories: [
     {
@@ -393,7 +393,7 @@ export const previousWinners2018: PastWinners = {
 
 
 export const previousWinners2017: PastWinners = {
-  name: 'art gallery design',
+  name: 'Art Gallery Design',
   year: '2017',
   categories: [
     {
