@@ -9,7 +9,7 @@ import { createClient } from '@/lib/supabase/client';
 
 const changa = Changa({
   subsets: ["latin"],
-  weight: ["500"],
+  weight: ["200", "300", "500"],
 })
 
 // --- Props interface ---

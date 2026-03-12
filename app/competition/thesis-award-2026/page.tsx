@@ -321,7 +321,7 @@ export default function CompetitionPage() {
         />
 
         {/* Mobile Hero Section */}
-        <section className="relative h-dvh flex flex-col items-center justify-end pb-16 px-6 md:hidden">
+        <section className="relative h-dvh flex flex-col items-center justify-center px-6 md:hidden">
           {/* Background Image */}
           <div className="absolute inset-0 z-0">
             <Image
@@ -331,22 +331,17 @@ export default function CompetitionPage() {
               className="object-cover object-center"
               priority
             />
-            {/* Gradient overlay for text readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
           </div>
 
           {/* Content */}
-          <div className="relative z-10 w-full text-center text-white animate-fade-in">
-            <span className="block text-sm font-medium tracking-[0.2em] uppercase text-gray-300 mb-1">
-              Architecture Thesis
-            </span>
-            <span className="block text-sm font-light italic text-gray-400 mb-4">
-              edition 02
-            </span>
+          <div className="relative z-10 w-full text-left text-gray-700 animate-fade-in">
             <h1 className={`${IBMPlexSansCondensedFont.className} text-6xl font-black leading-none mb-3`}>
-              Thesis<br />Award
+              Mind Rain <br/> Thesis Award
             </h1>
-            <p className="text-base font-medium tracking-wide text-gray-300 mb-10">
+            <span className="block font-light italic text-gray-600 mb-4">
+              Edition 02
+            </span>
+            <p className="text-base font-medium tracking-wide text-gray-600 mb-10">
               Undergraduate Architecture Thesis Recognition Program For Thesis prepared between 2019-2026
             </p>
 
