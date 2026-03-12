@@ -9,9 +9,11 @@ load_dotenv()
 POSTMARK_API_KEY = os.getenv("POSTMARK_API_KEY")
 TEMPLATE_ID = int(os.getenv("POSTMARK_TEMPLATE_ID"))
 CSV_FILE = "/home/senku/Downloads/mindrain/data/test_list.csv"
+# CSV_FILE = "/home/senku/Downloads/mindrain/data/college_list.csv"
 ZIP_FILE = "/home/senku/Downloads/mindrain/data/The Unreal House Docs.zip"
 FROM_EMAIL = "Mind Rain <team@mindrain.org>"
 POSTMARK_BATCH_URL = "https://api.postmarkapp.com/email/batchWithTemplates"
+EMAILS_PER_RUN = 5  # Number of emails to send at a time
 
 
 def load_zip_attachment(zip_path):
@@ -29,7 +31,7 @@ def load_zip_attachment(zip_path):
 def load_recipients(csv_path):
     """Parse CSV and return list of recipient dicts."""
     recipients = []
-    with open(csv_path, newline="", encoding="utf-8") as f:
+    with open(csv_path, newline="", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         for row in reader:
             email = row.get("Email", "").strip()
@@ -81,6 +83,7 @@ def send_batch(messages):
     payload = {"Messages": messages}
 
     print(f"Sending {len(messages)} emails via Postmark...")
+    # exit()
     response = requests.post(POSTMARK_BATCH_URL, json=payload, headers=headers)
 
     if response.status_code == 200:
@@ -116,12 +119,26 @@ def main():
 
     print(f"Loaded {len(recipients)} recipients from {CSV_FILE}")
 
-    # Postmark batch limit is 500 per request — chunk if needed
-    BATCH_SIZE = 500
-    for i in range(0, len(recipients), BATCH_SIZE):
-        chunk = recipients[i:i + BATCH_SIZE]
-        messages = build_messages(chunk, attachment)
-        send_batch(messages)
+    # Send emails in chunks of EMAILS_PER_RUN
+    BATCH_SIZE = 500  # Postmark batch limit per request
+    for i in range(0, len(recipients), EMAILS_PER_RUN):
+        run_chunk = recipients[i:i + EMAILS_PER_RUN]
+        batch_num = i // EMAILS_PER_RUN + 1
+        print(f"\n{'='*60}")
+        print(f"  BATCH {batch_num} — {len(run_chunk)} email(s)")
+        print(f"{'='*60}")
+        for idx, r in enumerate(run_chunk, start=1):
+            print(f"  {idx}. {r['name']}")
+            print(f"     Email       : {r['email']}")
+            print(f"     Designation : {r['designation'] or '—'}")
+            print(f"     Institution : {r['institution_name'] or '—'}")
+            print(f"     State       : {r['state'] or '—'}")
+        print(f"{'-'*60}")
+        # Further chunk by Postmark's API limit if needed
+        for j in range(0, len(run_chunk), BATCH_SIZE):
+            api_chunk = run_chunk[j:j + BATCH_SIZE]
+            messages = build_messages(api_chunk, attachment)
+            send_batch(messages)
 
 
 if __name__ == "__main__":

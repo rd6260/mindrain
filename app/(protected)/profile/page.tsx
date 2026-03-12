@@ -40,10 +40,25 @@ interface Registration {
   members?: Member[];
 }
 
+interface Registration2 {
+  id: string;
+  group: 'A' | 'B';
+  team_id: string;
+  paid: boolean;
+  event_id: string;
+  name: string;
+  email: string;
+  phone: string;
+  institute: string;
+  year_of_completion: string;
+  events: Event;
+}
+
 const ProfilePage = () => {
   const [user, setUser] = useState<User | null>(null);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [registrations2, setRegistrations2] = useState<Registration2[]>([]);
   const [participatedEvents, setParticipatedEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
@@ -90,13 +105,34 @@ const ProfilePage = () => {
       if (registrationsError) throw registrationsError;
       setRegistrations(registrationsData || []);
 
-      const uniqueEvents = registrationsData?.reduce((acc: Event[], reg) => {
+      // Fetch registrations_2
+      const { data: registrations2Data, error: registrations2Error } = await supabase
+        .from('registrations_2')
+        .select(`
+          *,
+          events (
+            id,
+            title,
+            code_name
+          )
+        `)
+        .eq('registration_by', currentUser.id);
+
+      if (registrations2Error) throw registrations2Error;
+      setRegistrations2(registrations2Data || []);
+
+      // Merge unique events from both tables
+      const allRegs = [
+        ...(registrationsData || []),
+        ...(registrations2Data || []),
+      ];
+      const uniqueEvents = allRegs.reduce((acc: Event[], reg) => {
         const event = reg.events as unknown as Event;
         if (event && !acc.find(e => e.id === event.id)) {
           acc.push(event);
         }
         return acc;
-      }, []) || [];
+      }, []);
 
       setParticipatedEvents(uniqueEvents);
 
@@ -112,7 +148,7 @@ const ProfilePage = () => {
     window.location.href = '/login';
   };
 
-  const hasPendingPayments = registrations.some(reg => !reg.paid);
+  const hasPendingPayments = registrations.some(reg => !reg.paid) || registrations2.some(reg => !reg.paid);
 
   const formatAcademicLevel = (level: string | null) => {
     if (level === 'UG') return 'Under Graduate';
@@ -287,12 +323,13 @@ const ProfilePage = () => {
                   My Registrations
                 </h3>
 
-                {registrations.length === 0 ? (
+                {registrations.length === 0 && registrations2.length === 0 ? (
                   <p style={{ color: '#6B6B6B' }}>
                     You haven't registered for any events yet.
                   </p>
                 ) : (
                   <div className="space-y-4">
+                    {/* Registrations (v1) */}
                     {registrations.map((registration) => (
                       <div
                         key={registration.id}
@@ -319,17 +356,6 @@ const ProfilePage = () => {
                             </p>
                           </div>
                           <div className="flex flex-col items-end gap-2">
-                            {/* 
-                            <span
-                              className="px-3 py-1 rounded-full text-xs font-semibold"
-                              style={{
-                                backgroundColor: registration.paid ? '#2D5F4F' : '#D97757',
-                                color: '#FFFFFF'
-                              }}
-                            >
-                              {registration.paid ? 'Paid' : 'Payment Pending'}
-                            </span>
-                            */}
                             {!registration.paid && (
                               <a
                                 href={`/payment?registration_id=${registration.id}`}
@@ -399,6 +425,92 @@ const ProfilePage = () => {
                             </div>
                           </div>
                         )}
+                      </div>
+                    ))}
+
+                    {/* Registrations (v2 — Thesis Award etc.) */}
+                    {registrations2.map((registration) => (
+                      <div
+                        key={registration.id}
+                        className="rounded-lg p-4 border"
+                        style={{
+                          backgroundColor: '#FFFFFF',
+                          borderColor: registration.paid ? '#D0CEC2' : '#D97757'
+                        }}
+                      >
+                        {/* Card Header */}
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <h4 className="text-lg font-bold" style={{ color: '#1A1A1A' }}>
+                              {registration.events.title}
+                            </h4>
+                            <p className="text-xs font-semibold mt-0.5" style={{ color: '#6B6B6B' }}>
+                              Mind ID:{' '}
+                              <span
+                                className="px-1.5 py-0.5 rounded font-mono"
+                                style={{ backgroundColor: '#EDEBDF', color: registration.paid ? '#2C5F5F' : '#8B8B8B' }}
+                              >
+                                {registration.paid ? registration.team_id : 'Not applicable'}
+                              </span>
+                            </p>
+                          </div>
+                          <div className="flex flex-col items-end gap-2">
+                            {!registration.paid && (
+                              <a
+                                href={`/payment-2?registration_id=${registration.id}`}
+                                className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:shadow-md"
+                                style={{
+                                  backgroundColor: '#2C5F5F',
+                                  color: '#FFFFFF',
+                                }}
+                                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#1A4D4D')}
+                                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#2C5F5F')}
+                              >
+                                Complete Payment →
+                              </a>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Registration Details */}
+                        <div className="grid grid-cols-2 gap-3 text-sm mb-4">
+                          <div>
+                            <p style={{ color: '#6B6B6B' }}>Name</p>
+                            <p className="font-semibold" style={{ color: '#1A1A1A' }}>
+                              {registration.name}
+                            </p>
+                          </div>
+                          <div>
+                            <p style={{ color: '#6B6B6B' }}>Email</p>
+                            <p className="font-semibold" style={{ color: '#1A1A1A' }}>
+                              {registration.email}
+                            </p>
+                          </div>
+                          <div>
+                            <p style={{ color: '#6B6B6B' }}>Group</p>
+                            <p className="font-semibold" style={{ color: '#1A1A1A' }}>
+                              {registration.group === 'A' ? 'A (Monetary Award)' : 'B (No Monetary Award)'}
+                            </p>
+                          </div>
+                          <div>
+                            <p style={{ color: '#6B6B6B' }}>Institute</p>
+                            <p className="font-semibold" style={{ color: '#1A1A1A' }}>
+                              {registration.institute}
+                            </p>
+                          </div>
+                          <div>
+                            <p style={{ color: '#6B6B6B' }}>Year of Completion</p>
+                            <p className="font-semibold" style={{ color: '#1A1A1A' }}>
+                              {registration.year_of_completion}
+                            </p>
+                          </div>
+                          <div>
+                            <p style={{ color: '#6B6B6B' }}>Phone</p>
+                            <p className="font-semibold" style={{ color: '#1A1A1A' }}>
+                              {registration.phone}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
