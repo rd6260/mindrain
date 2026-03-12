@@ -250,6 +250,8 @@ function RegistrationContent() {
     institute: '',
     year_of_completion: '',
   });
+  const [documentFile, setDocumentFile] = useState<File | null>(null);
+  const [documentUrl, setDocumentUrl] = useState<string>('');
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -315,6 +317,8 @@ function RegistrationContent() {
         setIsEditMode(false);
         setGroup('');
         setParticipant({ name: '', email: '', phone: '', institute: '', year_of_completion: '' });
+        setDocumentFile(null);
+        setDocumentUrl('');
         return;
       }
 
@@ -337,6 +341,7 @@ function RegistrationContent() {
         institute: existingReg.institute || '',
         year_of_completion: existingReg.year_of_completion || '',
       });
+      setDocumentUrl(existingReg.document || '');
     } catch (err) {
       console.error('Error loading existing registration:', err);
     }
@@ -354,7 +359,17 @@ function RegistrationContent() {
   const canSubmit = () => {
     if (isPaid) return false;
     if (!selectedEventId || !group) return false;
+    if (!documentFile && !documentUrl) return false;
     return !!(participant.name && participant.email && participant.phone && participant.institute && participant.year_of_completion);
+  };
+
+  const uploadDocument = async (file: File, userId: string): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${userId}_${Date.now()}.${fileExt}`;
+    const { error: uploadError } = await supabase.storage.from('college_id/thesis_award').upload(fileName, file);
+    if (uploadError) throw uploadError;
+    const { data: { publicUrl } } = supabase.storage.from('college_id/thesis_award').getPublicUrl(fileName);
+    return publicUrl;
   };
 
   const generateTeamId = async (
@@ -405,6 +420,16 @@ function RegistrationContent() {
 
       let registrationId = existingRegistrationId;
 
+      // Upload document if a new file was selected
+      let finalDocumentUrl = documentUrl;
+      if (documentFile) {
+        try {
+          finalDocumentUrl = await uploadDocument(documentFile, user.id);
+        } catch (uploadErr) {
+          throw new Error('Failed to upload supporting document');
+        }
+      }
+
       if (isEditMode && existingRegistrationId) {
         const { error: updateError } = await supabase.from('registrations_2')
           .update({
@@ -414,6 +439,7 @@ function RegistrationContent() {
             phone: participant.phone,
             institute: participant.institute,
             year_of_completion: participant.year_of_completion,
+            document: finalDocumentUrl,
           })
           .eq('id', existingRegistrationId);
         if (updateError) throw updateError;
@@ -437,6 +463,7 @@ function RegistrationContent() {
                 phone: participant.phone,
                 institute: participant.institute,
                 year_of_completion: participant.year_of_completion,
+                document: finalDocumentUrl,
               })
               .select()
               .single();
@@ -592,13 +619,60 @@ function RegistrationContent() {
                 disabled={isLoading || isPaid}
               />
               <FloatingSelect
-                label="Year of Completion"
+                label="Year of Completion (Under Graduate)"
                 value={participant.year_of_completion}
                 onChange={(e) => setParticipant({ ...participant, year_of_completion: e.target.value })}
                 disabled={isLoading || isPaid}
                 options={COMPLETION_YEARS.map(y => ({ value: y, label: y }))}
               />
             </div>
+          </div>
+
+          <div className="border-t border-[#E5E3D7]" />
+
+          {/* Supporting Document */}
+          <div>
+            <SectionHeading>Supporting Document</SectionHeading>
+            <p className="text-xs text-[#6B6B6B] mb-3">
+              Upload a document to verify your college and year (e.g. college ID, enrollment letter, marksheet)
+            </p>
+            {documentUrl && !documentFile && (
+              <div className="mb-3 flex items-center gap-2 px-4 py-2.5 bg-[#2D5F4F]/10 border border-[#2D5F4F]/30 rounded-xl">
+                <svg className="w-4 h-4 text-[#2D5F4F] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="text-xs font-medium text-[#2D5F4F]">Document already uploaded</span>
+              </div>
+            )}
+            <label className="relative block w-full">
+              <input
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png,.webp"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) setDocumentFile(e.target.files[0]);
+                }}
+                disabled={isLoading || isPaid}
+                className="
+                  w-full px-4 py-3 text-[#1A1A1A] bg-[#F8F7F2]
+                  border border-[#D0CEC2] rounded-xl outline-none
+                  text-sm font-medium
+                  transition-all duration-200
+                  focus:border-[#2C5F5F] focus:ring-2 focus:ring-[#2C5F5F]/10
+                  disabled:opacity-50 disabled:cursor-not-allowed
+                  file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0
+                  file:text-xs file:font-semibold file:bg-[#2C5F5F] file:text-white
+                  file:cursor-pointer
+                "
+              />
+            </label>
+            {documentFile && (
+              <p className="text-xs text-[#2C5F5F] font-medium mt-2 flex items-center gap-1.5">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                </svg>
+                {documentFile.name}
+              </p>
+            )}
           </div>
 
           <div className="border-t border-[#E5E3D7]" />
@@ -674,7 +748,7 @@ function RegistrationContent() {
             <button
               onClick={() => {
                 setShowPaymentDialog(false);
-                window.location.href = '/payment?registration_id=' + existingRegistrationId;
+                window.location.href = '/payment-2?registration_id=' + existingRegistrationId;
               }}
               className="w-full py-3.5 rounded-xl bg-[#2C5F5F] text-white text-sm font-bold hover:bg-[#1A4D4D] transition-colors shadow-lg shadow-[#2C5F5F]/20"
             >
