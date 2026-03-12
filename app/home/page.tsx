@@ -274,7 +274,7 @@ export default function HomePage() {
           <div className="h-6" />
 
           <LiveCompetitionCard
-            title="THESIS AWARD 2026"
+            title="MR THESIS AWARD 2026"
             subtitle="India's Premier Thesis Recognition Award"
             imageSrc="/thesis-award-2026/live-thumbnail.webp"
             imageAlt="Thesis Award 2026"
