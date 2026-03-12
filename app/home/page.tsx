@@ -8,6 +8,7 @@ import Footer from '@/app/components/Footer';
 import { colors } from '@/utils/colors';
 import { previousWinners2019 } from '@/data/winners';
 import LiveCompetitionCard from '@/app/components/LiveCompetitionCard';
+import WinnerCard from '@/app/components/WinnerCard';
 import localFont from "next/font/local";
 import GuestJury from '../components/GuestJuryComponent';
 
@@ -16,115 +17,12 @@ const FEARLogo = localFont({
 })
 
 
-interface WinnerCardProps {
-  winner: Winner;
-  position: string;
-}
 
-interface Member {
-  name: string;
-  profilePicture?: string;
-}
-
-function WinnerCard({ winner, position }: WinnerCardProps) {
-  // Simplify member display logic
-  const displayMembers: Member[] = winner.members && winner.members.length > 0
-    ? winner.members
-    : winner.profilePicture
-      ? [{ name: winner.name, profilePicture: winner.profilePicture }]
-      : [];
-
-  return (
-    <div
-      className="rounded-2xl overflow-hidden shadow-lg hover-lift group"
-      style={{ backgroundColor: colors.white }}
-      data-testid="winner-card"
-    >
-      {/* Project Image */}
-      <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
-        <Image
-          src={winner.projectImage}
-          alt={`${winner.name} project`}
-          fill
-          className="object-contain transition-transform duration-500 group-hover:scale-105"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
-        {/* Overlay gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      </div>
-
-      {/* Winner Info */}
-      <div className="p-6">
-        <div
-          className="inline-block px-4 py-2 rounded-full text-xs font-bold mb-4 shadow-md"
-          style={{
-            background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`,
-            color: colors.white
-          }}
-        >
-          {position}
-        </div>
-
-        {/* Profile Pictures */}
-        {displayMembers.length > 0 && (
-          <div className="flex items-center gap-2 mb-4">
-            {displayMembers.map((member, index) => (
-              member.profilePicture ? (
-                <div
-                  key={index}
-                  className="relative w-12 h-12 rounded-full border-3 shadow-md transition-transform hover:scale-110"
-                  style={{ borderColor: colors.accent }}
-                >
-                  <Image
-                    src={member.profilePicture}
-                    alt={member.name}
-                    fill
-                    className="rounded-full object-cover"
-                    sizes="48px"
-                  />
-                </div>
-              ) : null
-            ))}
-          </div>
-        )}
-
-        <h3
-          className="font-bold text-lg mb-2 line-clamp-2"
-          style={{ color: colors.textPrimary }}
-        >
-          {winner.name}
-        </h3>
-        <p
-          className="text-sm leading-relaxed line-clamp-2"
-          style={{ color: colors.textSecondary }}
-        >
-          {winner.description}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-
-interface WinnerWithPosition extends Winner {
-  position: string;
-}
 
 export default function HomePage() {
-  const category1Winners: WinnerWithPosition[] = [
-    ...(previousWinners2019.categories[0].winners.first?.map((w) => ({ ...w, position: '1st Prize' })) || []),
-    ...(previousWinners2019.categories[0].winners.second?.map((w) => ({ ...w, position: '2nd Prize' })) || []),
-    ...(previousWinners2019.categories[0].winners.third?.map((w) => ({ ...w, position: '3rd Prize' })) || []),
-  ];
-
-  const category2Winners: WinnerWithPosition[] = [
-    ...(previousWinners2019.categories[1].winners.first?.map((w) => ({ ...w, position: '1st Prize' })) || []),
-    ...(previousWinners2019.categories[1].winners.second?.map((w) => ({ ...w, position: '2nd Prize' })) || []),
-    ...(previousWinners2019.categories[1].winners.third?.map((w) => ({ ...w, position: '3rd Prize' })) || []),
-  ];
-
-  const honorableMentions: WinnerWithPosition[] =
-    previousWinners2019.honorableMentions?.map((w) => ({ ...w, position: 'Honorable Mention' })) || [];
+  const category1Winners = previousWinners2019.categories[0].winners;
+  const category2Winners = previousWinners2019.categories[1].winners;
+  const honorableMentions = previousWinners2019.categories[2].winners;
 
   return (
     <div style={{ backgroundColor: colors.background }} className="min-h-screen">
@@ -345,7 +243,6 @@ export default function HomePage() {
                 <WinnerCard
                   key={index}
                   winner={winner}
-                  position={winner.position}
                 />
               ))}
             </div>
@@ -370,7 +267,6 @@ export default function HomePage() {
                 <WinnerCard
                   key={index}
                   winner={winner}
-                  position={winner.position}
                 />
               ))}
             </div>
@@ -396,7 +292,6 @@ export default function HomePage() {
                   <WinnerCard
                     key={index}
                     winner={winner}
-                    position={winner.position}
                   />
                 ))}
               </div>
