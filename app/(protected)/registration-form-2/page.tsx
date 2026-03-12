@@ -558,6 +558,9 @@ function RegistrationContent() {
             {isEditMode ? 'Update Registration' : 'Event Registration'}
           </h1>
           <p className="text-[#6B6B6B] mt-1 text-sm">
+            Only Indian registrations are allowed
+          </p>
+          <p className="text-[#6B6B6B] mt-1 text-sm">
             {isEditMode ? 'Update your details below and resubmit' : 'Complete all sections to secure your spot'}
           </p>
         </div>
@@ -673,6 +676,10 @@ function RegistrationContent() {
                 {documentFile.name}
               </p>
             )}
+
+            <p className="text-xs text-[#6B6B6B] mb-3">
+              Only image formats are allowed
+            </p>
           </div>
 
           <div className="border-t border-[#E5E3D7]" />
