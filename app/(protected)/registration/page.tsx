@@ -888,6 +888,7 @@ function RegistrationContent() {
                 <p className="text-xs font-bold text-[#6B6B6B] uppercase tracking-wider mb-2">Institute ID Card</p>
                 <FloatingInput label="Upload ID card image" type="file" accept="image/*" onChange={handleFileChange} />
                 <p className="text-[10px] text-[#8B8B8B] mt-1">Upload a clear photo of your institute ID</p>
+                <p className="text-[10px] text-[#8B8B8B] mt-1">Only image formates are allowed</p>
               </div>
             </div>
 
