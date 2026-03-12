@@ -18,39 +18,22 @@ const IBMPlexSansCondensedFont = localFont({
 
 const TUHBriefFiles: BriefFile[] = [
   {
+    name: "MR Thesis Award Detailed PDF",
+    description: "Full competition brief document",
+    url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/thesis_award_26/MindRain%20Thesis%20Award%20(Detailed%20PDF).pdf",
+  },
+  {
     name: "Important Dates & Calendar",
     description: "Key deadlines and schedule",
-    url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/Important%20Dates-Calender.pdf",
+    url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/thesis_award_26/Important%20Dates-Calender.pdf",
   },
   {
     name: "Terms & Conditions",
     description: "Important rules and regulations",
-    url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/T&C%20(Important).pdf",
-  },
-  {
-    name: "Complete Brief",
-    description: "Full competition brief document",
-    url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/The%20Unreal%20House%20(Complete%20Brief).pdf",
-  },
-  {
-    name: "Brief (Print Format)",
-    description: "Print-ready version of the brief",
-    url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/The%20Unreal%20House%20(print%20format).pdf",
+    url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/thesis_award_26/T&C%20doc..pdf",
   },
 ];
 
-const TUHPressKitFiles: BriefFile[] = [
-  {
-    name: "A4 A3 Poster",
-    description: "A4 and A3 size Campaign Posters",
-    url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/A4_A3%20campaign%20poster.png",
-  },
-  {
-    name: "Instagram Post",
-    description: "Instragram Post sized posters",
-    url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/instagram%20post%20campaign.png",
-  },
-];
 
 const importantDates: ImportantDate[] = [
   { label: 'Competition Starts', date: '10 March 2026' },
@@ -69,40 +52,40 @@ const importantDates: ImportantDate[] = [
 // ─── Registration Fees Data ───────────────────────────────────────────────────
 
 const REGISTRATION_EVENT_ID = 'c4a201ae-8bfe-48bc-a526-4ac1288dd937';
-const REGISTRATION_URL = `/registration?event_id=${REGISTRATION_EVENT_ID}`;
+const REGISTRATION_URL = `/registration-form-2?event_id=${REGISTRATION_EVENT_ID}`;
 
 type Tier = 'Early Bird Registration' | 'Regular Registration' | 'Late Registration';
 type Group = 'group A' | 'group B';
 
 const FEES: Record<Tier, Record<Group, number>> = {
   'Early Bird Registration': { 'group A': 799, 'group B': 275 },
-  'Regular Registration':    { 'group A': 999, 'group B': 275 },
-  'Late Registration':       { 'group A': 1499, 'group B': 375 },
+  'Regular Registration': { 'group A': 999, 'group B': 275 },
+  'Late Registration': { 'group A': 1499, 'group B': 375 },
 };
 
 const TIER_META: Record<Tier, { shortLabel: string; color: string; bg: string; border: string; dot: string; endsOn: string }> = {
   'Early Bird Registration': {
     shortLabel: 'Early Bird',
-    color:  'text-[#2D5F4F]',
-    bg:     'bg-[#2D5F4F]/8',
+    color: 'text-[#2D5F4F]',
+    bg: 'bg-[#2D5F4F]/8',
     border: 'border-[#2D5F4F]/20',
-    dot:    'bg-[#2D5F4F]',
+    dot: 'bg-[#2D5F4F]',
     endsOn: '31 March 2026',
   },
   'Regular Registration': {
     shortLabel: 'Regular',
-    color:  'text-[#1A1A1A]',
-    bg:     'bg-[#F8F7F2]',
+    color: 'text-[#1A1A1A]',
+    bg: 'bg-[#F8F7F2]',
     border: 'border-[#D0CEC2]',
-    dot:    'bg-[#6B6B6B]',
+    dot: 'bg-[#6B6B6B]',
     endsOn: '30 June 2026',
   },
   'Late Registration': {
     shortLabel: 'Late',
-    color:  'text-[#D97757]',
-    bg:     'bg-[#D97757]/8',
+    color: 'text-[#D97757]',
+    bg: 'bg-[#D97757]/8',
     border: 'border-[#D97757]/20',
-    dot:    'bg-[#D97757]',
+    dot: 'bg-[#D97757]',
     endsOn: '01 September 2026',
   },
 };
@@ -370,7 +353,7 @@ export default function CompetitionPage() {
             <div className="flex flex-col gap-3 w-full max-w-xs mx-auto">
               <a
 
-                href="/registration?event_id=3f123e78-60d6-494d-b307-18c5b4c8ab7f"
+                href={REGISTRATION_URL}
                 className="w-full px-6 py-4 rounded-lg text-white font-bold text-base transition-all duration-300 active:scale-95 shadow-xl text-center"
                 style={{
                   background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
@@ -386,13 +369,6 @@ export default function CompetitionPage() {
                 onClick={() => handleDownloadClick('brief')}
               >
                 Download Brief ↓
-              </button>
-              <button
-                className="w-full px-6 py-4 rounded-lg font-bold text-base border border-white text-white transition-all duration-300 active:scale-95 shadow-xl"
-                style={{ background: 'rgba(255,255,255,0.08)' }}
-                onClick={() => handleDownloadClick('press')}
-              >
-                Press Kit ↓
               </button>
             </div>
           </div>
@@ -427,7 +403,7 @@ export default function CompetitionPage() {
 
             <div className="flex gap-8">
               <a
-                href="/registration?event_id=3f123e78-60d6-494d-b307-18c5b4c8ab7f"
+                href={REGISTRATION_URL}
                 className="mt-16 px-16 py-5 rounded-lg text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow inline-block text-center"
                 style={{
                   background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
@@ -621,13 +597,6 @@ export default function CompetitionPage() {
         files={TUHBriefFiles}
       />
 
-      <DownloadBriefModal
-        isOpen={isPressDownloadOpen}
-        onClose={() => setIsPressDownloadOpen(false)}
-        title="Download Press"
-        subtitle="The Unreal House — select files to download"
-        files={TUHPressKitFiles}
-      />
     </>
   );
 }
