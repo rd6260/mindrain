@@ -21,7 +21,7 @@ interface Event {
   code_name: string;
 }
 
-type RegistrationStatus = 'already_paid' | 'payment_pending' | null;
+type RegistrationStatus = 'already_paid' | null;
 
 // Floating label input component
 function FloatingInput({
@@ -118,72 +118,34 @@ function ToggleBtn({
   );
 }
 
-// Registration status popup
+// Registration status popup — only used for already_paid
 function RegistrationStatusDialog({
   status,
-  registrationId,
   onClose,
 }: {
   status: RegistrationStatus;
-  registrationId: string | null;
   onClose: () => void;
 }) {
-  if (!status) return null;
-
-  const isPaid = status === 'already_paid';
+  if (status !== 'already_paid') return null;
 
   return (
     <div className="fixed inset-0 bg-[#1A1A1A]/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-[#F8F7F2] rounded-2xl border border-[#D0CEC2] w-full max-w-sm p-8 text-center shadow-2xl">
-        <div
-          className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-5 ${isPaid ? 'bg-[#2D5F4F]' : 'bg-[#D97757]'
-            }`}
-        >
-          {isPaid ? (
-            <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-            </svg>
-          ) : (
-            <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          )}
+        <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-5 bg-[#2D5F4F]">
+          <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+          </svg>
         </div>
-
-        <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">
-          {isPaid ? 'Already Registered' : 'Payment Pending'}
-        </h3>
+        <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">Already Registered</h3>
         <p className="text-sm text-[#6B6B6B] mb-7 leading-relaxed">
-          {isPaid
-            ? 'You have already completed registration and payment for this event.'
-            : 'You have a registration for this event but payment is still pending. Complete payment to confirm your spot.'}
+          You have already completed registration and payment for this event.
         </p>
-
-        {isPaid ? (
-          <button
-            onClick={() => { window.location.href = '/'; }}
-            className="w-full py-3.5 rounded-xl bg-[#2C5F5F] text-white text-sm font-bold hover:bg-[#1A4D4D] transition-colors shadow-lg shadow-[#2C5F5F]/20"
-          >
-            Go to Home
-          </button>
-        ) : (
-          <div className="flex flex-col gap-2">
-            <button
-              onClick={() => {
-                window.location.href = '/payment?registration_id=' + registrationId;
-              }}
-              className="w-full py-3.5 rounded-xl bg-[#D97757] text-white text-sm font-bold hover:bg-[#C06640] transition-colors shadow-lg shadow-[#D97757]/20"
-            >
-              Complete Payment →
-            </button>
-            <button
-              onClick={onClose}
-              className="w-full py-3 rounded-xl border border-[#D0CEC2] text-sm font-semibold text-[#6B6B6B] hover:border-[#2C5F5F] transition-colors"
-            >
-              Edit Registration
-            </button>
-          </div>
-        )}
+        <button
+          onClick={() => { window.location.href = '/'; }}
+          className="w-full py-3.5 rounded-xl bg-[#2C5F5F] text-white text-sm font-bold hover:bg-[#1A4D4D] transition-colors shadow-lg shadow-[#2C5F5F]/20"
+        >
+          Go to Home
+        </button>
       </div>
     </div>
   );
@@ -206,9 +168,7 @@ function RegistrationContent() {
   const [members, setMembers] = useState<MemberData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
 
-  // Registration status popup
   const [registrationStatus, setRegistrationStatus] = useState<RegistrationStatus>(null);
 
   const [showAddMember, setShowAddMember] = useState(false);
@@ -286,7 +246,7 @@ function RegistrationContent() {
         return;
       }
 
-      // Show status popup based on paid field
+      // Only show popup if already paid; otherwise silently populate the form
       if (existingReg.paid === true) {
         setExistingRegistrationId(existingReg.id);
         setIsPaid(true);
@@ -294,11 +254,12 @@ function RegistrationContent() {
       } else {
         setExistingRegistrationId(existingReg.id);
         setIsPaid(false);
-        setRegistrationStatus('payment_pending');
+        setRegistrationStatus(null);
       }
 
       setIsEditMode(true);
       setCountry(existingReg.country);
+      setCountryType(existingReg.country === 'India' ? 'India' : 'Other');
       setGroup(existingReg.group);
       setCategory(existingReg.category);
       setTeamType(existingReg.team_type);
@@ -392,7 +353,6 @@ function RegistrationContent() {
   const handleRemoveMember = async (index: number) => {
     const member = members[index];
 
-    // If member has a DB id, delete from DB and storage
     if (member.id) {
       try {
         if (member.institute_id_url) {
@@ -414,14 +374,6 @@ function RegistrationContent() {
     setMembers(members.filter((_, i) => i !== index));
   };
 
-  /**
-   * Generate the next team_id for the given event.
-   * Fetches all existing team_ids for that event, finds the max trailing number,
-   * and returns (max + 1). Retries on failure to handle race conditions.
-   *
-   * Format: {eventPreCode}-{group}-{categoryPart}-{teamPart}-{paddedNumber}
-   * e.g. EVT-A-I-IND-0001
-   */
   const generateTeamId = async (
     eventId: string,
     codeName: string,
@@ -432,7 +384,6 @@ function RegistrationContent() {
   ): Promise<string> => {
     const maxRetries = 5;
     try {
-      // Fetch all team_ids for this event
       const { data: existingRegs, error: fetchError } = await supabase
         .from('registrations')
         .select('team_id')
@@ -495,7 +446,7 @@ function RegistrationContent() {
         const { error: deleteError } = await supabase.from('members').delete().eq('registration_id', existingRegistrationId);
         if (deleteError) throw deleteError;
       } else {
-        // Generate team_id for this new registration with retry on unique constraint violation
+        // Generate team_id with retry on unique constraint violation
         let teamId: string | null = null;
         let insertSuccess = false;
         let insertRetry = 0;
@@ -518,7 +469,6 @@ function RegistrationContent() {
               .single();
 
             if (regError) {
-              // 23505 = unique_violation — another registration grabbed this team_id simultaneously
               if (regError.code === '23505') {
                 insertRetry++;
                 await new Promise(resolve => setTimeout(resolve, 100 * insertRetry));
@@ -568,8 +518,8 @@ function RegistrationContent() {
         if (memberError) throw memberError;
       }
 
-      setIsEditMode(true);
-      setShowPaymentDialog(true);
+      // Save complete — redirect straight to payment
+      window.location.href = '/payment?registration_id=' + registrationId;
     } catch (err) {
       console.error('Registration error:', err);
       setError(err instanceof Error ? err.message : 'An error occurred during registration');
@@ -637,7 +587,7 @@ function RegistrationContent() {
             {isEditMode ? 'Update Registration' : 'Event Registration'}
           </h1>
           <p className="text-[#6B6B6B] mt-1 text-sm">
-            {isEditMode ? 'Update your details below and resubmit' : 'Complete all sections to secure your spot'}
+            {isEditMode ? 'Update your details below and proceed to payment' : 'Complete all sections to secure your spot'}
           </p>
         </div>
 
@@ -809,30 +759,32 @@ function RegistrationContent() {
                 </p>
               </div>
             ) : (
-              <button
-                onClick={handleSubmit}
-                disabled={!canSubmit() || isLoading}
-                className={`
-                  w-full py-4 rounded-xl text-sm font-bold tracking-wide transition-all duration-200
-                  ${canSubmit() && !isLoading
-                    ? 'bg-[#2C5F5F] text-white hover:bg-[#1A4D4D] shadow-lg shadow-[#2C5F5F]/20 hover:shadow-xl hover:shadow-[#2C5F5F]/30 hover:-translate-y-0.5'
-                    : 'bg-[#D0CEC2] text-[#8B8B8B] cursor-not-allowed'
+              <>
+                <button
+                  onClick={handleSubmit}
+                  disabled={!canSubmit() || isLoading}
+                  className={`
+                    w-full py-4 rounded-xl text-sm font-bold tracking-wide transition-all duration-200
+                    ${canSubmit() && !isLoading
+                      ? 'bg-[#2C5F5F] text-white hover:bg-[#1A4D4D] shadow-lg shadow-[#2C5F5F]/20 hover:shadow-xl hover:shadow-[#2C5F5F]/30 hover:-translate-y-0.5'
+                      : 'bg-[#D0CEC2] text-[#8B8B8B] cursor-not-allowed'
+                    }
+                  `}
+                >
+                  {isLoading
+                    ? <span className="flex items-center justify-center gap-2">
+                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Saving...
+                      </span>
+                    : 'Save & Proceed to Payment →'
                   }
-                `}
-              >
-                {isLoading
-                  ? <span className="flex items-center justify-center gap-2">
-                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    {isEditMode ? 'Updating...' : 'Registering...'}
-                  </span>
-                  : isEditMode ? 'Update Registration' : 'Complete Registration'
-                }
-              </button>
-            )}
-            {!canSubmit() && !isLoading && !isPaid && (
-              <p className="text-xs text-[#8B8B8B] text-center mt-2">
-                Complete all sections above to enable submission
-              </p>
+                </button>
+                {!canSubmit() && !isLoading && (
+                  <p className="text-xs text-[#8B8B8B] text-center mt-2">
+                    Complete all sections above to enable submission
+                  </p>
+                )}
+              </>
             )}
           </div>
 
@@ -888,7 +840,7 @@ function RegistrationContent() {
                 <p className="text-xs font-bold text-[#6B6B6B] uppercase tracking-wider mb-2">Institute ID Card</p>
                 <FloatingInput label="Upload ID card image" type="file" accept="image/*" onChange={handleFileChange} />
                 <p className="text-[10px] text-[#8B8B8B] mt-1">Upload a clear photo of your institute ID</p>
-                <p className="text-[10px] text-[#8B8B8B] mt-1">Only image formates are allowed</p>
+                <p className="text-[10px] text-[#8B8B8B] mt-1">Only image formats are allowed</p>
               </div>
             </div>
 
@@ -918,42 +870,11 @@ function RegistrationContent() {
         </div>
       )}
 
-      {/* Registration Status Dialog */}
+      {/* Registration Status Dialog — only shown when already paid */}
       <RegistrationStatusDialog
         status={registrationStatus}
-        registrationId={existingRegistrationId}
         onClose={() => setRegistrationStatus(null)}
       />
-
-      {/* Payment Dialog */}
-      {showPaymentDialog && (
-        <div className="fixed inset-0 bg-[#1A1A1A]/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#F8F7F2] rounded-2xl border border-[#D0CEC2] w-full max-w-sm p-8 text-center shadow-2xl">
-            <div className="w-14 h-14 bg-[#2D5F4F] rounded-full flex items-center justify-center mx-auto mb-5">
-              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">
-              {isEditMode ? 'Registration Updated!' : 'Registration Complete!'}
-            </h3>
-            <p className="text-sm text-[#6B6B6B] mb-7 leading-relaxed">
-              {isEditMode
-                ? 'Your registration has been updated. Proceed to payment to confirm your spot.'
-                : 'Your registration is saved. Complete payment to confirm your spot.'}
-            </p>
-            <button
-              onClick={() => {
-                setShowPaymentDialog(false);
-                window.location.href = '/payment?registration_id=' + existingRegistrationId;
-              }}
-              className="w-full py-3.5 rounded-xl bg-[#2C5F5F] text-white text-sm font-bold hover:bg-[#1A4D4D] transition-colors shadow-lg shadow-[#2C5F5F]/20"
-            >
-              Proceed to Payment →
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
