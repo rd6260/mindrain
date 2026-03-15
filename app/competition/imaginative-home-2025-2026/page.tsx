@@ -128,7 +128,7 @@ const TIER_META: Record<Tier, { shortLabel: string; color: string; bg: string; b
 
 function getCurrentTier(): Tier {
   const today = new Date();
-  if (today <= new Date('2026-03-15')) return 'Early Bird Registration';
+  if (today <= new Date('2026-03-16')) return 'Early Bird Registration';
   if (today <= new Date('2026-05-31')) return 'Regular Registration';
   return 'Last Minute Registration';
 }
