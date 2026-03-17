@@ -157,8 +157,8 @@ export default function HomePage() {
               { label: "Eligibility", value: "Open to all undergraduate students" },
             ]}
             deadlineLabel="Early bird registration deadline"
-            deadlineValue="15 March 2026"
-            findOutMoreHref="/competition/imaginative-home-2025-2026"
+            deadlineValue="22 March 2026"
+            findOutMoreHref="/competition/the-unreal-house-2025-2026"
             briefFiles={[
               { name: "Important Dates & Calendar", description: "Key deadlines and schedule", url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/Important%20Dates-Calender.pdf" },
               { name: "Terms & Conditions", description: "Important rules and regulations", url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/T&C%20(Important).pdf" },

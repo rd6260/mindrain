@@ -59,8 +59,8 @@ const PRESS_KIT_FILES: BriefFile[] = [
 const IMPORTANT_DATES: ImportantDate[] = [
   { label: 'Competition Starts',           date: '19 February 2026' },
   { label: 'Early Bird Registration Starts', date: '19 February 2026' },
-  { label: 'Early Bird Registration Ends',   date: '15 March 2026'   },
-  { label: 'Advance Registration Starts',    date: '16 March 2026'   },
+  { label: 'Early Bird Registration Ends',   date: '22 March 2026'   },
+  { label: 'Advance Registration Starts',    date: '23 March 2026'   },
   { label: 'Final Submission Starts',        date: '1 April 2026'    },
   { label: 'Advance Registration Ends',      date: '31 May 2026'     },
   { label: 'Late Registration Starts',       date: '1 June 2026'     },
@@ -106,7 +106,7 @@ const TIER_META: Record<Tier, { shortLabel: string; color: string; bg: string; b
     bg:     'bg-[#2D5F4F]/8',
     border: 'border-[#2D5F4F]/20',
     dot:    'bg-[#2D5F4F]',
-    endsOn: '15 March 2026',
+    endsOn: '22 March 2026',
   },
   'Regular Registration': {
     shortLabel: 'Regular',
@@ -128,7 +128,7 @@ const TIER_META: Record<Tier, { shortLabel: string; color: string; bg: string; b
 
 function getCurrentTier(): Tier {
   const today = new Date();
-  if (today <= new Date('2026-03-16')) return 'Early Bird Registration';
+  if (today <= new Date('2026-03-23')) return 'Early Bird Registration';
   if (today <= new Date('2026-05-31')) return 'Regular Registration';
   return 'Last Minute Registration';
 }

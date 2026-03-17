@@ -80,8 +80,8 @@ function PaymentContent() {
 
   const getRegistrationType = (): 'Early Bird' | 'Regular' | 'Last Minute' => {
     const now = new Date();
-    if (now >= new Date('2026-02-19') && now <= new Date('2026-03-15T23:59:59')) return 'Early Bird';
-    if (now >= new Date('2026-03-16') && now <= new Date('2026-05-31T23:59:59')) return 'Regular';
+    if (now >= new Date('2026-02-19') && now <= new Date('2026-03-22T23:59:59')) return 'Early Bird';
+    if (now >= new Date('2026-03-23') && now <= new Date('2026-05-31T23:59:59')) return 'Regular';
     if (now >= new Date('2026-06-01') && now <= new Date('2026-06-25T23:59:59')) return 'Last Minute';
     return 'Regular';
   };
