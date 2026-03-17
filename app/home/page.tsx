@@ -1,4 +1,5 @@
 'use client';
+import { useState, useEffect } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -24,9 +25,51 @@ export default function HomePage() {
   const category2Winners = previousWinners2019.categories[1].winners;
   const honorableMentions = previousWinners2019.categories[2].winners;
 
+  const [showPopup, setShowPopup] = useState(false);
+
+  useEffect(() => {
+    // Show the popup soon after mounting
+    const timer = setTimeout(() => setShowPopup(true), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div style={{ backgroundColor: colors.background }} className="min-h-screen">
       <Navigation />
+
+      {/* Date Extension Popup */}
+      {showPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-[#F8F7F2] rounded-2xl p-8 max-w-md w-full shadow-2xl relative border border-[#D0CEC2]">
+            <button 
+              onClick={() => setShowPopup(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-black transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 bg-[#2D5F4F]/10 text-[#2D5F4F] rounded-full flex items-center justify-center mb-4">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">Important Update</h3>
+              <p className="text-[#6B6B6B] leading-relaxed mb-6">
+                <strong>The Unreal House</strong> early bird registration last date has been extended to <span className="text-[#2D5F4F] font-bold">22nd March 2026</span>.
+              </p>
+              <button 
+                onClick={() => setShowPopup(false)}
+                className="w-full py-3 rounded-xl font-bold transition-all shadow-md hover:shadow-lg"
+                style={{ backgroundColor: colors.accent, color: colors.white }}
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Hero Section */}
       <section className="relative text-black w-full overflow-hidden">
