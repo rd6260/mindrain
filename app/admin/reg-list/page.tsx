@@ -425,8 +425,21 @@ export default function AdminRegistrationList() {
                           </div>
                           <div className="text-[#6B6B6B] truncate" title={member.email}>{member.email}</div>
                           {member.phone && <div className="text-[#6B6B6B]">{member.phone}</div>}
-                          <div className="text-[#8B8B8B] mt-1.5 pt-1.5 border-t border-[#F0EFE6] text-xs">
-                            {member.institute} · Yr {member.academic_year}
+                          <div className="text-[#8B8B8B] mt-1.5 pt-1.5 border-t border-[#F0EFE6] text-xs flex items-center justify-between">
+                            <span className="truncate pr-2" title={member.institute}>
+                              {member.institute} · Yr {member.academic_year}
+                            </span>
+                            {member.institute_id && (
+                              <a
+                                href={member.institute_id}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-2 py-1 bg-[#2C5F5F]/10 text-[#2C5F5F] hover:bg-[#2C5F5F] hover:text-white rounded text-xs font-bold transition-colors shrink-0 whitespace-nowrap"
+                                title="View College ID"
+                              >
+                                View ID
+                              </a>
+                            )}
                           </div>
                         </div>
                       ))}
