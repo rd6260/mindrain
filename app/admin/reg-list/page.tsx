@@ -10,6 +10,16 @@ type Member = {
   phone: string;
   institute: string;
   academic_year: number;
+  institute_id?: string;
+};
+
+type UserInfo = {
+  id: string;
+  name: string;
+  role: string;
+  institute: string | null;
+  academic_year: number | null;
+  academic_level: string | null;
 };
 
 type Registration = {
@@ -21,6 +31,8 @@ type Registration = {
   country: string;
   paid: boolean;
   team_id: string;
+  registration_by: string;
+  user_info?: UserInfo | null;
   members: Member[];
 };
 
@@ -36,6 +48,58 @@ export default function AdminRegistrationList() {
   const [filter, setFilter] = useState<'all' | 'paid' | 'unpaid'>('all');
 
   const supabase = createClient();
+
+  const handleDelete = async (reg: Registration) => {
+    if (reg.paid) return;
+    
+    if (!window.confirm(`Are you sure you want to delete registration ${reg.team_id || reg.id}? This will remove all associated members and files.`)) {
+      return;
+    }
+    
+    try {
+      // 1. Delete member files from storage
+      if (reg.members && reg.members.length > 0) {
+        const pathsToDelete: string[] = [];
+        const marker = '/object/public/college_id/';
+        
+        reg.members.forEach(member => {
+          if (member.institute_id) {
+            const markerIndex = member.institute_id.indexOf(marker);
+            if (markerIndex !== -1) {
+              const storagePath = member.institute_id
+                .slice(markerIndex + marker.length)
+                .split('?')[0];
+              pathsToDelete.push(storagePath);
+            }
+          }
+        });
+        
+        if (pathsToDelete.length > 0) {
+          await supabase.storage.from('college_id').remove(pathsToDelete);
+        }
+      }
+      
+      // 2. Delete from payments table (if exists)
+      await supabase.from('payments').delete().eq('registration_id', reg.id);
+      
+      // 3. Delete from registrations table (members will cascade drop)
+      const { error: deleteError } = await supabase.from('registrations').delete().eq('id', reg.id);
+      
+      if (deleteError) throw deleteError;
+      
+      // 4. Update state locally
+      setRegistrations(prev => prev.filter(r => r.id !== reg.id));
+      
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'Failed to delete registration');
+      } else {
+        setError('Failed to delete registration');
+      }
+      console.error(err);
+      window.scrollTo(0, 0); // scroll to top to see error
+    }
+  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,19 +127,43 @@ export default function AdminRegistrationList() {
           country,
           paid,
           team_id,
+          registration_by,
           members (
             id,
             name,
             email,
             phone,
             institute,
-            academic_year
+            academic_year,
+            institute_id
           )
         `)
         .order('created_at', { ascending: false });
 
       if (fetchError) throw fetchError;
-      setRegistrations(data as unknown as Registration[]);
+      
+      const regs = data as unknown as Registration[];
+      
+      // Fetch user_info for all unique registration_by IDs
+      const userIds = Array.from(new Set(regs.map(r => r.registration_by).filter(Boolean)));
+      
+      if (userIds.length > 0) {
+        const { data: userInfos } = await supabase
+          .from('user_info')
+          .select('id, name, role, institute, academic_year, academic_level')
+          .in('id', userIds);
+          
+        if (userInfos) {
+          const userInfoMap = new Map(userInfos.map(u => [u.id, u]));
+          regs.forEach(r => {
+            if (r.registration_by && userInfoMap.has(r.registration_by)) {
+              r.user_info = userInfoMap.get(r.registration_by) as UserInfo;
+            }
+          });
+        }
+      }
+
+      setRegistrations(regs);
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message || 'Failed to fetch registrations');
@@ -193,18 +281,62 @@ export default function AdminRegistrationList() {
                   </div>
                   
                   <div className="flex flex-col items-end gap-2">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide ${
-                      reg.paid 
-                        ? 'bg-[#2D5F4F]/10 text-[#2D5F4F] border border-[#2D5F4F]/20' 
-                        : 'bg-[#C85D3E]/10 text-[#C85D3E] border border-[#C85D3E]/20'
-                    }`}>
-                      {reg.paid ? 'PAID' : 'UNPAID'}
-                    </span>
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                      {!reg.paid && (
+                        <button
+                          onClick={() => handleDelete(reg)}
+                          className="px-3 py-1 bg-white border border-[#C85D3E] text-[#C85D3E] rounded-full text-xs font-bold hover:bg-[#C85D3E] hover:text-white transition-colors"
+                          title="Delete unpaid registration"
+                        >
+                          DELETE
+                        </button>
+                      )}
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide ${
+                        reg.paid 
+                          ? 'bg-[#2D5F4F]/10 text-[#2D5F4F] border border-[#2D5F4F]/20' 
+                          : 'bg-[#C85D3E]/10 text-[#C85D3E] border border-[#C85D3E]/20'
+                      }`}>
+                        {reg.paid ? 'PAID' : 'UNPAID'}
+                      </span>
+                    </div>
                     <span className="text-xs text-[#8B8B8B]">
                       {new Date(reg.created_at).toLocaleString()}
                     </span>
                   </div>
                 </div>
+
+                {/* Submitter Info */}
+                {reg.user_info && (
+                  <div className="bg-[#E5E3D7]/30 px-5 py-3 border-b border-[#E5E3D7] text-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-[#6B6B6B]">
+                      <div className="flex items-center gap-1.5 font-medium text-[#1A1A1A]">
+                        <svg className="w-4 h-4 text-[#2C5F5F] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <span className="truncate" title={reg.user_info.name}>By: {reg.user_info.name}</span>
+                      </div>
+                      <div className="hidden sm:block text-[#D0CEC2]">•</div>
+                      <div>Role: <span className="capitalize">{reg.user_info.role}</span></div>
+                      
+                      {reg.user_info.institute && (
+                        <>
+                          <div className="hidden sm:block text-[#D0CEC2]">•</div>
+                          <div className="truncate" title={reg.user_info.institute}>Institute: {reg.user_info.institute}</div>
+                        </>
+                      )}
+                      
+                      {(reg.user_info.academic_year || reg.user_info.academic_level) && (
+                        <>
+                          <div className="hidden sm:block text-[#D0CEC2]">•</div>
+                          <div>
+                            {reg.user_info.academic_level && <span className="capitalize mr-1">{reg.user_info.academic_level}</span>}
+                            {reg.user_info.academic_year && `Year ${reg.user_info.academic_year}`}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* Members List */}
                 <div className="p-5">
