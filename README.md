@@ -39,7 +39,7 @@ All colors are centrally managed in `/utils/colors.ts`:
 │   ├── about/
 │   │   └── page.tsx            # About page
 │   └── competition/
-│       └── imaginative-home-2025-2026/
+│       └── the-unreal-house-2025-2026/
 │           └── page.tsx        # Competition details page
 ├── components/
 │   ├── Navigation.tsx          # Navigation bar (only on /home)
@@ -67,7 +67,7 @@ All colors are centrally managed in `/utils/colors.ts`:
 - **Previous Winners Gallery**: Card-based grid showing past competition winners
 - **Footer**: Simple "Get in Touch" section
 
-### Competition Details Page (`/competition/imaginative-home-2025-2026`)
+### Competition Details Page (`/competition/the-unreal-house-2025-2026`)
 - **Hero Section**: Full-screen with background image and competition title
 - **Prize Pool**: Detailed breakdown by category
 - **Important Dates**: Visual zigzag timeline

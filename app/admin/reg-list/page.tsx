@@ -45,16 +45,23 @@ export default function AdminRegistrationList() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const [filter, setFilter] = useState<'all' | 'paid' | 'unpaid'>('all');
+  const [filterPaid, setFilterPaid] = useState<'all' | 'paid' | 'unpaid'>('all');
+  const [filterGroup, setFilterGroup] = useState<'all' | 'A' | 'B'>('all');
+  const [filterCategory, setFilterCategory] = useState<'all' | '1' | '2'>('all');
+  const [filterTeamType, setFilterTeamType] = useState<'all' | 'solo' | 'group'>('all');
+  const [filterCountry, setFilterCountry] = useState<'all' | 'india' | 'international'>('all');
+  const [sortBy, setSortBy] = useState<'time' | 'institute'>('time');
+
+  const [registrationToDelete, setRegistrationToDelete] = useState<Registration | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const supabase = createClient();
 
-  const handleDelete = async (reg: Registration) => {
-    if (reg.paid) return;
-    
-    if (!window.confirm(`Are you sure you want to delete registration ${reg.team_id || reg.id}? This will remove all associated members and files.`)) {
-      return;
-    }
+  const confirmDelete = async () => {
+    if (!registrationToDelete) return;
+    const reg = registrationToDelete;
+    setIsDeleting(true);
+    setError(null);
     
     try {
       // 1. Delete member files from storage
@@ -89,6 +96,7 @@ export default function AdminRegistrationList() {
       
       // 4. Update state locally
       setRegistrations(prev => prev.filter(r => r.id !== reg.id));
+      setRegistrationToDelete(null);
       
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -98,6 +106,8 @@ export default function AdminRegistrationList() {
       }
       console.error(err);
       window.scrollTo(0, 0); // scroll to top to see error
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -177,9 +187,25 @@ export default function AdminRegistrationList() {
   };
 
   const filteredRegistrations = registrations.filter(reg => {
-    if (filter === 'paid') return reg.paid;
-    if (filter === 'unpaid') return !reg.paid;
+    if (filterPaid === 'paid' && !reg.paid) return false;
+    if (filterPaid === 'unpaid' && reg.paid) return false;
+    if (filterGroup !== 'all' && reg.group !== filterGroup) return false;
+    if (filterCategory !== 'all' && reg.category !== filterCategory) return false;
+    if (filterTeamType !== 'all' && reg.team_type !== filterTeamType) return false;
+    
+    const isIndian = reg.country.toLowerCase() === 'india';
+    if (filterCountry === 'india' && !isIndian) return false;
+    if (filterCountry === 'international' && isIndian) return false;
+
     return true;
+  }).sort((a, b) => {
+    if (sortBy === 'time') {
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    } else {
+      const instA = a.user_info?.institute || a.members?.[0]?.institute || '';
+      const instB = b.user_info?.institute || b.members?.[0]?.institute || '';
+      return instA.localeCompare(instB);
+    }
   });
 
   if (!isAuthenticated) {
@@ -226,28 +252,73 @@ export default function AdminRegistrationList() {
     <div className="min-h-screen bg-[#EDEBDF] p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div className="flex flex-col xl:flex-row xl:items-start justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-[#1A1A1A] tracking-tight">Registrations</h1>
             <p className="text-[#6B6B6B] mt-1 text-sm">
-              Total: {registrations.length} | Paid: {registrations.filter(r => r.paid).length} | Unpaid: {registrations.filter(r => !r.paid).length}
+              Total: {filteredRegistrations.length} / {registrations.length} | Paid: {filteredRegistrations.filter(r => r.paid).length} | Unpaid: {filteredRegistrations.filter(r => !r.paid).length}
             </p>
           </div>
           
-          <div className="flex bg-[#F8F7F2] p-1 rounded-xl border border-[#D0CEC2] self-start">
-            {(['all', 'paid', 'unpaid'] as const).map(f => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold capitalize transition-all ${
-                  filter === f 
-                    ? 'bg-[#2C5F5F] text-white shadow-sm' 
-                    : 'text-[#6B6B6B] hover:text-[#1A1A1A]'
-                }`}
-              >
-                {f}
-              </button>
-            ))}
+          <div className="flex flex-wrap items-center gap-2 xl:max-w-3xl xl:justify-end">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="px-3 py-2 bg-white border border-[#D0CEC2] rounded-lg text-sm font-medium text-[#1A1A1A] outline-none focus:border-[#2C5F5F] shadow-sm appearance-none"
+            >
+              <option value="time">Sort: Time</option>
+              <option value="institute">Sort: Institute</option>
+            </select>
+            
+            <select
+              value={filterPaid}
+              onChange={(e) => setFilterPaid(e.target.value as any)}
+              className="px-3 py-2 bg-white border border-[#D0CEC2] rounded-lg text-sm font-medium text-[#1A1A1A] outline-none focus:border-[#2C5F5F] shadow-sm appearance-none"
+            >
+              <option value="all">Status: All</option>
+              <option value="paid">Status: Paid</option>
+              <option value="unpaid">Status: Unpaid</option>
+            </select>
+            
+            <select
+              value={filterGroup}
+              onChange={(e) => setFilterGroup(e.target.value as any)}
+              className="px-3 py-2 bg-white border border-[#D0CEC2] rounded-lg text-sm font-medium text-[#1A1A1A] outline-none focus:border-[#2C5F5F] shadow-sm appearance-none"
+            >
+              <option value="all">Group: All</option>
+              <option value="A">Group: A</option>
+              <option value="B">Group: B</option>
+            </select>
+
+            <select
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value as any)}
+              className="px-3 py-2 bg-white border border-[#D0CEC2] rounded-lg text-sm font-medium text-[#1A1A1A] outline-none focus:border-[#2C5F5F] shadow-sm appearance-none"
+            >
+              <option value="all">Category: All</option>
+              <option value="1">Category: 1</option>
+              <option value="2">Category: 2</option>
+            </select>
+
+            <select
+              value={filterTeamType}
+              onChange={(e) => setFilterTeamType(e.target.value as any)}
+              className="px-3 py-2 bg-white border border-[#D0CEC2] rounded-lg text-sm font-medium text-[#1A1A1A] outline-none focus:border-[#2C5F5F] shadow-sm appearance-none"
+            >
+              <option value="all">Type: All</option>
+              <option value="solo">Type: Solo</option>
+              <option value="group">Type: Group</option>
+            </select>
+
+            <select
+              value={filterCountry}
+              onChange={(e) => setFilterCountry(e.target.value as any)}
+              className="px-3 py-2 bg-white border border-[#D0CEC2] rounded-lg text-sm font-medium text-[#1A1A1A] outline-none focus:border-[#2C5F5F] shadow-sm appearance-none"
+            >
+              <option value="all">Region: All</option>
+              <option value="india">Indian</option>
+              <option value="international">International</option>
+            </select>
           </div>
         </div>
 
@@ -284,7 +355,7 @@ export default function AdminRegistrationList() {
                     <div className="flex flex-wrap items-center justify-end gap-2">
                       {!reg.paid && (
                         <button
-                          onClick={() => handleDelete(reg)}
+                          onClick={() => setRegistrationToDelete(reg)}
                           className="px-3 py-1 bg-white border border-[#C85D3E] text-[#C85D3E] rounded-full text-xs font-bold hover:bg-[#C85D3E] hover:text-white transition-colors"
                           title="Delete unpaid registration"
                         >
@@ -375,6 +446,52 @@ export default function AdminRegistrationList() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {registrationToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1A1A]/60 backdrop-blur-sm">
+          <div className="bg-[#F8F7F2] rounded-2xl w-full max-w-md p-6 shadow-2xl border border-[#D0CEC2]">
+            <h3 className="text-xl font-bold text-[#1A1A1A] mb-2 flex items-center gap-2">
+              <span className="w-8 h-8 rounded-full bg-[#C85D3E]/10 flex items-center justify-center text-[#C85D3E]">⚠</span>
+              Confirm Deletion
+            </h3>
+            <p className="text-sm text-[#6B6B6B] mb-5 leading-relaxed">
+              Are you sure you want to permanently delete this registration? All associated members and uploaded documents will be removed.
+            </p>
+            
+            <div className="bg-white border border-[#E5E3D7] rounded-xl p-4 mb-6">
+              <div className="text-sm font-semibold text-[#1A1A1A] mb-1 flex items-center gap-2">
+                Team ID: <span className="font-mono text-[#C85D3E]">{registrationToDelete.team_id || 'N/A'}</span>
+              </div>
+              <div className="text-sm text-[#6B6B6B] flex items-center gap-2">
+                Registered By: <span className="font-medium text-[#1A1A1A]">{registrationToDelete.user_info?.name || 'Unknown User'}</span>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setRegistrationToDelete(null)}
+                disabled={isDeleting}
+                className="px-5 py-2.5 rounded-xl text-sm font-semibold text-[#6B6B6B] bg-white border border-[#D0CEC2] hover:bg-[#F0EFE6] transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={isDeleting}
+                className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#C85D3E] hover:bg-[#A94C31] shadow-lg shadow-[#C85D3E]/20 transition-all disabled:opacity-50 flex items-center gap-2"
+              >
+                {isDeleting ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Deleting...
+                  </>
+                ) : 'Delete Registration'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
