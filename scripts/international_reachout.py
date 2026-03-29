@@ -7,15 +7,15 @@ from dotenv import load_dotenv
 load_dotenv()
 
 POSTMARK_API_KEY = os.getenv("POSTMARK_API_KEY")
-TEMPLATE_ID = 44004779
+TEMPLATE_ID = 43917366
 # CSV_FILE = "/home/senku/Downloads/mindrain/data/test_list.csv"
 CSV_FILE = "/home/senku/Downloads/mindrain/data/batch-1-2.csv"
 ZIP_FILE = "/home/senku/Downloads/mindrain/data/The-Unreal-House-Docs.zip"
-POSTER_FILE = "/home/senku/Downloads/mindrain/data/campain-poster-extended-dates.jpg"
+POSTER_FILE = "/home/senku/Downloads/mindrain/data/final call poster.jpg"
 FROM_EMAIL = "Mind Rain <team@mindrain.org>"
 POSTMARK_BATCH_URL = "https://api.postmarkapp.com/email/batchWithTemplates"
 REPLY_TO = "team@mindrain.org"
-EMAILS_PER_RUN = 5
+EMAILS_PER_RUN = 40
 
 
 def load_zip_attachment(zip_path):
@@ -74,8 +74,10 @@ def build_messages(recipients, attachments):
             "TemplateId": TEMPLATE_ID,
             "ReplyTo": REPLY_TO,
             "TemplateModel": {
-                "college_name": r["college_name"],
-                "institution_name": r["institution_name"],
+                "name": "Sir/Madam",
+                "institution_name": r["college_name"],
+                # "college_name": r["college_name"],
+                # "institution_name": r["institution_name"],
             },
             "Attachments": attachments
         })
@@ -118,7 +120,7 @@ def main():
 
     zip_attachment    = load_zip_attachment(ZIP_FILE)
     poster_attachment = load_poster_attachment(POSTER_FILE)
-    attachments       = [poster_attachment, zip_attachment]
+    attachments       = [poster_attachment]
 
     recipients = load_recipients(CSV_FILE)
     if not recipients:

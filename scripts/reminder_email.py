@@ -11,12 +11,12 @@ TEMPLATE_ID = 43917366
 # CSV_FILE = "/home/senku/Downloads/mindrain/data/test_list.csv"
 CSV_FILE = "/home/senku/Downloads/mindrain/data/college_list.csv"
 ZIP_FILE = "/home/senku/Downloads/mindrain/data/The Unreal House Docs.zip"
-POSTER_FILE = "/home/senku/Downloads/mindrain/data/campain-poster-extended-dates.jpg"
+POSTER_FILE = "/home/senku/Downloads/mindrain/data/final call poster.jpg"
 FROM_EMAIL = "Mind Rain <team@mindrain.org>"
 POSTMARK_BATCH_URL = "https://api.postmarkapp.com/email/batchWithTemplates"
 REPLY_TO = "team@mindrain.org"
 # Number of emails to send at a time
-EMAILS_PER_RUN = 5
+EMAILS_PER_RUN = 20
 
 
 def load_zip_attachment(zip_path):

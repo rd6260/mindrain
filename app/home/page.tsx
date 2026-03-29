@@ -38,6 +38,7 @@ export default function HomePage() {
       <Navigation />
 
       {/* Date Extension Popup */}
+      {/* 
       {showPopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm animate-fade-in">
           <div className="bg-[#F8F7F2] rounded-2xl p-8 max-w-md w-full shadow-2xl relative border border-[#D0CEC2]">
@@ -70,6 +71,8 @@ export default function HomePage() {
           </div>
         </div>
       )}
+      */}
+      
 
       {/* Hero Section */}
       <section className="relative text-black w-full overflow-hidden">
