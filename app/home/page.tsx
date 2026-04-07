@@ -25,13 +25,13 @@ export default function HomePage() {
   const category2Winners = previousWinners2019.categories[1].winners;
   const honorableMentions = previousWinners2019.categories[2].winners;
 
-  const [showPopup, setShowPopup] = useState(false);
+  // const [showPopup, setShowPopup] = useState(false);
 
-  useEffect(() => {
-    // Show the popup soon after mounting
-    const timer = setTimeout(() => setShowPopup(true), 500);
-    return () => clearTimeout(timer);
-  }, []);
+  // useEffect(() => {
+  //   // Show the popup soon after mounting
+  //   const timer = setTimeout(() => setShowPopup(true), 500);
+  //   return () => clearTimeout(timer);
+  // }, []);
 
   return (
     <div style={{ backgroundColor: colors.background }} className="min-h-screen">

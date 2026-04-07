@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { colors } from '@/utils/colors';
 import Footer from '@/app/components/Footer';
 import Timeline from '@/app/components/Timeline';
@@ -10,6 +11,18 @@ import { useEffect, useState } from 'react';
 import Navigation from '@/app/components/Navigation';
 import { createClient } from '@/lib/supabase/client';
 import localFont from "next/font/local";
+
+// ─── Submission Links ─────────────────────────────────────────────────────────
+const SUBMISSION_LINKS: Record<string, string> = {
+  TUH: 'https://forms.gle/ZcnqVNnbVNazzAW5A',
+  MRTA2: 'https://forms.gle/gnjPH2TBZk8P1RYXA',
+};
+
+function getSubmissionLink(teamId: string): string | null {
+  if (teamId.startsWith('TUH')) return SUBMISSION_LINKS.TUH;
+  if (teamId.startsWith('MRTA2')) return SUBMISSION_LINKS.MRTA2;
+  return null;
+}
 
 const IBMPlexSansCondensedFont = localFont({
   src: "../../fonts/IBMPlexSans-Regular.ttf"
@@ -133,15 +146,133 @@ function ToggleButton({ active, onClick, children }: {
   );
 }
 
+// ─── Payment Required Modal ───────────────────────────────────────────────────
+function PaymentRequiredModal({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
+  const router = useRouter();
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+      style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
+      onClick={onClose}
+    >
+      <div
+        className="relative rounded-2xl p-8 max-w-sm w-full shadow-2xl text-center"
+        style={{ backgroundColor: colors.white }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors text-2xl leading-none"
+          aria-label="Close"
+        >
+          &times;
+        </button>
+
+        <svg className="w-12 h-12 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="#D97757">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+
+        <h3
+          className="text-2xl font-bold mb-2"
+          style={{ color: colors.textPrimary }}
+        >
+          Payment Required
+        </h3>
+        <p
+          className="text-base mb-8 leading-relaxed"
+          style={{ color: colors.textSecondary }}
+        >
+          Please complete the payment first to submit your entry.
+        </p>
+
+        <div className="flex flex-col gap-3">
+          <button
+            onClick={() => router.push('/profile')}
+            className="block w-full px-6 py-3 rounded-lg text-white font-semibold text-base transition-all duration-200 hover:opacity-90 hover:scale-[1.02]"
+            style={{
+              background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`,
+            }}
+          >
+            Go to Profile →
+          </button>
+          <button
+            onClick={onClose}
+            className="w-full px-6 py-3 rounded-lg font-semibold text-base border transition-all duration-200 hover:bg-gray-50"
+            style={{
+              color: colors.textSecondary,
+              borderColor: colors.borderLight,
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Registration Fees Component ──────────────────────────────────────────────
 
-function RegistrationFees() {
+function RegistrationFees({
+  userRegistration,
+  onPaymentModal,
+}: {
+  userRegistration: { paid: boolean; team_id: string } | null;
+  onPaymentModal: () => void;
+}) {
   const [group, setGroup] = useState<Group>('group A');
 
   const activeTier = getCurrentTier();
   const { shortLabel, color, bg, border, dot, endsOn } = TIER_META[activeTier];
 
   const amount = FEES[activeTier][group];
+
+  // Determine the CTA button
+  const renderCTA = () => {
+    if (userRegistration && userRegistration.paid) {
+      const link = getSubmissionLink(userRegistration.team_id);
+      return (
+        <a
+          href={link || '#'}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-12 py-3.5 rounded-lg text-white font-bold text-sm transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow inline-block text-center"
+          style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})` }}
+        >
+          Submit Entry →
+        </a>
+      );
+    }
+    if (userRegistration && !userRegistration.paid) {
+      return (
+        <button
+          onClick={onPaymentModal}
+          className="px-12 py-3.5 rounded-lg text-white font-bold text-sm transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow inline-block text-center"
+          style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})` }}
+        >
+          Submit Entry →
+        </button>
+      );
+    }
+    return (
+      <a
+        href={REGISTRATION_URL}
+        className="px-12 py-3.5 rounded-lg text-white font-bold text-sm transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow inline-block text-center"
+        style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})` }}
+        data-testid="register-now-button"
+      >
+        Register Now →
+      </a>
+    );
+  };
 
   return (
     <div className="rounded-lg p-6 space-y-7" style={{ backgroundColor: colors.white }}>
@@ -182,14 +313,7 @@ function RegistrationFees() {
       </div>
 
       <div className="flex items-center justify-center">
-        <a
-          href={REGISTRATION_URL}
-          className="px-12 py-3.5 rounded-lg text-white font-bold text-sm transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow inline-block text-center"
-          style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})` }}
-          data-testid="register-now-button"
-        >
-          Register Now →
-        </a>
+        {renderCTA()}
       </div>
     </div>
   );
@@ -269,14 +393,26 @@ export default function CompetitionPage() {
   const [isBriefDownloadOpen, setIsBriefDownloadOpen] = useState(false);
   const [isPressDownloadOpen, setIsPressDownloadOpen] = useState(false);
   const [isLoginPromptOpen, setIsLoginPromptOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null); // null = loading
+  const [userRegistration, setUserRegistration] = useState<{ paid: boolean; team_id: string } | null>(null);
   const [navOpacity, setNavOpacity] = useState(0);
 
   // Check auth status on mount
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setIsLoggedIn(!!session);
+      if (session?.user) {
+        const { data } = await supabase
+          .from('registrations_2')
+          .select('paid, team_id')
+          .eq('registration_by', session.user.id)
+          .eq('event_id', REGISTRATION_EVENT_ID)
+          .limit(1)
+          .maybeSingle();
+        if (data) setUserRegistration(data);
+      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -346,16 +482,39 @@ export default function CompetitionPage() {
             </p>
 
             <div className="flex flex-col gap-3 w-full max-w-xs mx-auto">
-              <a
-
-                href={REGISTRATION_URL}
-                className="w-full px-6 py-4 rounded-lg text-white font-bold text-base transition-all duration-300 active:scale-95 shadow-xl text-center"
-                style={{
-                  background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
-                }}
-              >
-                Register Now →
-              </a>
+              {userRegistration && userRegistration.paid ? (
+                <a
+                  href={getSubmissionLink(userRegistration.team_id) || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full px-6 py-4 rounded-lg text-white font-bold text-base transition-all duration-300 active:scale-95 shadow-xl text-center"
+                  style={{
+                    background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
+                  }}
+                >
+                  Submit Entry →
+                </a>
+              ) : userRegistration && !userRegistration.paid ? (
+                <button
+                  onClick={() => setIsPaymentModalOpen(true)}
+                  className="w-full px-6 py-4 rounded-lg text-white font-bold text-base transition-all duration-300 active:scale-95 shadow-xl text-center"
+                  style={{
+                    background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
+                  }}
+                >
+                  Submit Entry →
+                </button>
+              ) : (
+                <a
+                  href={REGISTRATION_URL}
+                  className="w-full px-6 py-4 rounded-lg text-white font-bold text-base transition-all duration-300 active:scale-95 shadow-xl text-center"
+                  style={{
+                    background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
+                  }}
+                >
+                  Register Now →
+                </a>
+              )}
               <button
                 className="w-full px-6 py-4 rounded-lg text-white font-bold text-base transition-all duration-300 active:scale-95 shadow-xl"
                 style={{
@@ -397,16 +556,40 @@ export default function CompetitionPage() {
             </h1>
 
             <div className="flex gap-8">
-              <a
-                href={REGISTRATION_URL}
-                className="mt-16 px-16 py-5 rounded-lg text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow inline-block text-center"
-                style={{
-                  background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
-                }}
-                data-testid="register-now-button"
-              >
-                Register Now →
-              </a>
+              {userRegistration && userRegistration.paid ? (
+                <a
+                  href={getSubmissionLink(userRegistration.team_id) || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-16 px-16 py-5 rounded-lg text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow inline-block text-center"
+                  style={{
+                    background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
+                  }}
+                >
+                  Submit Entry →
+                </a>
+              ) : userRegistration && !userRegistration.paid ? (
+                <button
+                  onClick={() => setIsPaymentModalOpen(true)}
+                  className="mt-16 px-16 py-5 rounded-lg text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow"
+                  style={{
+                    background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
+                  }}
+                >
+                  Submit Entry →
+                </button>
+              ) : (
+                <a
+                  href={REGISTRATION_URL}
+                  className="mt-16 px-16 py-5 rounded-lg text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow inline-block text-center"
+                  style={{
+                    background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`
+                  }}
+                  data-testid="register-now-button"
+                >
+                  Register Now →
+                </a>
+              )}
               <button
                 className="mt-16 px-16 py-5 rounded-lg text-white font-bold text-xl transition-all duration-300 hover:scale-110 shadow-2xl hover:shadow-3xl animate-pulse-glow"
                 style={{
@@ -520,7 +703,7 @@ export default function CompetitionPage() {
             >
               Registration Fees
             </h2>
-            <RegistrationFees />
+            <RegistrationFees userRegistration={userRegistration} onPaymentModal={() => setIsPaymentModalOpen(true)} />
           </div>
         </section >
 
@@ -581,6 +764,12 @@ export default function CompetitionPage() {
         isOpen={isLoginPromptOpen}
         onClose={() => setIsLoginPromptOpen(false)
         }
+      />
+
+      {/* Payment Required Modal */}
+      <PaymentRequiredModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
       />
 
       {/* Download Modals (only reachable when logged in) */}

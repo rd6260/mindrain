@@ -5,6 +5,18 @@ import { createClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
 import Navigation from '@/app/components/Navigation';
 
+// ─── Submission Links ─────────────────────────────────────────────────────────
+const SUBMISSION_LINKS: Record<string, string> = {
+  TUH: 'https://forms.gle/ZcnqVNnbVNazzAW5A',
+  MRTA2: 'https://forms.gle/gnjPH2TBZk8P1RYXA',
+};
+
+function getSubmissionLink(teamId: string): string | null {
+  if (teamId.startsWith('TUH')) return SUBMISSION_LINKS.TUH;
+  if (teamId.startsWith('MRTA2')) return SUBMISSION_LINKS.MRTA2;
+  return null;
+}
+
 
 // Types
 interface UserInfo {
@@ -356,7 +368,7 @@ const ProfilePage = () => {
                             </p>
                           </div>
                           <div className="flex flex-col items-end gap-2">
-                            {!registration.paid && (
+                            {!registration.paid ? (
                               <a
                                 href={`/payment?registration_id=${registration.id}`}
                                 className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:shadow-md"
@@ -369,7 +381,22 @@ const ProfilePage = () => {
                               >
                                 Complete Payment →
                               </a>
-                            )}
+                            ) : getSubmissionLink(registration.team_id) ? (
+                              <a
+                                href={getSubmissionLink(registration.team_id)!}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:shadow-md"
+                                style={{
+                                  backgroundColor: '#D97757',
+                                  color: '#FFFFFF',
+                                }}
+                                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#C04B2B')}
+                                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#D97757')}
+                              >
+                                Submit Entry →
+                              </a>
+                            ) : null}
                           </div>
                         </div>
 
@@ -455,7 +482,7 @@ const ProfilePage = () => {
                             </p>
                           </div>
                           <div className="flex flex-col items-end gap-2">
-                            {!registration.paid && (
+                            {!registration.paid ? (
                               <a
                                 href={`/payment-2?registration_id=${registration.id}`}
                                 className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:shadow-md"
@@ -468,7 +495,22 @@ const ProfilePage = () => {
                               >
                                 Complete Payment →
                               </a>
-                            )}
+                            ) : getSubmissionLink(registration.team_id) ? (
+                              <a
+                                href={getSubmissionLink(registration.team_id)!}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:shadow-md"
+                                style={{
+                                  backgroundColor: '#D97757',
+                                  color: '#FFFFFF',
+                                }}
+                                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#C04B2B')}
+                                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#D97757')}
+                              >
+                                Submit Entry →
+                              </a>
+                            ) : null}
                           </div>
                         </div>
 
