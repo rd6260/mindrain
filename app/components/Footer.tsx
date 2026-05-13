@@ -67,7 +67,7 @@ export default function Footer() {
             you.
           </p>
           <a
-            href="/contactUs"
+            href="mailto:support@mindrain.org"
             className="inline-block px-12 py-5 rounded-full text-white font-semibold text-lg transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-2xl"
             style={{
               background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`,
@@ -81,23 +81,23 @@ export default function Footer() {
             className="mt-12 pt-8 border-t"
             style={{ borderColor: colors.border }}
           >
+            <p className="text-sm" style={{ color: colors.textLight }}>
+              © 2026 Mind Rain. All rights reserved.
+            </p>
 
             {/* Policy links */}
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+            <div className="mt-4 flex flex-wrap justify-center gap-x-6 gap-y-2">
+              <style>{`
+                .footer-policy-link { color: ${colors.textLight}; }
+                .footer-policy-link:hover { color: ${colors.accent}; }
+              `}</style>
               {POLICY_DOCUMENTS.map((doc) => (
                 <a
                   key={doc.url}
                   href={doc.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`${changa.className} inline-flex items-center gap-1 text-xs uppercase tracking-widest transition-colors hover:underline underline-offset-2`}
-                  style={{ color: colors.textLight }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.color = colors.accent)
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.color = colors.textLight)
-                  }
+                  className={`footer-policy-link ${changa.className} inline-flex items-center gap-1 text-xs uppercase tracking-widest transition-colors hover:underline underline-offset-2`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -114,10 +114,6 @@ export default function Footer() {
                 </a>
               ))}
             </div>
-
-            <p className="text-sm mt-4" style={{ color: colors.textLight }}>
-              © 2026 Mind Rain. All rights reserved.
-            </p>
           </div>
         </div>
       </div>
