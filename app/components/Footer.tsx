@@ -67,7 +67,7 @@ export default function Footer() {
             you.
           </p>
           <a
-            href="mailto:support@mindrain.org"
+            href="/contactUs"
             className="inline-block px-12 py-5 rounded-full text-white font-semibold text-lg transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-2xl"
             style={{
               background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`,
