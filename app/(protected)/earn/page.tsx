@@ -1,5 +1,6 @@
 'use client';
 
+import Footer from '@/app/components/Footer';
 import Navigation from '@/app/components/Navigation';
 import Link from 'next/link';
 
@@ -261,6 +262,8 @@ export default function EarnPage() {
             </svg>
           </Link>
         </section>
+
+        <Footer/>
 
       </div>
     </div>

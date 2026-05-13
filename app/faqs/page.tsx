@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Navigation from '@/app/components/Navigation';
+import Footer from '../components/Footer';
 
 const faqs = [
   {
@@ -227,6 +228,7 @@ export default function FAQPage() {
             </svg>
           </a>
         </section>
+        <Footer/>
 
       </div>
     </div>

@@ -12,6 +12,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import Navigation from '@/app/components/Navigation';
+import Footer from '../components/Footer';
 
 // Discord icon (not in lucide)
 function DiscordIcon({ className }: { className?: string }) {
@@ -302,8 +303,10 @@ export default function ContactPage() {
               .
             </p>
 
+
           </div>
         </div>
+            <Footer/>
       </div>
     </>
   );
