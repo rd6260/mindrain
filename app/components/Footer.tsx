@@ -1,29 +1,12 @@
 import { Changa } from "next/font/google";
 import { colors } from "@/utils/colors";
+import { POLICY_DOCUMENTS } from "@/data/policyDocs";
 
 const changa = Changa({
   subsets: ["latin"],
   weight: ["500"],
 });
 
-const POLICY_DOCUMENTS = [
-  {
-    name: "Copyright Policy",
-    url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/policy/policy-v2/MindRain%20Copyright%20Policy.pdf",
-  },
-  {
-    name: "Privacy Policy",
-    url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/policy/policy-v2/MindRain%20Privicy%20Policy.pdf",
-  },
-  {
-    name: "Refund & Cancellation",
-    url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/policy/policy-v2/MindRain%20Refund%20%26%20Cancelation%20Policy.pdf",
-  },
-  {
-    name: "Terms & Conditions",
-    url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/policy/policy-v2/MindRain%20Terms%20%26%20Conditions.pdf",
-  },
-];
 
 export default function Footer() {
 
@@ -67,7 +50,7 @@ export default function Footer() {
             you.
           </p>
           <a
-            href="mailto:support@mindrain.org"
+            href="/contactUs"
             className="inline-block px-12 py-5 rounded-full text-white font-semibold text-lg transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-2xl"
             style={{
               background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`,

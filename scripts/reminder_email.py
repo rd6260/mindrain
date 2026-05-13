@@ -8,10 +8,9 @@ load_dotenv()
 
 POSTMARK_API_KEY = os.getenv("POSTMARK_API_KEY")
 TEMPLATE_ID = 43917366
-# CSV_FILE = "/home/senku/Downloads/mindrain/data/test_list.csv"
 CSV_FILE = "/home/senku/Downloads/mindrain/data/college_list.csv"
 ZIP_FILE = "/home/senku/Downloads/mindrain/data/The Unreal House Docs.zip"
-POSTER_FILE = "/home/senku/Downloads/mindrain/data/final call poster.jpg"
+POSTER_FILE = "/home/senku/Downloads/mindrain/IMG-20260330-WA0051.jpg"
 FROM_EMAIL = "Mind Rain <team@mindrain.org>"
 POSTMARK_BATCH_URL = "https://api.postmarkapp.com/email/batchWithTemplates"
 REPLY_TO = "team@mindrain.org"

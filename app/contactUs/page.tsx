@@ -12,7 +12,15 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import Navigation from '@/app/components/Navigation';
-import Footer from '../components/Footer';
+import { POLICY_DOCUMENTS } from '@/data/policyDocs';
+import { colors } from "@/utils/colors";
+import { Changa } from "next/font/google";
+
+const changa = Changa({
+  subsets: ["latin"],
+  weight: ["500"],
+});
+
 
 // Discord icon (not in lucide)
 function DiscordIcon({ className }: { className?: string }) {
@@ -290,7 +298,7 @@ export default function ContactPage() {
             </div>
 
             {/* Footer note */}
-            <p className="text-xs text-center text-[#A8A89A] pb-4">
+            <p className="mt-4 text-xs text-center text-[#A8A89A] pb-4">
               For the fastest response, reach us on{' '}
               <a
                 href="https://wa.me/919988822776"
@@ -303,10 +311,39 @@ export default function ContactPage() {
               .
             </p>
 
+            {/* Policy links */}
+            <div className="flex flex-wrap justify-center gap-x-6">
+              <style>{`
+                .footer-policy-link { color: ${colors.textLight}; }
+                .footer-policy-link:hover { color: ${colors.accent}; }
+              `}</style>
+              {POLICY_DOCUMENTS.map((doc) => (
+                <a
+                  key={doc.url}
+                  href={doc.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`footer-policy-link ${changa.className} inline-flex items-center gap-1 text-xs uppercase tracking-widest transition-colors hover:underline underline-offset-2`}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    className="w-3 h-3 flex-shrink-0"
+                  >
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                  </svg>
+                  {doc.name}
+                </a>
+              ))}
+            </div>
+
 
           </div>
         </div>
-            <Footer/>
       </div>
     </>
   );
