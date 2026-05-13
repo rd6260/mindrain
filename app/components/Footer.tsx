@@ -1,6 +1,3 @@
-"use client";
-
-import { useState } from "react";
 import { Changa } from "next/font/google";
 import { colors } from "@/utils/colors";
 
@@ -29,7 +26,6 @@ const POLICY_DOCUMENTS = [
 ];
 
 export default function Footer() {
-  const [policyOpen, setPolicyOpen] = useState(false);
 
   return (
     <footer
@@ -85,67 +81,43 @@ export default function Footer() {
             className="mt-12 pt-8 border-t"
             style={{ borderColor: colors.border }}
           >
-            <p className="text-sm" style={{ color: colors.textLight }}>
+
+            {/* Policy links */}
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+              {POLICY_DOCUMENTS.map((doc) => (
+                <a
+                  key={doc.url}
+                  href={doc.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${changa.className} inline-flex items-center gap-1 text-xs uppercase tracking-widest transition-colors hover:underline underline-offset-2`}
+                  style={{ color: colors.textLight }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = colors.accent)
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = colors.textLight)
+                  }
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    className="w-3 h-3 flex-shrink-0"
+                  >
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                  </svg>
+                  {doc.name}
+                </a>
+              ))}
+            </div>
+
+            <p className="text-sm mt-4" style={{ color: colors.textLight }}>
               © 2026 Mind Rain. All rights reserved.
             </p>
-
-            {/* Policy toggle */}
-            <div className="mt-4">
-              <button
-                onClick={() => setPolicyOpen((prev) => !prev)}
-                className={`${changa.className} inline-flex items-center gap-1.5 text-xs uppercase tracking-widest transition-colors`}
-                style={{ color: policyOpen ? colors.accent : colors.textLight }}
-              >
-                Policies
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  className={`w-3 h-3 transition-transform duration-200 ${
-                    policyOpen ? "rotate-180" : ""
-                  }`}
-                >
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </button>
-
-              {/* Document links */}
-              {policyOpen && (
-                <div className="mt-3 flex flex-wrap justify-center gap-x-6 gap-y-2">
-                  {POLICY_DOCUMENTS.map((doc) => (
-                    <a
-                      key={doc.url}
-                      href={doc.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs transition-colors hover:underline underline-offset-2"
-                      style={{ color: colors.textLight }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.color = colors.accent)
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.color = colors.textLight)
-                      }
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        className="w-3 h-3 flex-shrink-0"
-                      >
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                        <polyline points="14 2 14 8 20 8" />
-                      </svg>
-                      {doc.name}
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </div>
