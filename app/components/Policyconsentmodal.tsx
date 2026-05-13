@@ -68,6 +68,7 @@ export default function PolicyConsentModal() {
         .eq("user_id", user.id)
         .eq("policy_version", POLICY_VERSION)
         .eq("accepted", true)
+        .limit(1)
         .maybeSingle();
 
       if (!data) {
@@ -87,12 +88,15 @@ export default function PolicyConsentModal() {
 
     const { error: insertError } = await supabase
       .from("user_privacy_consents")
-      .insert({
-        user_id: userId,
-        accepted: true,
-        policy_version: POLICY_VERSION,
-        accepted_at: new Date().toISOString(),
-      });
+      .upsert(
+        {
+          user_id: userId,
+          accepted: true,
+          policy_version: POLICY_VERSION,
+          accepted_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id,policy_version" }
+      );
 
     if (insertError) {
       setError("Something went wrong. Please try again.");
@@ -110,7 +114,7 @@ export default function PolicyConsentModal() {
       <div
         className="bg-white w-full max-w-lg mx-4 rounded-lg shadow-2xl overflow-hidden flex flex-col"
         style={{ backgroundColor: colors.white }}
-        // No onClick on backdrop — cannot dismiss
+      // No onClick on backdrop — cannot dismiss
       >
         {/* Header */}
         <div className="px-6 pt-6 pb-4 border-b border-gray-100">
@@ -201,11 +205,10 @@ export default function PolicyConsentModal() {
                 className="sr-only"
               />
               <div
-                className={`w-4 h-4 border rounded-sm transition-colors flex items-center justify-center ${
-                  checked
-                    ? "border-transparent"
-                    : "border-gray-300 group-hover:border-gray-500"
-                }`}
+                className={`w-4 h-4 border rounded-sm transition-colors flex items-center justify-center ${checked
+                  ? "border-transparent"
+                  : "border-gray-300 group-hover:border-gray-500"
+                  }`}
                 style={checked ? { backgroundColor: colors.accent } : {}}
               >
                 {checked && (
@@ -239,11 +242,10 @@ export default function PolicyConsentModal() {
           <button
             onClick={handleAccept}
             disabled={!checked || isAccepting}
-            className={`w-full flex items-center justify-center gap-2 text-white text-sm font-medium px-4 py-2.5 transition-opacity ${
-              !checked || isAccepting
-                ? "opacity-40 cursor-not-allowed"
-                : "hover:opacity-80"
-            }`}
+            className={`w-full flex items-center justify-center gap-2 text-white text-sm font-medium px-4 py-2.5 transition-opacity ${!checked || isAccepting
+              ? "opacity-40 cursor-not-allowed"
+              : "hover:opacity-80"
+              }`}
             style={{ backgroundColor: colors.accent }}
           >
             {isAccepting ? (
