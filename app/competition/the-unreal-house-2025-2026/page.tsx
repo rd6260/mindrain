@@ -4,12 +4,13 @@ import Image from 'next/image';
 import { colors } from '@/utils/colors';
 import Footer from '@/app/components/Footer';
 import Timeline from '@/app/components/Timeline';
-import { ImportantDate } from '@/types';
-import DownloadBriefModal, { BriefFile } from '@/app/components/DownloadModal';
-import { useEffect, useState } from 'react';
 import Navigation from '@/app/components/Navigation';
-import { createClient } from '@/lib/supabase/client';
+import BriefModal from '@/app/components/BriefModal';
+import DownloadBriefModal from '@/app/components/DownloadModal';
+import { useState } from 'react';
 import localFont from 'next/font/local';
+import { getCompetitionMeta } from '@/data/competitionBriefFiles';
+import { ImportantDate } from '@/types';
 
 // ─── Font ─────────────────────────────────────────────────────────────────────
 
@@ -18,32 +19,10 @@ const TechnorFont = localFont({ src: '../../fonts/Technor-Variable.woff2' });
 // ─── Static Data ──────────────────────────────────────────────────────────────
 
 const REGISTRATION_EVENT_ID = '3f123e78-60d6-494d-b307-18c5b4c8ab7f';
+const meta = getCompetitionMeta(REGISTRATION_EVENT_ID)!;
 const REGISTRATION_URL = `/registration?event_id=${REGISTRATION_EVENT_ID}`;
 
-const BRIEF_FILES: BriefFile[] = [
-  {
-    name: 'Important Dates & Calendar',
-    description: 'Key deadlines and schedule',
-    url: 'https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/Important%20Dates-Calender.pdf',
-  },
-  {
-    name: 'Terms & Conditions',
-    description: 'Important rules and regulations',
-    url: 'https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/T&C%20(Important).pdf',
-  },
-  {
-    name: 'Complete Brief',
-    description: 'Full competition brief document',
-    url: 'https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/The%20Unreal%20House%20(Complete%20Brief).pdf',
-  },
-  {
-    name: 'Brief (Print Format)',
-    description: 'Print-ready version of the brief',
-    url: 'https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/The%20Unreal%20House%20(print%20format).pdf',
-  },
-];
-
-const PRESS_KIT_FILES: BriefFile[] = [
+const PRESS_KIT_FILES = [
   {
     name: 'A4 A3 Poster',
     description: 'A4 and A3 size Campaign Posters',
@@ -57,22 +36,22 @@ const PRESS_KIT_FILES: BriefFile[] = [
 ];
 
 const IMPORTANT_DATES: ImportantDate[] = [
-  { label: 'Competition Starts',           date: '19 February 2026' },
+  { label: 'Competition Starts', date: '19 February 2026' },
   { label: 'Early Bird Registration Starts', date: '19 February 2026' },
-  { label: 'Early Bird Registration Ends',   date: '22 March 2026'   },
-  { label: 'Advance Registration Starts',    date: '23 March 2026'   },
-  { label: 'Final Submission Starts',        date: '1 April 2026'    },
-  { label: 'Advance Registration Ends',      date: '31 May 2026'     },
-  { label: 'Late Registration Starts',       date: '1 June 2026'     },
-  { label: 'Late Registration Ends',         date: '25 June 2026'    },
-  { label: 'Final Submission Ends',          date: '30 June 2026'    },
-  { label: 'Announcement of Result',         date: '1 August 2026'   },
+  { label: 'Early Bird Registration Ends', date: '22 March 2026' },
+  { label: 'Advance Registration Starts', date: '23 March 2026' },
+  { label: 'Final Submission Starts', date: '1 April 2026' },
+  { label: 'Advance Registration Ends', date: '31 May 2026' },
+  { label: 'Late Registration Starts', date: '1 June 2026' },
+  { label: 'Late Registration Ends', date: '25 June 2026' },
+  { label: 'Final Submission Ends', date: '30 June 2026' },
+  { label: 'Announcement of Result', date: '1 August 2026' },
 ];
 
 const PRIZES = [
   { label: '1st Prize', amount: '₹11,000', emoji: '🥇' },
-  { label: '2nd Prize', amount: '₹8,000',  emoji: '🥈' },
-  { label: '3rd Prize', amount: '₹6,000',  emoji: '🥉' },
+  { label: '2nd Prize', amount: '₹8,000', emoji: '🥈' },
+  { label: '3rd Prize', amount: '₹6,000', emoji: '🥉' },
 ];
 
 // ─── Registration Fees Data ───────────────────────────────────────────────────
@@ -83,45 +62,45 @@ type EntryType = 'solo' | 'group';
 
 const FEES: Record<Tier, Record<FeeKey, Record<EntryType, string>>> = {
   'Early Bird Registration': {
-    india_monetary:    { solo: '₹549',  group: '₹999'   },
-    india_no_monetary: { solo: '₹275',  group: '₹559'   },
-    international:     { solo: '$35',   group: '$79'    },
+    india_monetary: { solo: '₹549', group: '₹999' },
+    india_no_monetary: { solo: '₹275', group: '₹559' },
+    international: { solo: '$35', group: '$79' },
   },
   'Regular Registration': {
-    india_monetary:    { solo: '₹699',  group: '₹1,499' },
-    india_no_monetary: { solo: '₹275',  group: '₹559'   },
-    international:     { solo: '$45',   group: '$99'    },
+    india_monetary: { solo: '₹699', group: '₹1,499' },
+    india_no_monetary: { solo: '₹275', group: '₹559' },
+    international: { solo: '$45', group: '$99' },
   },
   'Last Minute Registration': {
-    india_monetary:    { solo: '₹999',  group: '₹1,999' },
-    india_no_monetary: { solo: '₹375',  group: '₹819'   },
-    international:     { solo: '$69',   group: '$149'   },
+    india_monetary: { solo: '₹999', group: '₹1,999' },
+    india_no_monetary: { solo: '₹375', group: '₹819' },
+    international: { solo: '$69', group: '$149' },
   },
 };
 
 const TIER_META: Record<Tier, { shortLabel: string; color: string; bg: string; border: string; dot: string; endsOn: string }> = {
   'Early Bird Registration': {
     shortLabel: 'Early Bird',
-    color:  'text-[#2D5F4F]',
-    bg:     'bg-[#2D5F4F]/8',
+    color: 'text-[#2D5F4F]',
+    bg: 'bg-[#2D5F4F]/8',
     border: 'border-[#2D5F4F]/20',
-    dot:    'bg-[#2D5F4F]',
+    dot: 'bg-[#2D5F4F]',
     endsOn: '22 March 2026',
   },
   'Regular Registration': {
     shortLabel: 'Regular',
-    color:  'text-[#1A1A1A]',
-    bg:     'bg-[#F8F7F2]',
+    color: 'text-[#1A1A1A]',
+    bg: 'bg-[#F8F7F2]',
     border: 'border-[#D0CEC2]',
-    dot:    'bg-[#6B6B6B]',
+    dot: 'bg-[#6B6B6B]',
     endsOn: '31 May 2026',
   },
   'Last Minute Registration': {
     shortLabel: 'Last Minute',
-    color:  'text-[#D97757]',
-    bg:     'bg-[#D97757]/8',
+    color: 'text-[#D97757]',
+    bg: 'bg-[#D97757]/8',
     border: 'border-[#D97757]/20',
-    dot:    'bg-[#D97757]',
+    dot: 'bg-[#D97757]',
     endsOn: '25 June 2026',
   },
 };
@@ -203,14 +182,14 @@ function MobileHero({ onBriefClick, onPressClick }: { onBriefClick: () => void; 
 
       <div className="relative z-10 w-full text-center text-white animate-fade-in">
         <span className="block text-sm font-medium tracking-[0.2em] uppercase text-gray-300 mb-1">
-          Architecture Competition
+          {meta.category}
         </span>
-        <span className="block text-sm font-light italic text-gray-400 mb-4">edition 06</span>
+        <span className="block text-sm font-light italic text-gray-400 mb-4">{meta.edition}</span>
         <h1 className={`${TechnorFont.className} text-6xl font-black leading-none mb-3`}>
           The Unreal<br />House
         </h1>
         <p className="text-base font-medium tracking-wide text-gray-300 mb-10">
-          An Imaginary Home Design Challenge
+          {meta.subtitle}
         </p>
 
         <div className="flex flex-col gap-3 w-full max-w-xs mx-auto">
@@ -256,13 +235,13 @@ function DesktopHero({ onBriefClick, onPressClick }: { onBriefClick: () => void;
 
       <div className="relative z-10 ml-24 mt-10 max-w-5xl text-left text-gray-200 animate-fade-in">
         <h1 className="space-y-4">
-          <span className="block text-2xl md:text-4xl font-medium tracking-wide">Architecture Competition</span>
-          <span className="block text-xl md:text-2xl font-light italic">edition 06</span>
+          <span className="block text-2xl md:text-4xl font-medium tracking-wide">{meta.category}</span>
+          <span className="block text-xl md:text-2xl font-light italic">{meta.edition}</span>
           <span className="font-['Technor-Variable'] block text-6xl md:text-8xl lg:text-9xl font-black my-6 leading-tight">
-            The Unreal House
+            {meta.title}
           </span>
           <span className="block text-2xl md:text-4xl font-medium tracking-wide">
-            An Imaginary Home Design Challenge
+            {meta.subtitle}
           </span>
         </h1>
 
@@ -370,23 +349,23 @@ function StudentDiscounts() {
           </div>
 
           <div className="text-center">
-            <a
-              href="mailto:support@mindrain.org"
-              className="inline-block px-8 py-3 rounded-lg text-white font-medium transition-all hover:opacity-90"
-              style={{ backgroundColor: colors.accent }}
-              data-testid="discount-email-link"
+          <a
+            href="mailto:support@mindrain.org"
+            className="inline-block px-8 py-3 rounded-lg text-white font-medium transition-all hover:opacity-90"
+            style={{ backgroundColor: colors.accent }}
+            data-testid="discount-email-link"
             >
-              Contact for Group Discounts
-            </a>
-          </div>
+            Contact for Group Discounts
+          </a>
         </div>
       </div>
-    </section>
+    </div>
+    </section >
   );
 }
 
 function RegistrationFees() {
-  const [origin, setOrigin]     = useState<'india' | 'international'>('india');
+  const [origin, setOrigin] = useState<'india' | 'international'>('india');
   const [monetary, setMonetary] = useState<'yes' | 'no'>('yes');
   const [teamType, setTeamType] = useState<EntryType>('solo');
 
@@ -395,8 +374,8 @@ function RegistrationFees() {
 
   const feeKey: FeeKey =
     origin === 'international' ? 'international'
-    : monetary === 'yes'       ? 'india_monetary'
-    :                            'india_no_monetary';
+      : monetary === 'yes' ? 'india_monetary'
+        : 'india_no_monetary';
 
   const amount = FEES[activeTier][feeKey][teamType];
 
@@ -412,7 +391,7 @@ function RegistrationFees() {
       <div>
         <SectionHeading>Application Type</SectionHeading>
         <div className="flex gap-2">
-          <ToggleButton active={origin === 'india'}         onClick={() => setOrigin('india')}>Indian Application</ToggleButton>
+          <ToggleButton active={origin === 'india'} onClick={() => setOrigin('india')}>Indian Application</ToggleButton>
           <ToggleButton active={origin === 'international'} onClick={() => setOrigin('international')}>International</ToggleButton>
         </div>
       </div>
@@ -438,7 +417,7 @@ function RegistrationFees() {
       <div>
         <SectionHeading>Entry Type</SectionHeading>
         <div className="flex gap-2">
-          <ToggleButton active={teamType === 'solo'}  onClick={() => setTeamType('solo')}>
+          <ToggleButton active={teamType === 'solo'} onClick={() => setTeamType('solo')}>
             <span className="block text-xs font-bold">Solo</span>
             <span className="block text-[10px] opacity-70 mt-0.5">1 member</span>
           </ToggleButton>
@@ -481,19 +460,8 @@ function RegistrationFees() {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function CompetitionPage() {
-  const [isBriefOpen, setIsBriefOpen]   = useState(false);
-  const [isPressOpen, setIsPressOpen]   = useState(false);
-  const [isLoggedIn, setIsLoggedIn]     = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getSession().then(({ data: { session } }) => setIsLoggedIn(!!session));
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => setIsLoggedIn(!!session));
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const openBrief = () => setIsBriefOpen(true);
-  const openPress = () => setIsPressOpen(true);
+  const [isBriefOpen, setIsBriefOpen] = useState(false);
+  const [isPressOpen, setIsPressOpen] = useState(false);
 
   return (
     <>
@@ -507,8 +475,8 @@ export default function CompetitionPage() {
           style={{ backgroundColor: colors.accent }}
         />
 
-        <MobileHero  onBriefClick={openBrief} onPressClick={openPress} />
-        <DesktopHero onBriefClick={openBrief} onPressClick={openPress} />
+        <MobileHero onBriefClick={() => setIsBriefOpen(true)} onPressClick={() => setIsPressOpen(true)} />
+        <DesktopHero onBriefClick={() => setIsBriefOpen(true)} onPressClick={() => setIsPressOpen(true)} />
 
         <PrizePool />
 
@@ -534,17 +502,16 @@ export default function CompetitionPage() {
         <Footer />
       </div>
 
-      <DownloadBriefModal
+      <BriefModal
         isOpen={isBriefOpen}
         onClose={() => setIsBriefOpen(false)}
-        title="Download Brief"
-        subtitle="The Unreal House — select files to download"
-        files={BRIEF_FILES}
+        eventId={REGISTRATION_EVENT_ID}
       />
+
       <DownloadBriefModal
         isOpen={isPressOpen}
         onClose={() => setIsPressOpen(false)}
-        title="Download Press"
+        title="Download Press Kit"
         subtitle="The Unreal House — select files to download"
         files={PRESS_KIT_FILES}
       />

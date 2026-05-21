@@ -74,7 +74,8 @@ if __name__ == "__main__":
     paid_user_ids = set()
     if FILTER_OUT_REGISTERED_USER:
         paid_user_ids = fetch_registered_users(supabase)
-        print(f"Users with paid registrations (filtered out): {len(paid_user_ids)}\n")
+        print(f"Users with paid registrations:   {len(paid_user_ids)}\n")
+        print(f"Users with unpaid registrations: {len(users) - len(paid_user_ids)}\n")
 
     for index, user in enumerate(users):
         email = user.get("email")
