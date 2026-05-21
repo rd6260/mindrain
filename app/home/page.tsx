@@ -202,8 +202,8 @@ export default function HomePage() {
               { label: "Prize", value: "Monetary award" },
               { label: "Eligibility", value: "Open to all undergraduate students" },
             ]}
-            deadlineLabel="Early bird registration deadline"
-            deadlineValue="22 March 2026"
+            deadlineLabel="Regular Registration Ends"
+            deadlineValue="31 May 2026"
             findOutMoreHref="/competition/the-unreal-house-2025-2026"
             briefFiles={[
               { name: "Important Dates & Calendar", description: "Key deadlines and schedule", url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/Important%20Dates-Calender.pdf" },
@@ -227,8 +227,8 @@ export default function HomePage() {
               { label: "Origin", value: "India" },
               { label: "Eligibility", value: "Students Completed UG from 2019-2026" },
             ]}
-            deadlineLabel="Early bird registration deadline"
-            deadlineValue="31 March 2026"
+            deadlineLabel="Regular Registration Ends"
+            deadlineValue="30 June 2026"
             findOutMoreHref="/competition/thesis-award-2026"
             briefFiles={[
               { name: "MR Thesis Award Detailed PDF", description: "Full competition brief document", url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/thesis_award_26/MindRain%20Thesis%20Award%20(Detailed%20PDF).pdf" },
