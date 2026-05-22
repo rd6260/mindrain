@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCompetitionBriefFiles, getCompetitionMeta } from '@/data/competitionBriefFiles';
 import { createClient } from '@/lib/supabase/server';
 
-const supabase = await createClient();
 
 export async function POST(req: NextRequest) {
   try {
+    const supabase = await createClient();
     const { email, eventId } = await req.json();
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
