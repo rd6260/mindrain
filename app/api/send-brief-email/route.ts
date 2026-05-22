@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCompetitionBriefFiles, getCompetitionMeta } from '@/data/competitionBriefFiles';
 import { createClient } from '@/lib/supabase/server';
 
-const supabase = createClient();
+const supabase = await createClient();
 
 export async function POST(req: NextRequest) {
   try {
