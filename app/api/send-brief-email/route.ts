@@ -26,6 +26,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No brief files found for this competition' }, { status: 404 });
     }
 
+    if (!meta) {
+      return NextResponse.json({ error: 'No metadata found for this competition' }, { status: 404 });
+    }
+
     // Store email in Supabase — ignore if duplicate (unique constraint)
     const { error: dbError } = await supabase
       .from('brief_emails')
