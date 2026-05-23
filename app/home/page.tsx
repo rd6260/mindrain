@@ -213,6 +213,7 @@ export default function HomePage() {
             ]}
             briefModalTitle="Download Brief"
             briefModalSubtitle="The Unreal House — select files to download"
+            eventId="3f123e78-60d6-494d-b307-18c5b4c8ab7f"
           />
 
           <div className="h-6" />
@@ -237,6 +238,7 @@ export default function HomePage() {
             ]}
             briefModalTitle="Download Brief"
             briefModalSubtitle="Thesis Award 2026 — select files to download"
+            eventId="c4a201ae-8bfe-48bc-a526-4ac1288dd937"
           />
 
           <div className='flex justify-center items-center py-4 text-sm'>

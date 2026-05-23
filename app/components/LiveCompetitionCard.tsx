@@ -5,6 +5,7 @@ import { colors } from '@/utils/colors';
 import { Changa } from "next/font/google";
 import { useEffect, useState } from "react";
 import DownloadBriefModal, { BriefFile } from "./DownloadModal";
+import BriefModal from "./BriefModal";
 import { createClient } from '@/lib/supabase/client';
 
 const changa = Changa({
@@ -26,6 +27,7 @@ export interface CompetitionCardProps {
   briefFiles?: BriefFile[];
   briefModalTitle?: string;
   briefModalSubtitle?: string;
+  eventId?: string;
 }
 
 // --- Login Required Modal ---
@@ -99,6 +101,7 @@ export default function LiveCompetitionCard({
   briefFiles,
   briefModalTitle,
   briefModalSubtitle,
+  eventId,
 }: CompetitionCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoginPromptOpen, setIsLoginPromptOpen] = useState(false);
@@ -204,14 +207,22 @@ export default function LiveCompetitionCard({
         onClose={() => setIsLoginPromptOpen(false)}
       />
 
-      {briefFiles && briefFiles.length > 0 && (
-        <DownloadBriefModal
+      {eventId ? (
+        <BriefModal
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
-          title={briefModalTitle || "Download Brief"}
-          subtitle={briefModalSubtitle || "Select files to download"}
-          files={briefFiles}
+          eventId={eventId}
         />
+      ) : (
+        briefFiles && briefFiles.length > 0 && (
+          <DownloadBriefModal
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+            title={briefModalTitle || "Download Brief"}
+            subtitle={briefModalSubtitle || "Select files to download"}
+            files={briefFiles}
+          />
+        )
       )}
     </>
   );
