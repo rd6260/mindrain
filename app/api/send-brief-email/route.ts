@@ -57,14 +57,20 @@ export async function POST(req: NextRequest) {
     <tr>
       <td align="center">
         <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,0.08);">
-          <!-- Header -->
-          <tr>
-            <td style="background:linear-gradient(135deg,#2C5F5F,#3d8080); padding:40px 48px 32px;">
-              <p style="margin:0 0 8px; font-size:12px; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:rgba(255,255,255,0.7);">${meta.category} · ${meta.edition}</p>
-              <h1 style="margin:0; font-size:36px; font-weight:900; color:#ffffff; line-height:1.1;">${meta.title}</h1>
-              <p style="margin:8px 0 0; font-size:15px; color:rgba(255,255,255,0.8);">${meta.subtitle}</p>
-            </td>
-          </tr>
+        <!-- Header -->
+        <tr>
+          <td style="background:linear-gradient(135deg,#2C5F5F,#3d8080); padding:32px 48px 28px;">
+            <img
+              src="https://cdn.jsdelivr.net/gh/rd6260/mindrain@main/public/icons/mind-rain-logo.svg"
+              alt="Mind Rain"
+              width="140"
+              style="display:block; margin-bottom:20px; filter: brightness(0) invert(1);"
+            />
+            <p style="margin:0 0 8px; font-size:12px; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:rgba(255,255,255,0.7);">${meta.category} · ${meta.edition}</p>
+            <h1 style="margin:0; font-size:36px; font-weight:900; color:#ffffff; line-height:1.1;">${meta.title}</h1>
+            <p style="margin:8px 0 0; font-size:15px; color:rgba(255,255,255,0.8);">${meta.subtitle}</p>
+          </td>
+        </tr>
           <!-- Body -->
           <tr>
             <td style="padding:40px 48px;">
@@ -84,7 +90,54 @@ export async function POST(req: NextRequest) {
           </tr>
           <!-- Footer -->
           <tr>
-            <td style="background:#F8F7F2; padding:24px 48px; border-top:1px solid #e5e3d7;">
+            <td style="background:#F8F7F2; padding:32px 48px; border-top:1px solid #e5e3d7;">
+
+              <!-- Socials -->
+              <p style="margin:0 0 16px; font-size:12px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#9b9b9b;">Connect with us</p>
+              <table cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+                <tr>
+                  <td style="padding:0 8px 12px 0;">
+                    <a href="mailto:support@mindrain.org" style="display:inline-flex; align-items:center; gap:6px; text-decoration:none; color:#2C5F5F; font-size:13px; font-weight:600;">
+                      <img src="https://cdn.jsdelivr.net/npm/@tabler/icons@latest/icons/outline/mail.svg" width="16" height="16" alt="" style="opacity:0.7;" />
+                      Email
+                    </a>
+                  </td>
+                  <td style="padding:0 8px 12px 0;">
+                    <a href="https://wa.me/919988822776" style="display:inline-flex; align-items:center; gap:6px; text-decoration:none; color:#2C5F5F; font-size:13px; font-weight:600;">
+                      <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/whatsapp.svg" width="16" height="16" alt="" style="opacity:0.7; filter:invert(27%) sepia(60%) saturate(400%) hue-rotate(120deg);" />
+                      WhatsApp
+                    </a>
+                  </td>
+                  <td style="padding:0 8px 12px 0;">
+                    <a href="https://www.instagram.com/mind_rain?igsh=OXZyNGo5ZHpzeDMz" style="display:inline-flex; align-items:center; gap:6px; text-decoration:none; color:#2C5F5F; font-size:13px; font-weight:600;">
+                      <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/instagram.svg" width="16" height="16" alt="" style="opacity:0.7; filter:invert(27%) sepia(60%) saturate(400%) hue-rotate(120deg);" />
+                      Instagram
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:0 8px 0 0;">
+                    <a href="https://whatsapp.com/channel/0029VbBdx7WICVfm5K8Kis3P" style="display:inline-flex; align-items:center; gap:6px; text-decoration:none; color:#2C5F5F; font-size:13px; font-weight:600;">
+                      <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/whatsapp.svg" width="16" height="16" alt="" style="opacity:0.7; filter:invert(27%) sepia(60%) saturate(400%) hue-rotate(120deg);" />
+                      WhatsApp Channel
+                    </a>
+                  </td>
+                  <td style="padding:0 8px 0 0;">
+                    <a href="https://discord.gg/ww8BjY8Nb6" style="display:inline-flex; align-items:center; gap:6px; text-decoration:none; color:#2C5F5F; font-size:13px; font-weight:600;">
+                      <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/discord.svg" width="16" height="16" alt="" style="opacity:0.7; filter:invert(27%) sepia(60%) saturate(400%) hue-rotate(120deg);" />
+                      Discord
+                    </a>
+                  </td>
+                  <td style="padding:0 8px 0 0;">
+                    <a href="https://t.me/mindrain_arch" style="display:inline-flex; align-items:center; gap:6px; text-decoration:none; color:#2C5F5F; font-size:13px; font-weight:600;">
+                      <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/telegram.svg" width="16" height="16" alt="" style="opacity:0.7; filter:invert(27%) sepia(60%) saturate(400%) hue-rotate(120deg);" />
+                      Telegram
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Legal -->
               <p style="margin:0; font-size:12px; color:#9b9b9b; line-height:1.6;">
                 You received this email because you requested the competition brief from mindrain.org.<br>
                 © Mind Rain Competitions · <a href="mailto:support@mindrain.org" style="color:#2C5F5F;">support@mindrain.org</a>
@@ -97,6 +150,7 @@ export async function POST(req: NextRequest) {
   </table>
 </body>
 </html>`;
+
 
     const textBody = `
 ${meta.title} — Competition Brief
