@@ -181,6 +181,25 @@ export default function EarnOnboardingPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [hasScrolledPolicy, setHasScrolledPolicy] = useState(false);
+  const [isCheckingAccount, setIsCheckingAccount] = useState(true);
+
+  useEffect(() => {
+    const checkExisting = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data } = await supabase
+        .from('referral_account')
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (data) router.replace('/earn/dashboard');
+      else setIsCheckingAccount(false);
+    };
+
+    checkExisting();
+  }, []);
 
   // Sanitise input: uppercase alphanumeric only
   const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -258,6 +277,14 @@ export default function EarnOnboardingPage() {
       setIsLoading(false);
     }
   };
+
+  if (isCheckingAccount) {
+    return (
+      <div className="min-h-screen bg-[#EDEBDF] flex items-center justify-center">
+        <span className="w-6 h-6 border-2 border-[#2C5F5F] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#EDEBDF] py-10 px-4">
