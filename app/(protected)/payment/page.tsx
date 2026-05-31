@@ -58,6 +58,13 @@ function PaymentContent() {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [alreadyPaid, setAlreadyPaid] = useState(false);
 
+  // Coupon state
+  const [hasCoupon, setHasCoupon] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const [discountedFee, setDiscountedFee] = useState<FeeCalculation | null>(null);
+
   const supabase = createClient();
 
   const getFeeStructure = () => ({
@@ -80,21 +87,29 @@ function PaymentContent() {
 
   const getRegistrationType = (): 'Early Bird' | 'Regular' | 'Last Minute' => {
     const now = new Date();
-    if (now >= new Date('2026-02-19') && now <= new Date('2026-03-22T23:59:59')) return 'Early Bird';
-    if (now >= new Date('2026-03-23') && now <= new Date('2026-05-31T23:59:59')) return 'Regular';
-    if (now >= new Date('2026-06-01') && now <= new Date('2026-06-25T23:59:59')) return 'Last Minute';
-    return 'Regular';
+    if (now >= new Date('2026-02-19T00:00:00') && now <= new Date('2026-03-22T23:59:59')) return 'Early Bird';
+    if (now >= new Date('2026-03-23T00:00:00') && now <= new Date('2026-05-31T23:59:59')) return 'Regular';
+    if (now >= new Date('2026-06-01T00:00:00') && now <= new Date('2026-06-25T23:59:59')) return 'Last Minute';
+    return 'Last Minute';
   };
 
-  const calculateFee = (country: string, awardGroup: 'A' | 'B', teamType: 'solo' | 'group'): FeeCalculation => {
+  const calculateFee = (
+    country: string,
+    awardGroup: 'A' | 'B',
+    teamType: 'solo' | 'group',
+    overrideTier?: 'earlyBird' | 'regular' | 'lastMinute'
+  ): FeeCalculation => {
     const fees = getFeeStructure();
     const registrationType = getRegistrationType();
     const isIndian = country.toLowerCase() === 'india';
     const currency = isIndian ? 'INR' : 'USD';
 
-    const tier = registrationType === 'Early Bird' ? fees.earlyBird
-      : registrationType === 'Regular' ? fees.regular
-      : fees.lastMinute;
+    const tierKey = overrideTier ??
+      (registrationType === 'Early Bird' ? 'earlyBird'
+        : registrationType === 'Regular' ? 'regular'
+        : 'lastMinute');
+
+    const tier = fees[tierKey];
 
     const bucket = !isIndian ? tier.international
       : awardGroup === 'A' ? tier.india_monetary
@@ -102,6 +117,46 @@ function PaymentContent() {
 
     const amount = bucket[teamType];
     return { amount, currency, registrationType, mindrain_fee: amount };
+  };
+
+  const VALID_COUPONS: Record<string, { from: Date; to: Date; tierOverride: 'earlyBird' | 'regular' | 'lastMinute'; label: string }> = {
+    'MR-SPECIAL': {
+      from: new Date('2026-06-01T00:00:00'),
+      to: new Date('2026-06-02T23:59:59'),
+      tierOverride: 'regular',
+      label: 'Regular price applied',
+    },
+  };
+
+  const applyCoupon = () => {
+    setCouponError(null);
+    const code = couponCode.trim().toUpperCase();
+    const coupon = VALID_COUPONS[code];
+    const now = new Date();
+
+    if (!coupon) {
+      setCouponError('Invalid coupon code.');
+      setCouponApplied(false);
+      setDiscountedFee(null);
+      return;
+    }
+    if (now < coupon.from || now > coupon.to) {
+      setCouponError('This coupon is not valid at this time.');
+      setCouponApplied(false);
+      setDiscountedFee(null);
+      return;
+    }
+    if (!registration) return;
+    const newFee = calculateFee(registration.country, registration.group, registration.team_type, coupon.tierOverride);
+    setDiscountedFee(newFee);
+    setCouponApplied(true);
+  };
+
+  const removeCoupon = () => {
+    setCouponApplied(false);
+    setCouponCode('');
+    setCouponError(null);
+    setDiscountedFee(null);
   };
 
   useEffect(() => {
@@ -143,12 +198,13 @@ function PaymentContent() {
     setIsProcessing(true);
     setError(null);
     try {
+      const effectiveFee = couponApplied && discountedFee ? discountedFee : feeDetails;
       const res = await fetch('/api/createOrder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: feeDetails.amount * 100,
-          currency: feeDetails.currency,
+          amount: effectiveFee.amount * 100,
+          currency: effectiveFee.currency,
           registration_id: registrationId,
         }),
       });
@@ -158,10 +214,10 @@ function PaymentContent() {
       const paymentData = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         order_id: data.razorpay_order_id,
-        amount: feeDetails.amount * 100,
-        currency: feeDetails.currency,
+        amount: effectiveFee.amount * 100,
+        currency: effectiveFee.currency,
         name: 'MindDrain Event Registration',
-        description: `${feeDetails.registrationType} Registration - ${registration.team_type}`,
+        description: `${effectiveFee.registrationType} Registration - ${registration.team_type}`,
         handler: async function (response: any) {
           try {
             const verifyRes = await fetch('/api/verifyOrder', {
@@ -317,9 +373,15 @@ function PaymentContent() {
                   value={registration.group === 'A' ? 'Group A — Monetary Award' : 'Group B — No Monetary Award'}
                   highlight
                 />
+                {couponApplied && discountedFee && discountedFee.amount !== feeDetails.amount && (
+                  <SummaryRow
+                    label="Original Amount"
+                    value={`${currencySymbol}${feeDetails.amount.toLocaleString()}`}
+                  />
+                )}
                 <SummaryRow
                   label="Total Amount"
-                  value={`${currencySymbol}${feeDetails.amount.toLocaleString()}`}
+                  value={`${currencySymbol}${(couponApplied && discountedFee ? discountedFee.amount : feeDetails.amount).toLocaleString()}`}
                 />
               </div>
 
@@ -332,6 +394,83 @@ function PaymentContent() {
                   You're registering under the <strong className="text-[#2C5F5F]">{feeDetails.registrationType}</strong> period.
                   The registration fee is <strong>non-refundable</strong> once payment is complete.
                 </p>
+              </div>
+
+              {/* Coupon section */}
+              <div>
+                <label className="flex items-center gap-3 cursor-pointer select-none group">
+                  <div className="relative">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={hasCoupon}
+                      onChange={(e) => {
+                        setHasCoupon(e.target.checked);
+                        if (!e.target.checked) removeCoupon();
+                      }}
+                    />
+                    <div className="w-5 h-5 rounded-md border-2 border-[#D0CEC2] bg-white peer-checked:bg-[#2C5F5F] peer-checked:border-[#2C5F5F] transition-all duration-200 flex items-center justify-center">
+                      {hasCoupon && (
+                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </div>
+                  </div>
+                  <span className="text-sm font-semibold text-[#4B4B4B] group-hover:text-[#2C5F5F] transition-colors">
+                    I have a coupon
+                  </span>
+                </label>
+
+                {hasCoupon && (
+                  <div className="mt-3 space-y-2">
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={couponCode}
+                        onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(null); if (couponApplied) removeCoupon(); }}
+                        placeholder="Enter coupon code"
+                        disabled={couponApplied}
+                        className="flex-1 px-4 py-2.5 rounded-xl border border-[#D0CEC2] bg-white text-sm font-mono font-semibold text-[#1A1A1A] outline-none focus:border-[#2C5F5F] focus:ring-2 focus:ring-[#2C5F5F]/10 transition-all disabled:opacity-60 disabled:cursor-not-allowed tracking-widest placeholder:tracking-normal placeholder:font-normal"
+                      />
+                      {couponApplied ? (
+                        <button
+                          type="button"
+                          onClick={removeCoupon}
+                          className="px-4 py-2.5 rounded-xl bg-[#C85D3E]/10 border border-[#C85D3E]/30 text-[#C85D3E] text-sm font-bold hover:bg-[#C85D3E]/20 transition-colors"
+                        >
+                          Remove
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={applyCoupon}
+                          disabled={!couponCode.trim()}
+                          className="px-4 py-2.5 rounded-xl bg-[#2C5F5F] text-white text-sm font-bold hover:bg-[#1A4D4D] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          Apply
+                        </button>
+                      )}
+                    </div>
+
+                    {couponError && (
+                      <p className="text-xs text-[#C85D3E] font-semibold flex items-center gap-1.5">
+                        <span>⚠</span> {couponError}
+                      </p>
+                    )}
+
+                    {couponApplied && discountedFee && (
+                      <div className="flex items-center gap-2 p-3 bg-[#2D5F4F]/10 border border-[#2D5F4F]/25 rounded-xl">
+                        <svg className="w-4 h-4 text-[#2D5F4F] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                        </svg>
+                        <p className="text-xs font-semibold text-[#2D5F4F]">
+                          Coupon applied — Regular price ({currencySymbol}{discountedFee.amount.toLocaleString()}) will be charged.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="border-t border-[#E5E3D7]" />
@@ -353,7 +492,7 @@ function PaymentContent() {
                       <span className="w-4 h-4 border-2 border-[#8B8B8B] border-t-transparent rounded-full animate-spin" />
                       Processing...
                     </span>
-                  : `Pay ${currencySymbol}${feeDetails.amount.toLocaleString()} →`
+                  : `Pay ${currencySymbol}${(couponApplied && discountedFee ? discountedFee.amount : feeDetails.amount).toLocaleString()} →`
                 }
               </button>
 
