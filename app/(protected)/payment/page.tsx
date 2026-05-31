@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Script from 'next/script';
+import confetti from 'canvas-confetti';
 
 interface RegistrationData {
   id: string;
@@ -128,6 +129,22 @@ function PaymentContent() {
     },
   };
 
+  const fireConfetti = () => {
+    const burst = (originX: number) =>
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { x: originX, y: 1 },
+        angle: originX < 0.5 ? 60 : 120,
+        colors: ['#2C5F5F', '#2D5F4F', '#4CAF88', '#F8F7F2', '#D4AF37'],
+        startVelocity: 45,
+        gravity: 0.8,
+        ticks: 200,
+      });
+    burst(0.1);
+    setTimeout(() => burst(0.9), 100);
+  };
+
   const applyCoupon = () => {
     setCouponError(null);
     const code = couponCode.trim().toUpperCase();
@@ -150,6 +167,7 @@ function PaymentContent() {
     const newFee = calculateFee(registration.country, registration.group, registration.team_type, coupon.tierOverride);
     setDiscountedFee(newFee);
     setCouponApplied(true);
+    fireConfetti();
   };
 
   const removeCoupon = () => {
