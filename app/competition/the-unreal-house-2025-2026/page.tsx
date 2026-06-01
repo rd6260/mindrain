@@ -11,6 +11,7 @@ import { useState } from 'react';
 import localFont from 'next/font/local';
 import { getCompetitionMeta } from '@/data/competitionBriefFiles';
 import { ImportantDate } from '@/types';
+import CouponPopup from '@/app/components/CouponPopup';
 
 // ─── Font ─────────────────────────────────────────────────────────────────────
 
@@ -349,17 +350,17 @@ function StudentDiscounts() {
           </div>
 
           <div className="text-center">
-          <a
-            href="mailto:support@mindrain.org"
-            className="inline-block px-8 py-3 rounded-lg text-white font-medium transition-all hover:opacity-90"
-            style={{ backgroundColor: colors.accent }}
-            data-testid="discount-email-link"
+            <a
+              href="mailto:support@mindrain.org"
+              className="inline-block px-8 py-3 rounded-lg text-white font-medium transition-all hover:opacity-90"
+              style={{ backgroundColor: colors.accent }}
+              data-testid="discount-email-link"
             >
-            Contact for Group Discounts
-          </a>
+              Contact for Group Discounts
+            </a>
+          </div>
         </div>
       </div>
-    </div>
     </section >
   );
 }
@@ -467,6 +468,7 @@ export default function CompetitionPage() {
     <>
       <div className="fixed top-0 left-0 right-0 z-50">
         <Navigation />
+        <CouponPopup />
       </div>
 
       <div style={{ backgroundColor: colors.background }} className="min-h-screen relative overflow-hidden">
