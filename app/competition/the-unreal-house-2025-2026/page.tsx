@@ -11,7 +11,6 @@ import { useState } from 'react';
 import localFont from 'next/font/local';
 import { getCompetitionMeta } from '@/data/competitionBriefFiles';
 import { ImportantDate } from '@/types';
-import CouponPopup from '@/app/components/CouponPopup';
 
 // ─── Font ─────────────────────────────────────────────────────────────────────
 
@@ -468,7 +467,6 @@ export default function CompetitionPage() {
     <>
       <div className="fixed top-0 left-0 right-0 z-50">
         <Navigation />
-        <CouponPopup />
       </div>
 
       <div style={{ backgroundColor: colors.background }} className="min-h-screen relative overflow-hidden">

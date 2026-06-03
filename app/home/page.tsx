@@ -12,7 +12,6 @@ import LiveCompetitionCard from '@/app/components/LiveCompetitionCard';
 import WinnerCard from '@/app/components/WinnerCard';
 import localFont from "next/font/local";
 import GuestJury from '../components/GuestJuryComponent';
-import CouponPopup from '../components/CouponPopup';
 
 const FEARLogo = localFont({
   src: "../fonts/FEARLogo-Regular.woff2"
@@ -37,7 +36,6 @@ export default function HomePage() {
   return (
     <div style={{ backgroundColor: colors.background }} className="min-h-screen">
       <Navigation />
-      <CouponPopup />
 
       {/* Date Extension Popup */}
       {/* 
