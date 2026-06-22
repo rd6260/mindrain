@@ -202,8 +202,8 @@ export default function HomePage() {
               { label: "Prize", value: "Monetary award" },
               { label: "Eligibility", value: "Open to all undergraduate students" },
             ]}
-            deadlineLabel="Regular Registration Ends"
-            deadlineValue="31 May 2026"
+            deadlineLabel="Late Registration Ends (Extended)"
+            deadlineValue="25 July 2026"
             findOutMoreHref="/competition/the-unreal-house-2025-2026"
             briefFiles={[
               { name: "Important Dates & Calendar", description: "Key deadlines and schedule", url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/Important%20Dates-Calender.pdf" },

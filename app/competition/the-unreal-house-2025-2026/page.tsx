@@ -43,9 +43,9 @@ const IMPORTANT_DATES: ImportantDate[] = [
   { label: 'Final Submission Starts', date: '1 April 2026' },
   { label: 'Advance Registration Ends', date: '31 May 2026' },
   { label: 'Late Registration Starts', date: '1 June 2026' },
-  { label: 'Late Registration Ends', date: '25 June 2026' },
-  { label: 'Final Submission Ends', date: '30 June 2026' },
-  { label: 'Announcement of Result', date: '1 August 2026' },
+  { label: 'Late Registration Ends (Extended)', date: '25 July 2026' },
+  { label: 'Final Submission Ends (Extended)', date: '30 July 2026' },
+  { label: 'Announcement of Result', date: '1 September 2026' },
 ];
 
 const PRIZES = [
@@ -101,7 +101,7 @@ const TIER_META: Record<Tier, { shortLabel: string; color: string; bg: string; b
     bg: 'bg-[#D97757]/8',
     border: 'border-[#D97757]/20',
     dot: 'bg-[#D97757]',
-    endsOn: '25 June 2026',
+    endsOn: '25 July 2026',
   },
 };
 
