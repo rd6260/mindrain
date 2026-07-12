@@ -1,4 +1,4 @@
-# Mind Rain - Architecture Design Competitions
+# Mind Rain - Architecture Design Competitions 
 
 A minimalist, professional website for Mind Rain, an architecture competition and events hosting organization.
 
