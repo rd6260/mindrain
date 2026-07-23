@@ -3,6 +3,7 @@
 import { useState, FormEvent, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import { isOnboardingComplete } from '@/utils/onboarding';
 
 const ROLES = ['Student', 'Educator', 'Architect', 'Professional', 'Enthusiast', 'Other'];
 const ROLES_WITH_INSTITUTE = ['Student', 'Educator'];
@@ -130,6 +131,8 @@ export default function OnboardingPage() {
   const [name, setName] = useState<string>('');
   const [institute, setInstitute] = useState<string>('');
   const [isChecking, setIsChecking] = useState(true);
+  // Whether this is a resume/update of an existing incomplete record
+  const [isResuming, setIsResuming] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
@@ -163,10 +166,29 @@ export default function OnboardingPage() {
       }
 
       if (userInfo) {
-        router.push('/home');
-      } else {
-        setIsChecking(false);
+        // If onboarding is fully complete, redirect away
+        if (isOnboardingComplete(userInfo)) {
+          router.push('/home');
+          return;
+        }
+
+        // Pre-fill existing data so the user can complete the missing parts
+        setIsResuming(true);
+        if (userInfo.name) setName(userInfo.name);
+        if (userInfo.role) {
+          if (ROLES.includes(userInfo.role)) {
+            setSelectedRole(userInfo.role);
+          } else {
+            setSelectedRole('Other');
+            setCustomRole(userInfo.role);
+          }
+        }
+        if (userInfo.institute) setInstitute(userInfo.institute);
+        if (userInfo.academic_level) setAcademicLevel(userInfo.academic_level);
+        if (userInfo.academic_year) setSelectedYear(String(userInfo.academic_year));
       }
+
+      setIsChecking(false);
     };
     checkUserAndData();
   }, [router, supabase]);
@@ -208,18 +230,37 @@ export default function OnboardingPage() {
 
       const finalRole = selectedRole === 'Other' ? customRole.trim() : selectedRole;
 
-      const { error: insertError } = await supabase
-        .from('user_info')
-        .insert({
-          id: user.id,
-          name,
-          role: finalRole,
-          institute: ROLES_WITH_INSTITUTE.includes(selectedRole) ? institute : null,
-          academic_year: selectedRole === 'Student' ? parseInt(selectedYear) : null,
-          academic_level: selectedRole === 'Student' ? academicLevel : null,
-        });
+      const payload = {
+        id: user.id,
+        name,
+        role: finalRole,
+        institute: ROLES_WITH_INSTITUTE.includes(selectedRole) ? institute : null,
+        academic_year: selectedRole === 'Student' ? parseInt(selectedYear) : null,
+        academic_level: selectedRole === 'Student' ? academicLevel : null,
+      };
 
-      if (insertError) throw insertError;
+      if (isResuming) {
+        // Update the existing incomplete record
+        const { error: updateError } = await supabase
+          .from('user_info')
+          .update({
+            name: payload.name,
+            role: payload.role,
+            institute: payload.institute,
+            academic_year: payload.academic_year,
+            academic_level: payload.academic_level,
+          })
+          .eq('id', user.id);
+
+        if (updateError) throw updateError;
+      } else {
+        // Insert a new record
+        const { error: insertError } = await supabase
+          .from('user_info')
+          .insert(payload);
+
+        if (insertError) throw insertError;
+      }
 
       router.push('/home');
       router.refresh();
@@ -253,16 +294,28 @@ export default function OnboardingPage() {
               <span className="absolute inset-0 rounded-full bg-[#2C5F5F] animate-ping opacity-50" />
             </div>
             <span className="text-xs font-bold uppercase tracking-widest text-[#2C5F5F]">
-              Getting Started
+              {isResuming ? 'Complete Your Profile' : 'Getting Started'}
             </span>
           </div>
           <h1 className="text-3xl font-bold text-[#1A1A1A] tracking-tight">
-            Welcome! Let's set up your account
+            {isResuming ? 'Finish setting up your account' : 'Welcome! Let\'s set up your account'}
           </h1>
           <p className="text-[#6B6B6B] mt-1 text-sm">
-            Tell us a bit about yourself to personalize your experience
+            {isResuming
+              ? 'A few details are still missing — fill them in to unlock all features'
+              : 'Tell us a bit about yourself to personalize your experience'}
           </p>
         </div>
+
+        {/* Resume banner */}
+        {isResuming && (
+          <div className="mb-5 p-4 bg-[#2C5F5F]/10 border border-[#2C5F5F]/30 rounded-xl flex items-start gap-3">
+            <span className="text-[#2C5F5F] text-lg mt-0.5">ℹ</span>
+            <p className="text-[#2C5F5F] text-sm font-medium">
+              Your profile was partially saved. We've pre-filled what we have — just complete the missing fields below.
+            </p>
+          </div>
+        )}
 
         {/* Error */}
         {error && (
@@ -386,7 +439,7 @@ export default function OnboardingPage() {
                       Setting up...
                     </span>
                   )
-                  : 'Complete Setup'
+                  : isResuming ? 'Save & Complete Setup' : 'Complete Setup'
                 }
               </button>
             </div>

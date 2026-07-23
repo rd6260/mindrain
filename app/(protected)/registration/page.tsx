@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useSearchParams } from 'next/navigation';
+import { isOnboardingComplete } from '@/utils/onboarding';
 
 interface MemberData {
   id?: string; // DB id for existing members (used for deletion)
@@ -155,6 +156,11 @@ function RegistrationContent() {
   const searchParams = useSearchParams();
   const eventIdFromUrl = searchParams.get('event_id');
 
+  // ── Onboarding gate ──────────────────────────────────────────────────────
+  const [onboardingChecked, setOnboardingChecked] = useState(false);
+  const [onboardingDone, setOnboardingDone] = useState(false);
+  // ─────────────────────────────────────────────────────────────────────────
+
   const [selectedEventId, setSelectedEventId] = useState<string | null>(eventIdFromUrl);
   const [eventPreCode, setEventPreCode] = useState<string>('');
   const [availableEvents, setAvailableEvents] = useState<Event[]>([]);
@@ -186,6 +192,25 @@ function RegistrationContent() {
   const [isPaid, setIsPaid] = useState(false);
 
   const supabase = createClient();
+
+  // ── Check onboarding completion on mount ─────────────────────────────────
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { setOnboardingChecked(true); setOnboardingDone(false); return; }
+
+      const { data: userInfo } = await supabase
+        .from('user_info')
+        .select('name, role, institute, academic_year, academic_level')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      setOnboardingDone(isOnboardingComplete(userInfo));
+      setOnboardingChecked(true);
+    };
+    checkOnboarding();
+  }, []);
+  // ─────────────────────────────────────────────────────────────────────────
 
   useEffect(() => {
     const fetchEventData = async () => {
@@ -528,12 +553,65 @@ function RegistrationContent() {
     }
   };
 
-  if (loadingEvents) {
+  // Show spinner while checking onboarding
+  if (!onboardingChecked || loadingEvents) {
     return (
       <div className="min-h-screen bg-[#EDEBDF] flex items-center justify-center">
         <div className="flex items-center gap-3 text-[#2C5F5F]">
           <div className="w-5 h-5 border-2 border-[#2C5F5F] border-t-transparent rounded-full animate-spin" />
           <span className="text-base font-semibold">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Block access if onboarding is not complete
+  if (!onboardingDone) {
+    return (
+      <div className="min-h-screen bg-[#EDEBDF] flex items-center justify-center p-6">
+        <div className="w-full max-w-md">
+          <div className="bg-[#F8F7F2] rounded-2xl border border-[#D0CEC2] p-8 text-center shadow-2xl">
+            {/* Icon */}
+            <div className="w-16 h-16 rounded-full bg-[#2C5F5F]/10 flex items-center justify-center mx-auto mb-5">
+              <svg className="w-8 h-8 text-[#2C5F5F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+
+            {/* Heading */}
+            <h2 className="text-2xl font-bold text-[#1A1A1A] tracking-tight mb-2">
+              Complete Your Profile First
+            </h2>
+            <p className="text-sm text-[#6B6B6B] leading-relaxed mb-7">
+              You need to finish setting up your account before you can register for events.
+              It only takes a minute!
+            </p>
+
+            {/* Steps */}
+            <div className="bg-[#EDEBDF] rounded-xl p-4 mb-7 text-left space-y-2">
+              <p className="text-xs font-bold uppercase tracking-widest text-[#2C5F5F] mb-3">Required to unlock registration</p>
+              {[
+                'Your full name',
+                'Your profession / role',
+                'Institute (if Student or Educator)',
+                'Academic details (if Student)',
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-full border-2 border-[#D0CEC2] flex items-center justify-center flex-shrink-0">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#D0CEC2]" />
+                  </div>
+                  <span className="text-xs text-[#6B6B6B] font-medium">{item}</span>
+                </div>
+              ))}
+            </div>
+
+            <a
+              href="/onboarding"
+              className="block w-full py-3.5 rounded-xl bg-[#2C5F5F] text-white text-sm font-bold hover:bg-[#1A4D4D] transition-colors shadow-lg shadow-[#2C5F5F]/20"
+            >
+              Set Up My Profile →
+            </a>
+          </div>
         </div>
       </div>
     );

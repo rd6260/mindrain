@@ -12,6 +12,8 @@ import LiveCompetitionCard from '@/app/components/LiveCompetitionCard';
 import WinnerCard from '@/app/components/WinnerCard';
 import localFont from "next/font/local";
 import GuestJury from '../components/GuestJuryComponent';
+import { createClient } from '@/lib/supabase/client';
+import { isOnboardingComplete } from '@/utils/onboarding';
 
 const FEARLogo = localFont({
   src: "../fonts/FEARLogo-Regular.woff2"
@@ -25,6 +27,29 @@ export default function HomePage() {
   const category2Winners = previousWinners2019.categories[1].winners;
   const honorableMentions = previousWinners2019.categories[2].winners;
 
+  // ── Onboarding incomplete banner ──────────────────────────────────────────
+  const [showOnboardingBanner, setShowOnboardingBanner] = useState(false);
+
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: userInfo } = await supabase
+        .from('user_info')
+        .select('name, role, institute, academic_year, academic_level')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (!isOnboardingComplete(userInfo)) {
+        setShowOnboardingBanner(true);
+      }
+    };
+    checkOnboarding();
+  }, []);
+  // ───────────────────────────────────────────────────────────────────────
+
   // const [showPopup, setShowPopup] = useState(false);
 
   // useEffect(() => {
@@ -37,8 +62,59 @@ export default function HomePage() {
     <div style={{ backgroundColor: colors.background }} className="min-h-screen">
       <Navigation />
 
-      {/* Date Extension Popup */}
-      {/* 
+      {/* ── Onboarding Incomplete Popup ── */}
+      {showOnboardingBanner && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#F8F7F2] rounded-2xl p-8 max-w-md w-full shadow-2xl relative border border-[#D0CEC2]">
+            {/* Close */}
+            <button
+              onClick={() => setShowOnboardingBanner(false)}
+              className="absolute top-4 right-4 text-[#8B8B8B] hover:text-[#1A1A1A] transition-colors"
+              aria-label="Dismiss"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div className="flex flex-col items-center text-center">
+              {/* Icon */}
+              <div className="w-14 h-14 bg-[#2C5F5F]/10 rounded-full flex items-center justify-center mb-5">
+                <svg className="w-7 h-7 text-[#2C5F5F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+
+              <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">
+                Complete Your Profile
+              </h3>
+              <p className="text-sm text-[#6B6B6B] leading-relaxed mb-6">
+                Your account setup is not fully complete. Finish onboarding to unlock
+                event registration and all platform features.
+              </p>
+
+              <div className="flex flex-col gap-2 w-full">
+                <a
+                  href="/onboarding"
+                  className="w-full py-3 rounded-xl font-bold text-sm text-white transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
+                  style={{ backgroundColor: colors.accent }}
+                >
+                  Complete My Profile
+                </a>
+                <button
+                  onClick={() => setShowOnboardingBanner(false)}
+                  className="w-full py-3 rounded-xl font-semibold text-sm text-[#6B6B6B] border border-[#D0CEC2] hover:border-[#2C5F5F] hover:text-[#2C5F5F] transition-colors"
+                >
+                  Remind me later
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Date Extension Popup (commented out — preserved for reference) */}
+      {/*
       {showPopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm animate-fade-in">
           <div className="bg-[#F8F7F2] rounded-2xl p-8 max-w-md w-full shadow-2xl relative border border-[#D0CEC2]">

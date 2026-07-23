@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
 import Navigation from '@/app/components/Navigation';
+import { isOnboardingComplete } from '@/utils/onboarding';
+import { useRouter } from 'next/navigation';
 
 // ─── Submission Links ─────────────────────────────────────────────────────────
 const SUBMISSION_LINKS: Record<string, string> = {
@@ -74,6 +76,7 @@ const ProfilePage = () => {
   const [participatedEvents, setParticipatedEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
+  const router = useRouter();
 
 
   useEffect(() => {
@@ -89,13 +92,18 @@ const ProfilePage = () => {
       }
       setUser(currentUser);
 
-      const { data: userInfoData, error: userInfoError } = await supabase
+      const { data: userInfoData } = await supabase
         .from('user_info')
         .select('*')
         .eq('id', currentUser.id)
-        .single();
+        .maybeSingle();
 
-      if (userInfoError) throw userInfoError;
+      // Redirect to onboarding if profile is missing or incomplete
+      if (!isOnboardingComplete(userInfoData)) {
+        router.push('/onboarding');
+        return;
+      }
+
       setUserInfo(userInfoData);
 
       const { data: registrationsData, error: registrationsError } = await supabase
@@ -182,12 +190,13 @@ const ProfilePage = () => {
   }
 
   if (!userInfo) {
+    // Still loading or redirecting — show spinner so there's no flash
     return (
       <>
         <Navigation />
         <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#EDEBDF' }}>
-          <div className="text-xl" style={{ color: '#C85D3E' }}>
-            User information not found
+          <div className="animate-pulse text-2xl font-semibold" style={{ color: '#2C5F5F' }}>
+            Loading...
           </div>
         </div>
       </>
