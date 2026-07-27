@@ -7,7 +7,6 @@ import Timeline from '@/app/components/Timeline';
 import Navigation from '@/app/components/Navigation';
 import BriefModal from '@/app/components/BriefModal';
 import DownloadBriefModal from '@/app/components/DownloadModal';
-import BulkDiscountPopup from '@/app/components/BulkDiscountPopup';
 import { useState } from 'react';
 import localFont from 'next/font/local';
 import { getCompetitionMeta } from '@/data/competitionBriefFiles';
@@ -525,7 +524,6 @@ export default function CompetitionPage() {
   return (
     <>
       {isRegClosedOpen && <RegistrationClosedPopup onClose={() => setIsRegClosedOpen(false)} />}
-      <BulkDiscountPopup />
       <div className="fixed top-0 left-0 right-0 z-50">
         <Navigation />
       </div>
