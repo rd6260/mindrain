@@ -131,6 +131,62 @@ function GradientButton({ href, onClick, children, className = '', testId }: {
   return <button onClick={onClick} className={baseClass} style={style} data-testid={testId}>{children}</button>;
 }
 
+// ─── Registration Closed Popup ────────────────────────────────────────────────
+
+function RegistrationClosedPopup({ onClose }: { onClose: () => void }) {
+  return (
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+      style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-md rounded-2xl p-8 shadow-2xl animate-fade-in-up text-center"
+        style={{ backgroundColor: '#FAFAF7', border: '1px solid #E5E3D7' }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full text-[#6B6B6B] hover:text-[#1A1A1A] hover:bg-[#E5E3D7] transition-all"
+          aria-label="Close"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M2 2l12 12M14 2L2 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        </button>
+
+        {/* Icon */}
+        <div
+          className="w-16 h-16 mx-auto mb-5 rounded-full flex items-center justify-center"
+          style={{ backgroundColor: '#D97757/10', border: '2px solid #D97757' }}
+        >
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <path d="M16 10v6M16 22h.01" stroke="#D97757" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="16" cy="16" r="13" stroke="#D97757" strokeWidth="2.5" />
+          </svg>
+        </div>
+
+        <h2 className="text-2xl font-bold mb-2" style={{ color: '#1A1A1A' }}>Registrations Closed</h2>
+        <p className="text-base leading-relaxed mb-6" style={{ color: '#6B6B6B' }}>
+          Registration for <strong style={{ color: '#1A1A1A' }}>The Unreal House</strong> is now closed.
+          <br />
+          If you still wish to participate, reach out to us at:
+        </p>
+
+        <a
+          href="mailto:support@mindrain.org"
+          className="inline-block px-6 py-3 rounded-lg text-white font-semibold text-base transition-all hover:scale-105 shadow-lg"
+          style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})` }}
+          data-testid="registration-closed-email-link"
+        >
+          support@mindrain.org
+        </a>
+      </div>
+    </div>
+  );
+}
+
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3 mb-3">
@@ -167,7 +223,7 @@ function ToggleButton({ active, onClick, children }: {
 
 // ─── Sections ─────────────────────────────────────────────────────────────────
 
-function MobileHero({ onBriefClick, onPressClick }: { onBriefClick: () => void; onPressClick: () => void }) {
+function MobileHero({ onBriefClick, onPressClick, onRegisterClick }: { onBriefClick: () => void; onPressClick: () => void; onRegisterClick: () => void }) {
   return (
     <section className="relative h-dvh flex flex-col items-center justify-end pb-16 px-6 md:hidden">
       <div className="absolute inset-0 z-0">
@@ -194,13 +250,14 @@ function MobileHero({ onBriefClick, onPressClick }: { onBriefClick: () => void; 
         </p>
 
         <div className="flex flex-col gap-3 w-full max-w-xs mx-auto">
-          <a
-            href={REGISTRATION_URL}
+          <button
+            onClick={onRegisterClick}
             className="w-full px-6 py-4 rounded-lg text-white font-bold text-base transition-all duration-300 active:scale-95 shadow-xl text-center"
             style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})` }}
+            data-testid="register-now-button-mobile"
           >
             Register Now →
-          </a>
+          </button>
           <button
             className="w-full px-6 py-4 rounded-lg text-white font-bold text-base transition-all duration-300 active:scale-95 shadow-xl"
             style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})` }}
@@ -221,7 +278,7 @@ function MobileHero({ onBriefClick, onPressClick }: { onBriefClick: () => void; 
   );
 }
 
-function DesktopHero({ onBriefClick, onPressClick }: { onBriefClick: () => void; onPressClick: () => void }) {
+function DesktopHero({ onBriefClick, onPressClick, onRegisterClick }: { onBriefClick: () => void; onPressClick: () => void; onRegisterClick: () => void }) {
   return (
     <section className="relative min-h-screen hidden md:flex items-center justify-start px-4 sm:px-6 lg:px-8">
       <div className="absolute inset-0 z-0">
@@ -247,7 +304,7 @@ function DesktopHero({ onBriefClick, onPressClick }: { onBriefClick: () => void;
         </h1>
 
         <div className="flex gap-8">
-          <GradientButton href={REGISTRATION_URL} className="mt-16" testId="register-now-button">
+          <GradientButton onClick={onRegisterClick} className="mt-16" testId="register-now-button">
             Register Now →
           </GradientButton>
           <GradientButton onClick={onBriefClick} className="mt-16" testId="download-brief-button">
@@ -365,7 +422,7 @@ function StudentDiscounts() {
   );
 }
 
-function RegistrationFees() {
+function RegistrationFees({ onRegisterClick }: { onRegisterClick: () => void }) {
   const [origin, setOrigin] = useState<'india' | 'international'>('india');
   const [monetary, setMonetary] = useState<'yes' | 'no'>('yes');
   const [teamType, setTeamType] = useState<EntryType>('solo');
@@ -450,7 +507,7 @@ function RegistrationFees() {
       </div>
 
       <div className="flex items-center justify-center">
-        <GradientButton href={REGISTRATION_URL} className="!px-12 !py-3.5 !text-sm" testId="register-now-button">
+        <GradientButton onClick={onRegisterClick} className="!px-12 !py-3.5 !text-sm" testId="register-now-button">
           Register Now →
         </GradientButton>
       </div>
@@ -463,9 +520,11 @@ function RegistrationFees() {
 export default function CompetitionPage() {
   const [isBriefOpen, setIsBriefOpen] = useState(false);
   const [isPressOpen, setIsPressOpen] = useState(false);
+  const [isRegClosedOpen, setIsRegClosedOpen] = useState(false);
 
   return (
     <>
+      {isRegClosedOpen && <RegistrationClosedPopup onClose={() => setIsRegClosedOpen(false)} />}
       <BulkDiscountPopup />
       <div className="fixed top-0 left-0 right-0 z-50">
         <Navigation />
@@ -477,8 +536,8 @@ export default function CompetitionPage() {
           style={{ backgroundColor: colors.accent }}
         />
 
-        <MobileHero onBriefClick={() => setIsBriefOpen(true)} onPressClick={() => setIsPressOpen(true)} />
-        <DesktopHero onBriefClick={() => setIsBriefOpen(true)} onPressClick={() => setIsPressOpen(true)} />
+        <MobileHero onBriefClick={() => setIsBriefOpen(true)} onPressClick={() => setIsPressOpen(true)} onRegisterClick={() => setIsRegClosedOpen(true)} />
+        <DesktopHero onBriefClick={() => setIsBriefOpen(true)} onPressClick={() => setIsPressOpen(true)} onRegisterClick={() => setIsRegClosedOpen(true)} />
 
         <PrizePool />
 
@@ -496,7 +555,7 @@ export default function CompetitionPage() {
             <h2 className="text-4xl md:text-5xl font-bold text-center mb-12" style={{ color: colors.textPrimary }}>
               Registration Fees
             </h2>
-            <RegistrationFees />
+            <RegistrationFees onRegisterClick={() => setIsRegClosedOpen(true)} />
           </div>
         </section>
 
