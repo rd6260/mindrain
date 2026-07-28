@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useSearchParams } from 'next/navigation';
 import { isOnboardingComplete } from '@/utils/onboarding';
+import { isRegistrationOpen } from '@/utils/registration';
 
 interface MemberData {
   id?: string; // DB id for existing members (used for deletion)
@@ -560,6 +561,36 @@ function RegistrationContent() {
         <div className="flex items-center gap-3 text-[#2C5F5F]">
           <div className="w-5 h-5 border-2 border-[#2C5F5F] border-t-transparent rounded-full animate-spin" />
           <span className="text-base font-semibold">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Block page if registration deadline has passed
+  if (!isRegistrationOpen()) {
+    return (
+      <div className="min-h-screen bg-[#EDEBDF] flex items-center justify-center p-6">
+        <div className="w-full max-w-md">
+          <div className="bg-[#F8F7F2] rounded-2xl border border-[#D0CEC2] p-8 text-center shadow-2xl">
+            <div className="w-16 h-16 rounded-full bg-[#D97757]/10 border-2 border-[#D97757] flex items-center justify-center mx-auto mb-5">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <path d="M16 10v6M16 22h.01" stroke="#D97757" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx="16" cy="16" r="13" stroke="#D97757" strokeWidth="2.5" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-[#1A1A1A] mb-1">Registrations Closed</h1>
+            <p className="text-xs font-semibold text-[#D97757] mb-4">Registration closed on 30 July 2026</p>
+            <p className="text-sm text-[#6B6B6B] leading-relaxed mb-7">
+              Registration for <strong className="text-[#1A1A1A]">The Unreal House</strong> is now closed.
+              <br />If you still wish to participate, reach out to us at:
+            </p>
+            <a
+              href="mailto:support@mindrain.org"
+              className="inline-block px-6 py-3 rounded-lg text-white font-semibold text-sm transition-all hover:scale-105 shadow-lg bg-[#2C5F5F] hover:bg-[#1A4D4D]"
+            >
+              support@mindrain.org
+            </a>
+          </div>
         </div>
       </div>
     );

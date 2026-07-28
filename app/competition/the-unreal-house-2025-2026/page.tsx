@@ -11,6 +11,7 @@ import { useState } from 'react';
 import localFont from 'next/font/local';
 import { getCompetitionMeta } from '@/data/competitionBriefFiles';
 import { ImportantDate } from '@/types';
+import { isRegistrationOpen } from '@/utils/registration';
 
 // ─── Font ─────────────────────────────────────────────────────────────────────
 
@@ -167,6 +168,7 @@ function RegistrationClosedPopup({ onClose }: { onClose: () => void }) {
         </div>
 
         <h2 className="text-2xl font-bold mb-2" style={{ color: '#1A1A1A' }}>Registrations Closed</h2>
+        <p className="text-xs font-medium mb-3" style={{ color: '#D97757' }}>Registration closed on 30 July 2026</p>
         <p className="text-base leading-relaxed mb-6" style={{ color: '#6B6B6B' }}>
           Registration for <strong style={{ color: '#1A1A1A' }}>The Unreal House</strong> is now closed.
           <br />
@@ -521,6 +523,15 @@ export default function CompetitionPage() {
   const [isPressOpen, setIsPressOpen] = useState(false);
   const [isRegClosedOpen, setIsRegClosedOpen] = useState(false);
 
+  const registrationOpen = isRegistrationOpen();
+  const handleRegisterClick = () => {
+    if (registrationOpen) {
+      window.location.href = REGISTRATION_URL;
+    } else {
+      setIsRegClosedOpen(true);
+    }
+  };
+
   return (
     <>
       {isRegClosedOpen && <RegistrationClosedPopup onClose={() => setIsRegClosedOpen(false)} />}
@@ -534,8 +545,8 @@ export default function CompetitionPage() {
           style={{ backgroundColor: colors.accent }}
         />
 
-        <MobileHero onBriefClick={() => setIsBriefOpen(true)} onPressClick={() => setIsPressOpen(true)} onRegisterClick={() => setIsRegClosedOpen(true)} />
-        <DesktopHero onBriefClick={() => setIsBriefOpen(true)} onPressClick={() => setIsPressOpen(true)} onRegisterClick={() => setIsRegClosedOpen(true)} />
+        <MobileHero onBriefClick={() => setIsBriefOpen(true)} onPressClick={() => setIsPressOpen(true)} onRegisterClick={handleRegisterClick} />
+        <DesktopHero onBriefClick={() => setIsBriefOpen(true)} onPressClick={() => setIsPressOpen(true)} onRegisterClick={handleRegisterClick} />
 
         <PrizePool />
 
@@ -553,7 +564,7 @@ export default function CompetitionPage() {
             <h2 className="text-4xl md:text-5xl font-bold text-center mb-12" style={{ color: colors.textPrimary }}>
               Registration Fees
             </h2>
-            <RegistrationFees onRegisterClick={() => setIsRegClosedOpen(true)} />
+            <RegistrationFees onRegisterClick={handleRegisterClick} />
           </div>
         </section>
 
