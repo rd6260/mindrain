@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
 import Navigation from '@/app/components/Navigation';
 import { isOnboardingComplete } from '@/utils/onboarding';
+import { isCertificatesAvailable } from '@/utils/registration';
 import { useRouter } from 'next/navigation';
 
 // ─── Submission Links ─────────────────────────────────────────────────────────
@@ -49,9 +50,111 @@ interface Registration {
   team_type: 'solo' | 'group';
   team_id: string;
   paid: boolean;
+  has_submitted: boolean | null;
+  participation_certificates: string[] | null;
   event_id: string;
   events: Event;
   members?: Member[];
+}
+
+// ─── Certificates Modal ───────────────────────────────────────────────────────
+function CertificatesModal({
+  urls,
+  onClose,
+}: {
+  urls: string[];
+  onClose: () => void;
+}) {
+  const handleDownload = async (url: string, index: number) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = objectUrl;
+      a.download = `participation_certificate_${index + 1}.png`;
+      a.click();
+      URL.revokeObjectURL(objectUrl);
+    } catch {
+      // Fallback: open in new tab if fetch fails
+      window.open(url, '_blank');
+    }
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ backgroundColor: 'rgba(26,26,26,0.6)', backdropFilter: 'blur(4px)' }}
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-sm rounded-2xl p-6 shadow-2xl border"
+        style={{ backgroundColor: '#F8F7F2', borderColor: '#D0CEC2' }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-full transition-colors"
+          style={{ backgroundColor: '#EDEBDF', color: '#6B6B6B' }}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#D0CEC2')}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#EDEBDF')}
+          aria-label="Close"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        </button>
+
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#2C5F5F' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2l3 7h7l-6 4 2 7-6-4-6 4 2-7L2 9h7z" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="text-base font-bold" style={{ color: '#1A1A1A' }}>Participation Certificates</h3>
+            <p className="text-xs" style={{ color: '#6B6B6B' }}>{urls.length} certificate{urls.length !== 1 ? 's' : ''} available</p>
+          </div>
+        </div>
+
+        {/* Certificate rows */}
+        <div className="space-y-2">
+          {urls.map((url, i) => (
+            <div
+              key={i}
+              className="flex items-center justify-between rounded-xl px-4 py-3 border"
+              style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E3D7' }}
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#EDEBDF' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2C5F5F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <path d="M3 9h18M9 21V9" />
+                  </svg>
+                </div>
+                <span className="text-sm font-semibold" style={{ color: '#1A1A1A' }}>Certificate {i + 1}</span>
+              </div>
+              <button
+                id={`download-cert-${i + 1}`}
+                onClick={() => handleDownload(url, i)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200"
+                style={{ backgroundColor: '#2C5F5F', color: '#FFFFFF' }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#1A4D4D')}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#2C5F5F')}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 5v14M5 12l7 7 7-7" />
+                </svg>
+                Download
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 interface Registration2 {
@@ -75,8 +178,10 @@ const ProfilePage = () => {
   const [registrations2, setRegistrations2] = useState<Registration2[]>([]);
   const [participatedEvents, setParticipatedEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [certPopup, setCertPopup] = useState<string[] | null>(null);
   const supabase = createClient();
   const router = useRouter();
+  const certAvailable = isCertificatesAvailable();
 
 
   useEffect(() => {
@@ -123,7 +228,7 @@ const ProfilePage = () => {
         .eq('registration_by', currentUser.id);
 
       if (registrationsError) throw registrationsError;
-      setRegistrations(registrationsData || []);
+      setRegistrations((registrationsData || []) as Registration[]);
 
       // Fetch registrations_2
       const { data: registrations2Data, error: registrations2Error } = await supabase
@@ -205,6 +310,9 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#EDEBDF' }}>
+      {certPopup && (
+        <CertificatesModal urls={certPopup} onClose={() => setCertPopup(null)} />
+      )}
       <Navigation />
 
       <div className="py-8 px-2">
@@ -390,7 +498,21 @@ const ProfilePage = () => {
                               >
                                 Complete Payment →
                               </a>
-                            ) : getSubmissionLink(registration.team_id) ? (
+                            ) : certAvailable && registration.has_submitted && registration.participation_certificates?.length ? (
+                              <button
+                                id={`open-certs-${registration.id}`}
+                                onClick={() => setCertPopup(registration.participation_certificates!)}
+                                className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:shadow-md flex items-center gap-1.5"
+                                style={{ backgroundColor: '#2C5F5F', color: '#FFFFFF' }}
+                                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#1A4D4D')}
+                                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#2C5F5F')}
+                              >
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M12 5v14M5 12l7 7 7-7" />
+                                </svg>
+                                Participation Certificate
+                              </button>
+                            ) : !registration.has_submitted && getSubmissionLink(registration.team_id) ? (
                               <a
                                 href={getSubmissionLink(registration.team_id)!}
                                 target="_blank"

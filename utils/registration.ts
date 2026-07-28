@@ -10,3 +10,16 @@ export const REGISTRATION_DEADLINE = new Date('2026-07-30T23:59:59+05:30');
 export function isRegistrationOpen(): boolean {
   return new Date() <= REGISTRATION_DEADLINE;
 }
+
+/**
+ * Certificates release date: 30 July 2026 at 23:59:59 (IST / Asia/Kolkata)
+ *
+ * Returns `true` once this date has passed (certificates are available).
+ * Returns `false` before this date.
+ */
+export const CERTIFICATES_AVAILABLE_AFTER = new Date('2026-07-30T23:59:59+05:30');
+// export const CERTIFICATES_AVAILABLE_AFTER = new Date('2026-07-29T23:59:59+05:30');
+
+export function isCertificatesAvailable(): boolean {
+  return new Date() > CERTIFICATES_AVAILABLE_AFTER;
+}
