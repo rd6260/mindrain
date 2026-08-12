@@ -53,6 +53,18 @@ const COMPETITIONS: Record<string, CompetitionData> = {
     ],
   },
 
+  // The Architecture of Play
+  'b2e94f01-3c7a-4d8e-a512-9f6d2b1c0e47': {
+    meta: {
+      title: 'The Architecture of Play',
+      subtitle: 'A Design Competition for Young Minds',
+      category: 'Architecture Competition',
+      edition: 'Edition 01',
+      registrationUrl: 'https://www.mindrain.org/competition/the-architecture-of-play',
+    },
+    briefFiles: [],
+  },
+
   // Mind Rain Thesis Award
   'c4a201ae-8bfe-48bc-a526-4ac1288dd937': {
     meta: {
