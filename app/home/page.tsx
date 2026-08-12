@@ -313,29 +313,6 @@ export default function HomePage() {
 
           <div className="h-6" />
 
-          <LiveCompetitionCard
-            title="THE UNREAL HOUSE"
-            subtitle="An Imaginary Home Design Challenge"
-            imageSrc="/the-unreal-house/TUH-cover.jpg"
-            imageAlt="The Unreal House"
-            prizeLabel={<>Total Prize Pool <span className="font-bold text-sm">₹50,000+</span></>}
-            details={[
-              { label: "Prize", value: "Monetary award" },
-              { label: "Eligibility", value: "Open to all undergraduate students" },
-            ]}
-            deadlineLabel="Late Registration Ends (Extended)"
-            deadlineValue="25 July 2026"
-            findOutMoreHref="/competition/the-unreal-house-2025-2026"
-            briefFiles={[
-              { name: "Important Dates & Calendar", description: "Key deadlines and schedule", url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/Important%20Dates-Calender.pdf" },
-              { name: "Terms & Conditions", description: "Important rules and regulations", url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/T%26C%20(Important).pdf" },
-              { name: "Complete Brief", description: "Full competition brief document", url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/The%20Unreal%20House%20(Complete%20Brief).pdf" },
-              { name: "Brief (Print Format)", description: "Print-ready version of the brief", url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/The%20Unreal%20House%20(print%20format).pdf" },
-            ]}
-            briefModalTitle="Download Brief"
-            briefModalSubtitle="The Unreal House — select files to download"
-            eventId="3f123e78-60d6-494d-b307-18c5b4c8ab7f"
-          />
 
           <div className='flex justify-center items-center py-4 text-sm'>
             <span>
