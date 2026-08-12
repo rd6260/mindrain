@@ -199,7 +199,7 @@ function MobileHero({ onBriefClick, onRegisterClick }: { onBriefClick: () => voi
     <section className="relative h-dvh flex flex-col items-center justify-end pb-16 px-6 md:hidden">
       <div className="absolute inset-0 z-0">
         <Image
-          src="/the-architecture-of-play/hero-portrait-v2.webp"
+          src="/the-architecture-of-play/hero-portrait-v3.webp"
           alt="The Architecture of Play"
           fill
           className="object-cover object-center"
@@ -246,7 +246,7 @@ function DesktopHero({ onBriefClick, onRegisterClick }: { onBriefClick: () => vo
   return (
     <section className="relative hidden min-h-screen items-center justify-start px-4 md:flex sm:px-6 lg:px-8">
       <Image
-        src="/the-architecture-of-play/hero-portrait-v2.webp"
+        src="/the-architecture-of-play/hero-portrait-v3.webp"
         alt="The Architecture of Play Competition"
         fill
         priority
