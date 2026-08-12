@@ -6,7 +6,7 @@ import Footer from '@/app/components/Footer';
 import Timeline from '@/app/components/Timeline';
 import Navigation from '@/app/components/Navigation';
 import BriefModal from '@/app/components/BriefModal';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import localFont from 'next/font/local';
 import { getCompetitionMeta } from '@/data/competitionBriefFiles';
 import { ImportantDate } from '@/types';
@@ -199,7 +199,7 @@ function MobileHero({ onBriefClick, onRegisterClick }: { onBriefClick: () => voi
     <section className="relative h-dvh flex flex-col items-center justify-end pb-16 px-6 md:hidden">
       <div className="absolute inset-0 z-0">
         <Image
-          src="/the-architecture-of-play/hero-portrait.webp"
+          src="/the-architecture-of-play/hero-portrait-v2.webp"
           alt="The Architecture of Play"
           fill
           className="object-cover object-center"
@@ -246,7 +246,7 @@ function DesktopHero({ onBriefClick, onRegisterClick }: { onBriefClick: () => vo
   return (
     <section className="relative hidden min-h-screen items-center justify-start px-4 md:flex sm:px-6 lg:px-8">
       <Image
-        src="/the-architecture-of-play/hero-portrait.webp"
+        src="/the-architecture-of-play/hero-portrait-v2.webp"
         alt="The Architecture of Play Competition"
         fill
         priority
@@ -459,13 +459,6 @@ function RegistrationFees({ onRegisterClick }: { onRegisterClick: () => void }) 
 export default function CompetitionPage() {
   const [isBriefOpen, setIsBriefOpen] = useState(false);
   const [isComingSoonOpen, setIsComingSoonOpen] = useState(false);
-  const [navVisible, setNavVisible] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setNavVisible(window.scrollY > 80);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Registrations are disabled until further notice — always show the coming-soon popup.
   const REGISTRATIONS_ENABLED = false;
@@ -480,14 +473,7 @@ export default function CompetitionPage() {
   return (
     <>
       {isComingSoonOpen && <RegistrationComingSoonPopup onClose={() => setIsComingSoonOpen(false)} />}
-      <div
-        className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
-        style={{
-          opacity: navVisible ? 1 : 0,
-          transform: navVisible ? 'translateY(0)' : 'translateY(-100%)',
-          pointerEvents: navVisible ? 'auto' : 'none',
-        }}
-      >
+      <div className="fixed top-0 left-0 right-0 z-50">
         <Navigation />
       </div>
 
