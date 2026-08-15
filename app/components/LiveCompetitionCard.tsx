@@ -180,7 +180,7 @@ export default function LiveCompetitionCard({
             >
               Find out more <span className="text-base leading-none">→</span>
             </a>
-            {briefFiles && briefFiles.length > 0 && (
+            {(eventId || (briefFiles && briefFiles.length > 0)) && (
               <button
                 onClick={handleDownloadClick}
                 className="flex items-center gap-1.5 text-sm text-gray-800 hover:text-gray-500 transition-colors cursor-pointer"
