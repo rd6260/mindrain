@@ -62,7 +62,23 @@ const COMPETITIONS: Record<string, CompetitionData> = {
       edition: 'Edition 01',
       registrationUrl: 'https://www.mindrain.org/competition/the-architecture-of-play',
     },
-    briefFiles: [],
+    briefFiles: [
+      {
+        name: 'Competition Calendar',
+        description: 'Key deadlines and schedule',
+        url: 'https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/architecture_of_play/Competition%20Calender.pdf',
+      },
+      {
+        name: 'Terms & Conditions',
+        description: 'Important rules and regulations',
+        url: 'https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/architecture_of_play/T&C%20(Important).pdf',
+      },
+      {
+        name: 'Printable Brief',
+        description: 'Print-ready version of the brief',
+        url: 'https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/architecture_of_play/The%20Architecture%20of%20Play%20(Printable%20brief).pdf',
+      },
+    ],
   },
 
   // Mind Rain Thesis Award
