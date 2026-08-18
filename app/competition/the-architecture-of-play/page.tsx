@@ -76,10 +76,8 @@ function RegistrationComingSoonPopup({ onClose }: { onClose: () => void }) {
           </svg>
         </button>
 
-        <h2 className="text-2xl font-bold mb-2" style={{ color: '#1A1A1A' }}>Coming Soon</h2>
+        <h2 className="text-2xl font-bold mb-2" style={{ color: '#1A1A1A' }}>Something went wrong!</h2>
         <p className="text-base leading-relaxed mb-6" style={{ color: '#6B6B6B' }}>
-          Registrations for <strong style={{ color: '#1A1A1A' }}>The Architecture of Play</strong> are not yet open.
-          <br />
           Please try again later, or reach out to us at:
         </p>
 
