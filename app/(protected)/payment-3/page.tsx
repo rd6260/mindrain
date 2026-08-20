@@ -235,7 +235,21 @@ function PaymentContent() {
           }
         },
         modal: {
-          ondismiss: () => { setIsProcessing(false); setError('Payment cancelled'); },
+          ondismiss: async () => { 
+            setIsProcessing(false); 
+            setError('Payment cancelled'); 
+            
+            // Log cancellation in database
+            try {
+              await fetch('/api/v3/cancel-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ payment_id: data.payment_id }),
+              });
+            } catch (err) {
+              console.error('Failed to register cancellation', err);
+            }
+          },
         },
         theme: { color: '#2C5F5F' },
       };

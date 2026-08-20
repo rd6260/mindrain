@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import Razorpay from 'razorpay';
 
-const razorpay = new Razorpay({
-  key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID as string,
-  key_secret: process.env.RAZORPAY_SECRET_ID as string,
-});
+
 
 export async function POST(req: NextRequest) {
   try {
@@ -41,7 +38,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Registration already paid' }, { status: 400 });
     }
 
+    if (!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || !process.env.RAZORPAY_SECRET_ID) {
+      console.error('Razorpay keys missing:', { 
+        hasKeyId: !!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, 
+        hasSecret: !!process.env.RAZORPAY_SECRET_ID 
+      });
+      return NextResponse.json({ error: 'Razorpay keys not configured' }, { status: 500 });
+    }
+
     // Create Razorpay order
+    const razorpay = new Razorpay({
+      key_id: (process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || '').trim(),
+      key_secret: (process.env.RAZORPAY_SECRET_ID || '').trim(),
+    });
+
     const order = await razorpay.orders.create({
       amount,
       currency,

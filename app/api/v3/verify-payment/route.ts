@@ -4,10 +4,6 @@ import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import { ServerClient } from 'postmark';
 
-const razorpay = new Razorpay({
-  key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID as string,
-  key_secret: process.env.RAZORPAY_SECRET_ID as string,
-});
 
 const postmark = new ServerClient(process.env.POSTMARK_API_KEY || '');
 
@@ -227,6 +223,10 @@ export async function POST(req: NextRequest) {
     // Signature verified — fetch payment details from Razorpay
     let rzpPayment: any = null;
     try {
+      const razorpay = new Razorpay({
+        key_id: (process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || '').trim(),
+        key_secret: (process.env.RAZORPAY_SECRET_ID || '').trim(),
+      });
       rzpPayment = await razorpay.payments.fetch(razorpay_payment_id);
     } catch (e) {
       console.error('Failed to fetch Razorpay payment details:', e);

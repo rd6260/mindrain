@@ -53,9 +53,22 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Already registered and paid' }, { status: 400 });
       }
       // Update existing unpaid registration
+      // Keep the same 4-digit sequence but regenerate the team_id prefix based on new form_data
+      const oldSequence = existingReg.team_id 
+        ? parseInt(existingReg.team_id.split('-').pop() || '0', 10) 
+        : Math.floor(Math.random() * 10000);
+        
+      const newTeamId = buildTeamId(
+        event.code_name,
+        form_data.group || 'A',
+        form_data.category || '1',
+        form_data.team_type || 'solo',
+        oldSequence
+      );
+
       const { data: updatedReg, error: updateError } = await supabase
         .from('registrations_v3')
-        .update({ form_data })
+        .update({ form_data, team_id: newTeamId })
         .eq('id', existingReg.id)
         .select('id, team_id')
         .single();
