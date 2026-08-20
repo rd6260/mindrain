@@ -63,7 +63,10 @@ export async function updateSession(request: NextRequest) {
     '/profile',
     '/admin',
     '/payment',
+    '/payment-2',
+    '/payment-3',
     '/registration',
+    '/registration-3',
     '/earn/onboarding',
     '/earn/dashboard'
   ]

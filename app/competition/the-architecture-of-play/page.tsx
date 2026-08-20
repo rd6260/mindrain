@@ -25,11 +25,9 @@ const TechnorFont = localFont({ src: '../../fonts/Technor-Variable.woff2' });
 
 // ─── Static Data ──────────────────────────────────────────────────────────────
 
-const REGISTRATION_EVENT_ID = 'b2e94f01-3c7a-4d8e-a512-9f6d2b1c0e47';
+const REGISTRATION_EVENT_ID = '1389f7d3-e98a-40dd-819a-5b756e3c2ada';
 const meta = getCompetitionMeta(REGISTRATION_EVENT_ID)!;
-
-// Registrations are currently disabled — this URL is kept for future use.
-// const REGISTRATION_URL = `/registration?event_id=${REGISTRATION_EVENT_ID}`;
+const REGISTRATION_URL = `/registration-3?event_id=${REGISTRATION_EVENT_ID}`;
 
 
 
@@ -394,21 +392,13 @@ function RegistrationFees({ onRegisterClick }: { onRegisterClick: () => void }) 
 
 export default function CompetitionPage() {
   const [isBriefOpen, setIsBriefOpen] = useState(false);
-  const [isComingSoonOpen, setIsComingSoonOpen] = useState(false);
 
-  // Registrations are disabled until further notice — always show the coming-soon popup.
-  const REGISTRATIONS_ENABLED = false;
   const handleRegisterClick = () => {
-    if (REGISTRATIONS_ENABLED) {
-      // window.location.href = REGISTRATION_URL;
-    } else {
-      setIsComingSoonOpen(true);
-    }
+    window.location.href = REGISTRATION_URL;
   };
 
   return (
     <>
-      {isComingSoonOpen && <RegistrationComingSoonPopup onClose={() => setIsComingSoonOpen(false)} />}
       <div className="fixed top-0 left-0 right-0 z-50">
         <Navigation />
       </div>
