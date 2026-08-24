@@ -22,6 +22,7 @@ import {
 // ─── Font ─────────────────────────────────────────────────────────────────────
 
 const TechnorFont = localFont({ src: '../../fonts/Technor-Variable.woff2' });
+const NiceSchool = localFont({ src: '../../fonts/Nice-School.otf' });
 
 // ─── Static Data ──────────────────────────────────────────────────────────────
 
@@ -133,7 +134,7 @@ function MobileHero({ onBriefClick, onRegisterClick }: { onBriefClick: () => voi
     <section className="relative h-dvh flex flex-col items-center justify-end pb-16 px-6 md:hidden">
       <div className="absolute inset-0 z-0">
         <Image
-          src="/the-architecture-of-play/hero-portrait-v3.webp"
+          src="/the-architecture-of-play/hero-landscape.png"
           alt="The Architecture of Play"
           fill
           className="object-cover object-center"
@@ -178,23 +179,39 @@ function MobileHero({ onBriefClick, onRegisterClick }: { onBriefClick: () => voi
 
 function DesktopHero({ onBriefClick, onRegisterClick }: { onBriefClick: () => void; onRegisterClick: () => void }) {
   return (
-    <section className="relative hidden min-h-screen items-center justify-start px-4 md:flex sm:px-6 lg:px-8">
+    <section className="relative hidden min-h-screen items-start justify-start px-4 pt-24 md:flex sm:px-6 lg:px-8">
       <Image
-        src="/the-architecture-of-play/hero-portrait-v3.webp"
+        src="/the-architecture-of-play/hero-landscape.png"
         alt="The Architecture of Play Competition"
         fill
         priority
         className="absolute inset-0 z-0 object-cover"
       />
 
-      <div className="absolute bottom-[10%] left-24 z-10 max-w-5xl animate-fade-in text-left text-gray-200">
-        <div className="flex gap-8">
-          <GradientButton onClick={onRegisterClick} className="mt-16" testId="register-now-button">
-            Register Now →
-          </GradientButton>
-          <GradientButton onClick={onBriefClick} className="mt-16" testId="download-brief-button">
-            Download Brief ↓
-          </GradientButton>
+      <div className="relative px-8 py-6">
+        <h1 className="space-y-4 text-[#393939]">
+          <span className={`${NiceSchool.className} flex flex-col gap-0 tracking-[0.2rem] font-extrabold mb-6 mt-0`}>
+            <span className="text-6xl md:text-8xl lg:text-[10rem] leading-none">The</span>
+            <span className="text-5xl md:text-7xl lg:text-8xl leading-none -mt-6">Architecture</span>
+            <span className="text-6xl md:text-8xl lg:text-[9rem] leading-none -mt-6">of Play</span>
+          </span>
+          <span className="block text-2xl md:text-4xl font-medium tracking-wide">
+            A Kindergarten Design Challenge <br/> 2026-27 <br/> <br/>
+          </span>
+          <span className="block text-2xl md:text-4xl font-medium tracking-wide">
+            ARCHITECTURE <br/> COMPETITION <span className="text-xl md:text-2xl font-light italic"># Edition 07</span>
+          </span>
+        </h1>
+
+        <div className="mt-20 animate-fade-in">
+          <div className="flex gap-8">
+            <GradientButton onClick={onRegisterClick} testId="register-now-button">
+              Register Now →
+            </GradientButton>
+            <GradientButton onClick={onBriefClick} testId="download-brief-button">
+              Download Brief ↓
+            </GradientButton>
+          </div>
         </div>
       </div>
     </section>
