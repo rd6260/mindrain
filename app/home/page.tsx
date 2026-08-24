@@ -172,7 +172,7 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-4">
               <div className="px-10 py-14 border-b md:border-b-0 md:border-r border-neutral-400 last:border-r-0">
                 <h2 className="text-5xl md:text-6xl font-semibold text-black mb-4">
-                  9+
+                  10+
                 </h2>
                 <p className="text-neutral-600 text-base leading-relaxed max-w-xs">
                   Years of experience
@@ -182,7 +182,7 @@ export default function HomePage() {
 
               <div className="px-10 py-14 border-b md:border-b-0 md:border-r border-neutral-400 last:border-r-0">
                 <h2 className="text-5xl md:text-6xl font-semibold text-black mb-4">
-                  2.3k+
+                  2.5k+
                 </h2>
                 <p className="text-neutral-600 text-base leading-relaxed max-w-xs">
                   Participants
@@ -202,7 +202,7 @@ export default function HomePage() {
 
               <div className="px-10 py-14 border-b md:border-b-0 md:border-r border-neutral-400 last:border-r-0">
                 <h2 className="text-5xl md:text-6xl font-semibold text-black mb-4">
-                  8+
+                  10+
                 </h2>
                 <p className="text-neutral-600 text-base leading-relaxed max-w-xs">
                   successful competitions conducted
