@@ -171,11 +171,43 @@ interface Registration2 {
   events: Event;
 }
 
+interface FormDataMember {
+  name: string;
+  email?: string;
+  phone?: string;
+  institute?: string;
+  academic_year?: string;
+  institute_id_url?: string;
+}
+
+interface Registration3FormData {
+  country?: string;
+  group?: string;
+  category?: string;
+  team_type?: string;
+  members?: FormDataMember[];
+  [key: string]: unknown;
+}
+
+interface Registration3 {
+  id: string;
+  registration_by: string;
+  event_id: string;
+  team_id: string;
+  form_data: Registration3FormData;
+  paid: boolean;
+  referral_used: string | null;
+  created_at: string;
+  updated_at: string;
+  events: Event;
+}
+
 const ProfilePage = () => {
   const [user, setUser] = useState<User | null>(null);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [registrations2, setRegistrations2] = useState<Registration2[]>([]);
+  const [registrations3, setRegistrations3] = useState<Registration3[]>([]);
   const [participatedEvents, setParticipatedEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [certPopup, setCertPopup] = useState<string[] | null>(null);
@@ -246,10 +278,27 @@ const ProfilePage = () => {
       if (registrations2Error) throw registrations2Error;
       setRegistrations2(registrations2Data || []);
 
-      // Merge unique events from both tables
+      // Fetch registrations_v3
+      const { data: registrations3Data, error: registrations3Error } = await supabase
+        .from('registrations_v3')
+        .select(`
+          *,
+          events (
+            id,
+            title,
+            code_name
+          )
+        `)
+        .eq('registration_by', currentUser.id);
+
+      if (registrations3Error) throw registrations3Error;
+      setRegistrations3((registrations3Data || []) as Registration3[]);
+
+      // Merge unique events from all tables
       const allRegs = [
         ...(registrationsData || []),
         ...(registrations2Data || []),
+        ...(registrations3Data || []),
       ];
       const uniqueEvents = allRegs.reduce((acc: Event[], reg) => {
         const event = reg.events as unknown as Event;
@@ -273,7 +322,7 @@ const ProfilePage = () => {
     window.location.href = '/login';
   };
 
-  const hasPendingPayments = registrations.some(reg => !reg.paid) || registrations2.some(reg => !reg.paid);
+  const hasPendingPayments = registrations.some(reg => !reg.paid) || registrations2.some(reg => !reg.paid) || registrations3.some(reg => !reg.paid);
 
   const formatAcademicLevel = (level: string | null) => {
     if (level === 'UG') return 'Under Graduate';
@@ -452,7 +501,7 @@ const ProfilePage = () => {
                   My Registrations
                 </h3>
 
-                {registrations.length === 0 && registrations2.length === 0 ? (
+                {registrations.length === 0 && registrations2.length === 0 && registrations3.length === 0 ? (
                   <p style={{ color: '#6B6B6B' }}>
                     You haven't registered for any events yet.
                   </p>
@@ -686,6 +735,137 @@ const ProfilePage = () => {
                         </div>
                       </div>
                     ))}
+
+                    {/* Registrations (v3 — JSONB form_data) */}
+                    {registrations3.map((registration) => {
+                      const fd = registration.form_data || {};
+                      const members = fd.members || [];
+                      return (
+                        <div
+                          key={registration.id}
+                          className="rounded-lg p-4 border"
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            borderColor: registration.paid ? '#D0CEC2' : '#D97757'
+                          }}
+                        >
+                          {/* Card Header */}
+                          <div className="flex justify-between items-start mb-4">
+                            <div>
+                              <h4 className="text-lg font-bold" style={{ color: '#1A1A1A' }}>
+                                {registration.events.title}
+                              </h4>
+                              <p className="text-xs font-semibold mt-0.5" style={{ color: '#6B6B6B' }}>
+                                Mind ID:{' '}
+                                <span
+                                  className="px-1.5 py-0.5 rounded font-mono"
+                                  style={{ backgroundColor: '#EDEBDF', color: registration.paid ? '#2C5F5F' : '#8B8B8B' }}
+                                >
+                                  {registration.paid ? registration.team_id : 'Not applicable'}
+                                </span>
+                              </p>
+                            </div>
+                            <div className="flex flex-col items-end gap-2">
+                              {!registration.paid ? (
+                                <a
+                                  href={`/payment-3?registration_id=${registration.id}`}
+                                  className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:shadow-md"
+                                  style={{
+                                    backgroundColor: '#2C5F5F',
+                                    color: '#FFFFFF',
+                                  }}
+                                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#1A4D4D')}
+                                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#2C5F5F')}
+                                >
+                                  Complete Payment →
+                                </a>
+                              ) : getSubmissionLink(registration.team_id) ? (
+                                <a
+                                  href={getSubmissionLink(registration.team_id)!}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:shadow-md"
+                                  style={{
+                                    backgroundColor: '#D97757',
+                                    color: '#FFFFFF',
+                                  }}
+                                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#C04B2B')}
+                                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#D97757')}
+                                >
+                                  Submit Entry →
+                                </a>
+                              ) : null}
+                            </div>
+                          </div>
+
+                          {/* Registration Details from form_data */}
+                          <div className="grid grid-cols-2 gap-3 text-sm mb-4">
+                            {fd.country && (
+                              <div>
+                                <p style={{ color: '#6B6B6B' }}>Country</p>
+                                <p className="font-semibold" style={{ color: '#1A1A1A' }}>
+                                  {fd.country}
+                                </p>
+                              </div>
+                            )}
+                            {fd.team_type && (
+                              <div>
+                                <p style={{ color: '#6B6B6B' }}>Team Type</p>
+                                <p className="font-semibold capitalize" style={{ color: '#1A1A1A' }}>
+                                  {fd.team_type}
+                                </p>
+                              </div>
+                            )}
+                            {fd.group && (
+                              <div>
+                                <p style={{ color: '#6B6B6B' }}>Group</p>
+                                <p className="font-semibold" style={{ color: '#1A1A1A' }}>
+                                  {fd.group === 'A' ? 'A (Monetary Award)' : 'B (No Monetary Award)'}
+                                </p>
+                              </div>
+                            )}
+                            {fd.category && (
+                              <div>
+                                <p style={{ color: '#6B6B6B' }}>Category</p>
+                                <p className="font-semibold" style={{ color: '#1A1A1A' }}>
+                                  {fd.category === '1' ? 'Category 1 (Year 1-2)' : 'Category 2 (Year 3-5)'}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Members from form_data */}
+                          {members.length > 0 && (
+                            <div
+                              className="pt-3 border-t"
+                              style={{ borderColor: '#EDEBDF' }}
+                            >
+                              <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: '#6B6B6B' }}>
+                                Team Members
+                              </p>
+                              <div className="flex flex-col gap-1.5">
+                                {members.map((member, idx) => (
+                                  <div
+                                    key={idx}
+                                    className="rounded-md px-3 py-2"
+                                    style={{ backgroundColor: '#F8F7F2' }}
+                                  >
+                                    <p className="text-sm font-semibold" style={{ color: '#1A1A1A' }}>
+                                      {member.name}
+                                    </p>
+                                    {member.institute && (
+                                      <p className="text-xs" style={{ color: '#6B6B6B' }}>
+                                        {member.institute}
+                                      </p>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
