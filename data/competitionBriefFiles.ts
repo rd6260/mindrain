@@ -54,12 +54,12 @@ const COMPETITIONS: Record<string, CompetitionData> = {
   },
 
   // The Architecture of Play
-  'b2e94f01-3c7a-4d8e-a512-9f6d2b1c0e47': {
+  '1389f7d3-e98a-40dd-819a-5b756e3c2ada': {
     meta: {
       title: 'The Architecture of Play',
-      subtitle: 'A Design Competition for Young Minds',
+      subtitle: 'A Kindergarten Design Challenge',
       category: 'Architecture Competition',
-      edition: 'Edition 01',
+      edition: 'Edition 07',
       registrationUrl: 'https://www.mindrain.org/competition/the-architecture-of-play',
     },
     briefFiles: [
@@ -72,6 +72,11 @@ const COMPETITIONS: Record<string, CompetitionData> = {
         name: 'Terms & Conditions',
         description: 'Important rules and regulations',
         url: 'https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/architecture_of_play/T&C%20(Important).pdf',
+      },
+      {
+        name: 'Complete Brief',
+        description: 'Full competition brief document',
+        url: 'https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/architecture_of_play/The%20Architecture%20of%20Play%20(Complete%20brief).pdf',
       },
       {
         name: 'Printable Brief',
