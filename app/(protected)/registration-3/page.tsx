@@ -123,7 +123,7 @@ function RegistrationContent() {
   const [category, setCategory] = useState<'1' | '2' | ''>('');
   const [teamType, setTeamType] = useState<'solo' | 'group' | ''>('');
   const [members, setMembers] = useState<MemberData[]>([]);
-  const [referralCode, setReferralCode] = useState('');
+
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -318,9 +318,7 @@ function RegistrationContent() {
         team_type: teamType,
         members: processedMembers,
       };
-      if (referralCode.trim()) {
-        form_data.referral_code = referralCode.trim();
-      }
+
 
       // Submit via v3 API
       const res = await fetch('/api/v3/register', {
@@ -554,13 +552,6 @@ function RegistrationContent() {
               </div>
             </>
           )}
-
-          {/* Referral Code */}
-          <div>
-            <SectionHeading>Referral Code (Optional)</SectionHeading>
-            <FloatingInput label="Enter referral code" value={referralCode}
-              onChange={e => setReferralCode(e.target.value)} disabled={isLoading || isPaid} />
-          </div>
 
           <div className="border-t border-[#E5E3D7]" />
 

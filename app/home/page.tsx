@@ -271,7 +271,7 @@ export default function HomePage() {
           <LiveCompetitionCard
             title="THE ARCHITECTURE OF PLAY"
             subtitle="A Design Competition for Young Minds"
-            imageSrc="/the-architecture-of-play/ratio-3-4.webp"
+            imageSrc="/the-architecture-of-play/ratio-3-4.png"
             imageAlt="The Architecture of Play"
             prizeLabel={<>Total Prize Pool <span className="font-bold text-sm">₹50,000</span></>}
             details={[

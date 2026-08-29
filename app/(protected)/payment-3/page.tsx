@@ -65,11 +65,16 @@ function PaymentContent() {
   const [alreadyPaid, setAlreadyPaid] = useState(false);
 
   // Coupon state
-  const [hasCoupon, setHasCoupon] = useState(false);
   const [couponCode, setCouponCode] = useState('');
   const [couponApplied, setCouponApplied] = useState(false);
   const [couponError, setCouponError] = useState<string | null>(null);
   const [discountedFee, setDiscountedFee] = useState<FeeCalculation | null>(null);
+  const [referralId, setReferralId] = useState<string | null>(null);
+  const [showCouponPopup, setShowCouponPopup] = useState(false);
+  const [couponPopupMessage, setCouponPopupMessage] = useState('');
+  const [couponPopupTitle, setCouponPopupTitle] = useState('');
+  const [discountPercent, setDiscountPercent] = useState<number | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
 
   const supabase = createClient();
 
@@ -117,29 +122,121 @@ function PaymentContent() {
     setTimeout(() => burst(0.9), 100);
   };
 
-  const applyCoupon = () => {
+  const applyCoupon = async () => {
     setCouponError(null);
     const code = couponCode.trim().toUpperCase();
-    const coupon = VALID_COUPONS[code];
+    if (!code) return;
+
+    setIsVerifying(true);
     const now = new Date();
 
-    if (!coupon) {
-      setCouponError('Invalid coupon code.');
-      setCouponApplied(false);
-      setDiscountedFee(null);
+    // 1. Check tier-override coupons first (MR-EARLY etc)
+    const coupon = VALID_COUPONS[code];
+    if (coupon) {
+      if (now < coupon.from || now > coupon.to) {
+        setCouponError('This coupon is not valid at this time.');
+        setCouponApplied(false);
+        setDiscountedFee(null);
+        setIsVerifying(false);
+        return;
+      }
+      if (!registration) {
+        setIsVerifying(false);
+        return;
+      }
+      const newFee = calculateFee(registration.form_data.country, registration.form_data.group, registration.form_data.team_type, coupon.tierOverride);
+      setDiscountedFee(newFee);
+      setCouponApplied(true);
+      setDiscountPercent(null);
+      setReferralId(null);
+      setCouponPopupTitle('Code Applied!');
+      setCouponPopupMessage(`${coupon.label}`);
+      setShowCouponPopup(true);
+      fireConfetti();
+      setTimeout(() => setShowCouponPopup(false), 2500);
+      setIsVerifying(false);
       return;
     }
-    if (now < coupon.from || now > coupon.to) {
-      setCouponError('This coupon is not valid at this time.');
-      setCouponApplied(false);
-      setDiscountedFee(null);
+
+    // 2. Check MINDRAIN20 (only valid during Early Bird Registration)
+    if (code === 'MINDRAIN20' && registration) {
+      if (getCurrentTier() !== 'Early Bird Registration') {
+        setCouponError('This coupon is only valid during the Early Bird Registration period.');
+        setCouponApplied(false);
+        setDiscountedFee(null);
+        setIsVerifying(false);
+        return;
+      }
+      try {
+        const { data: v1Reg } = await supabase
+          .from('registrations')
+          .select('id')
+          .eq('registration_by', registration.registration_by)
+          .eq('paid', true)
+          .limit(1)
+          .maybeSingle();
+
+        const { data: v2Reg } = await supabase
+          .from('registrations_2')
+          .select('id')
+          .eq('registration_by', registration.registration_by)
+          .eq('paid', true)
+          .limit(1)
+          .maybeSingle();
+
+        const hasExisting = v1Reg || v2Reg;
+        const discountPct = hasExisting ? 20 : 10;
+        if (feeDetails) {
+          const discountedAmount = Math.round(feeDetails.amount * (1 - discountPct / 100));
+          setDiscountedFee({ ...feeDetails, amount: discountedAmount });
+        }
+        setDiscountPercent(discountPct);
+        setCouponApplied(true);
+        setReferralId(null);
+
+        setCouponPopupTitle('Code Applied!');
+        setCouponPopupMessage(`MINDRAIN20 verified! You get ${discountPct}% off${hasExisting ? ' as a returning participant' : ' as a new participant'}.`);
+        setShowCouponPopup(true);
+        fireConfetti();
+        setTimeout(() => setShowCouponPopup(false), 2500);
+      } catch (err) {
+        setCouponError('Error verifying coupon.');
+      }
+      setIsVerifying(false);
       return;
     }
-    if (!registration) return;
-    const newFee = calculateFee(registration.form_data.country, registration.form_data.group, registration.form_data.team_type, coupon.tierOverride);
-    setDiscountedFee(newFee);
-    setCouponApplied(true);
-    fireConfetti();
+
+    // 3. Check referral codes
+    try {
+      const { data: referral } = await supabase
+        .from('referral_account')
+        .select('id')
+        .eq('code', code)
+        .eq('status', 'active')
+        .maybeSingle();
+
+      if (referral) {
+        setReferralId(referral.id);
+        setCouponApplied(true);
+        setDiscountedFee(null);
+        setDiscountPercent(null);
+        setCouponPopupTitle('Referral Applied!');
+        setCouponPopupMessage('Referral code verified successfully.');
+        setShowCouponPopup(true);
+        fireConfetti();
+        setTimeout(() => setShowCouponPopup(false), 2500);
+        setIsVerifying(false);
+        return;
+      }
+    } catch (err) {
+      console.error(err);
+    }
+
+    // 4. Nothing matched
+    setCouponError('Invalid coupon or referral code.');
+    setCouponApplied(false);
+    setDiscountedFee(null);
+    setIsVerifying(false);
   };
 
   const removeCoupon = () => {
@@ -147,6 +244,8 @@ function PaymentContent() {
     setCouponCode('');
     setCouponError(null);
     setDiscountedFee(null);
+    setDiscountPercent(null);
+    setReferralId(null);
   };
 
   useEffect(() => {
@@ -196,6 +295,8 @@ function PaymentContent() {
           amount: effectiveFee.amount * 100, // Pass in paisa/cents
           currency: effectiveFee.currency,
           registration_id: registrationId,
+          ...(referralId && { referral_id: referralId }),
+          ...(couponApplied && couponCode && !referralId && { coupon_code: couponCode }),
         }),
       });
       const data = await res.json();
@@ -377,11 +478,19 @@ function PaymentContent() {
                   value={registration.form_data.group === 'A' ? 'Group A — Monetary Award' : 'Group B — No Monetary Award'}
                   highlight
                 />
-                {couponApplied && discountedFee && discountedFee.amount !== feeDetails.amount && (
+                {couponApplied && discountedFee && discountedFee.amount !== feeDetails.amount && discountPercent && (
                   <SummaryRow
-                    label="Original Amount"
-                    value={`${currencySymbol}${feeDetails.amount.toLocaleString()}`}
+                    label="Discount"
+                    value={`${discountPercent}% off (-${currencySymbol}${(feeDetails.amount - discountedFee.amount).toLocaleString()})`}
                   />
+                )}
+                {couponApplied && discountedFee && discountedFee.amount !== feeDetails.amount && (
+                  <div className="flex items-center justify-between py-3 border-b border-[#E5E3D7] last:border-0">
+                    <span className="text-sm text-[#6B6B6B] font-medium">Original Amount</span>
+                    <span className="text-sm text-[#8B8B8B] line-through">
+                      {currencySymbol}{feeDetails.amount.toLocaleString()}
+                    </span>
+                  </div>
                 )}
                 <SummaryRow
                   label="Total Amount"
@@ -402,79 +511,79 @@ function PaymentContent() {
 
               {/* Coupon section */}
               <div>
-                <label className="flex items-center gap-3 cursor-pointer select-none group">
-                  <div className="relative">
+                <SectionHeading>Coupon/Referral Code (Optional)</SectionHeading>
+
+                <div className="mt-3 space-y-2">
+                  <div className="flex gap-2">
                     <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={hasCoupon}
-                      onChange={(e) => {
-                        setHasCoupon(e.target.checked);
-                        if (!e.target.checked) removeCoupon();
-                      }}
+                      type="text"
+                      value={couponCode}
+                      onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(null); if (couponApplied) removeCoupon(); }}
+                      placeholder="Enter coupon or referral code"
+                      disabled={couponApplied || isVerifying}
+                      className="flex-1 px-4 py-2.5 rounded-xl border border-[#D0CEC2] bg-white text-sm font-mono font-semibold text-[#1A1A1A] outline-none focus:border-[#2C5F5F] focus:ring-2 focus:ring-[#2C5F5F]/10 transition-all disabled:opacity-60 disabled:cursor-not-allowed tracking-widest placeholder:tracking-normal placeholder:font-normal"
                     />
-                    <div className="w-5 h-5 rounded-md border-2 border-[#D0CEC2] bg-white peer-checked:bg-[#2C5F5F] peer-checked:border-[#2C5F5F] transition-all duration-200 flex items-center justify-center">
-                      {hasCoupon && (
-                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
-                    </div>
+                    {couponApplied ? (
+                      <button
+                        type="button"
+                        onClick={removeCoupon}
+                        className="px-4 py-2.5 rounded-xl bg-[#C85D3E]/10 border border-[#C85D3E]/30 text-[#C85D3E] text-sm font-bold hover:bg-[#C85D3E]/20 transition-colors"
+                      >
+                        Remove
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={applyCoupon}
+                        disabled={!couponCode.trim() || isVerifying}
+                        className="px-4 py-2.5 w-24 rounded-xl bg-[#2C5F5F] text-white text-sm font-bold hover:bg-[#1A4D4D] transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center"
+                      >
+                        {isVerifying ? (
+                          <span className="w-4 h-4 border-2 border-white/50 border-t-white rounded-full animate-spin" />
+                        ) : 'Apply'}
+                      </button>
+                    )}
                   </div>
-                  <span className="text-sm font-semibold text-[#4B4B4B] group-hover:text-[#2C5F5F] transition-colors">
-                    I have a coupon
-                  </span>
-                </label>
 
-                {hasCoupon && (
-                  <div className="mt-3 space-y-2">
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={couponCode}
-                        onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(null); if (couponApplied) removeCoupon(); }}
-                        placeholder="Enter coupon code"
-                        disabled={couponApplied}
-                        className="flex-1 px-4 py-2.5 rounded-xl border border-[#D0CEC2] bg-white text-sm font-mono font-semibold text-[#1A1A1A] outline-none focus:border-[#2C5F5F] focus:ring-2 focus:ring-[#2C5F5F]/10 transition-all disabled:opacity-60 disabled:cursor-not-allowed tracking-widest placeholder:tracking-normal placeholder:font-normal"
-                      />
-                      {couponApplied ? (
-                        <button
-                          type="button"
-                          onClick={removeCoupon}
-                          className="px-4 py-2.5 rounded-xl bg-[#C85D3E]/10 border border-[#C85D3E]/30 text-[#C85D3E] text-sm font-bold hover:bg-[#C85D3E]/20 transition-colors"
-                        >
-                          Remove
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={applyCoupon}
-                          disabled={!couponCode.trim()}
-                          className="px-4 py-2.5 rounded-xl bg-[#2C5F5F] text-white text-sm font-bold hover:bg-[#1A4D4D] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                        >
-                          Apply
-                        </button>
-                      )}
-                    </div>
+                  {couponError && (
+                    <p className="text-xs text-[#C85D3E] font-semibold flex items-center gap-1.5">
+                      <span>⚠</span> {couponError}
+                    </p>
+                  )}
 
-                    {couponError && (
-                      <p className="text-xs text-[#C85D3E] font-semibold flex items-center gap-1.5">
-                        <span>⚠</span> {couponError}
+                  {couponApplied && discountedFee && !discountPercent && (
+                    <div className="flex items-center gap-2 p-3 bg-[#2D5F4F]/10 border border-[#2D5F4F]/25 rounded-xl">
+                      <svg className="w-4 h-4 text-[#2D5F4F] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <p className="text-xs font-semibold text-[#2D5F4F]">
+                        Coupon applied — Early Bird price ({currencySymbol}{discountedFee.amount.toLocaleString()}) will be charged.
                       </p>
-                    )}
+                    </div>
+                  )}
 
-                    {couponApplied && discountedFee && (
-                      <div className="flex items-center gap-2 p-3 bg-[#2D5F4F]/10 border border-[#2D5F4F]/25 rounded-xl">
-                        <svg className="w-4 h-4 text-[#2D5F4F] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                        </svg>
-                        <p className="text-xs font-semibold text-[#2D5F4F]">
-                          Coupon applied — Early Bird price ({currencySymbol}{discountedFee.amount.toLocaleString()}) will be charged.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )}
+                  {couponApplied && discountedFee && discountPercent && (
+                    <div className="flex items-center gap-2 p-3 bg-[#2D5F4F]/10 border border-[#2D5F4F]/25 rounded-xl">
+                      <svg className="w-4 h-4 text-[#2D5F4F] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <p className="text-xs font-semibold text-[#2D5F4F]">
+                        Code applied — {discountPercent === 20 ? 'Returning participant — 20% off' : 'New participant — 10% off'}.
+                      </p>
+                    </div>
+                  )}
+
+                  {couponApplied && referralId && (
+                    <div className="flex items-center gap-2 p-3 bg-[#2D5F4F]/10 border border-[#2D5F4F]/25 rounded-xl">
+                      <svg className="w-4 h-4 text-[#2D5F4F] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <p className="text-xs font-semibold text-[#2D5F4F]">
+                        Referral applied — verified successfully.
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="border-t border-[#E5E3D7]" />
@@ -507,6 +616,34 @@ function PaymentContent() {
           )}
         </div>
       </div>
+
+      {/* Coupon Success Popup Modal */}
+      {showCouponPopup && (
+        <div className="fixed inset-0 bg-[#1A1A1A]/40 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
+          <div
+            className="bg-[#F8F7F2] rounded-2xl border border-[#D0CEC2] w-full max-w-sm p-8 text-center shadow-2xl"
+            style={{
+              animation: 'couponPopupIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            }}
+          >
+            <style>{`
+              @keyframes couponPopupIn {
+                0% { opacity: 0; transform: scale(0.85) translateY(10px); }
+                100% { opacity: 1; transform: scale(1) translateY(0); }
+              }
+            `}</style>
+            <div className="w-14 h-14 bg-[#2D5F4F] rounded-full flex items-center justify-center mx-auto mb-5">
+              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">{couponPopupTitle}</h3>
+            <p className="text-sm text-[#6B6B6B] leading-relaxed">
+              {couponPopupMessage}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Success dialog */}
       {showSuccessDialog && (
