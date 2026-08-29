@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Script from 'next/script';
+import confetti from 'canvas-confetti';
 
 interface RegistrationData {
   id: string;
@@ -56,6 +57,18 @@ function PaymentContent() {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [alreadyPaid, setAlreadyPaid] = useState(false);
 
+  // Coupon state
+  const [couponCode, setCouponCode] = useState('');
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const [discountedFee, setDiscountedFee] = useState<FeeCalculation | null>(null);
+  const [referralId, setReferralId] = useState<string | null>(null);
+  const [showCouponPopup, setShowCouponPopup] = useState(false);
+  const [couponPopupMessage, setCouponPopupMessage] = useState('');
+  const [couponPopupTitle, setCouponPopupTitle] = useState('');
+  const [discountPercent, setDiscountPercent] = useState<number | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
+
   const supabase = createClient();
 
   // Fee structure for Thesis Award (registrations_2)
@@ -83,6 +96,99 @@ function PaymentContent() {
 
     const amount = tier[awardGroup];
     return { amount, currency: 'INR', registrationType, mindrain_fee: amount };
+  };
+
+  const fireConfetti = () => {
+    const burst = (originX: number) =>
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { x: originX, y: 1 },
+        angle: originX < 0.5 ? 60 : 120,
+        colors: ['#2C5F5F', '#2D5F4F', '#4CAF88', '#F8F7F2', '#D4AF37'],
+        startVelocity: 45,
+        gravity: 0.8,
+        ticks: 200,
+      });
+    burst(0.1);
+    setTimeout(() => burst(0.9), 100);
+  };
+
+  const applyCoupon = async () => {
+    setCouponError(null);
+    const code = couponCode.trim().toUpperCase();
+    if (!code) return;
+
+    setIsVerifying(true);
+
+    // 1. Check MINDRAIN20 (valid until registration ends — Sept 1, 2026)
+    if (code === 'MINDRAIN20') {
+      const now = new Date();
+      if (now > new Date('2026-09-01T23:59:59')) {
+        setCouponError('This coupon has expired.');
+        setCouponApplied(false);
+        setDiscountedFee(null);
+        setIsVerifying(false);
+        return;
+      }
+      if (feeDetails) {
+        const discountPct = 20;
+        const discountedAmount = Math.round(feeDetails.amount * (1 - discountPct / 100));
+        setDiscountedFee({ ...feeDetails, amount: discountedAmount });
+        setDiscountPercent(discountPct);
+        setCouponApplied(true);
+        setReferralId(null);
+
+        setCouponPopupTitle('Code Applied!');
+        setCouponPopupMessage(`MINDRAIN20 verified! You get ${discountPct}% off.`);
+        setShowCouponPopup(true);
+        fireConfetti();
+        setTimeout(() => setShowCouponPopup(false), 2500);
+      }
+      setIsVerifying(false);
+      return;
+    }
+
+    // 2. Check referral codes
+    try {
+      const { data: referral } = await supabase
+        .from('referral_account')
+        .select('id')
+        .eq('code', code)
+        .eq('status', 'active')
+        .maybeSingle();
+
+      if (referral) {
+        setReferralId(referral.id);
+        setCouponApplied(true);
+        setDiscountedFee(null);
+        setDiscountPercent(null);
+        setCouponPopupTitle('Referral Applied!');
+        setCouponPopupMessage('Referral code verified successfully.');
+        setShowCouponPopup(true);
+        fireConfetti();
+        setTimeout(() => setShowCouponPopup(false), 2500);
+        setIsVerifying(false);
+        return;
+      }
+    } catch (err) {
+      console.error(err);
+    }
+
+    // 3. Nothing matched
+    setCouponError('Invalid coupon or referral code.');
+    setCouponApplied(false);
+    setDiscountedFee(null);
+    setIsVerifying(false);
+  };
+
+  const removeCoupon = () => {
+    setCouponApplied(false);
+    setCouponCode('');
+    setCouponError(null);
+    setDiscountedFee(null);
+    setDiscountPercent(null);
+    setReferralId(null);
   };
 
   useEffect(() => {
@@ -124,13 +230,16 @@ function PaymentContent() {
     setIsProcessing(true);
     setError(null);
     try {
+      const effectiveFee = couponApplied && discountedFee ? discountedFee : feeDetails;
       const res = await fetch('/api/createOrder2', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: feeDetails.amount * 100,
-          currency: feeDetails.currency,
+          amount: effectiveFee.amount * 100,
+          currency: effectiveFee.currency,
           registration_id: registrationId,
+          ...(referralId && { referral_id: referralId }),
+          ...(couponApplied && couponCode && !referralId && { coupon_code: couponCode }),
         }),
       });
       const data = await res.json();
@@ -139,10 +248,10 @@ function PaymentContent() {
       const paymentData = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         order_id: data.razorpay_order_id,
-        amount: feeDetails.amount * 100,
-        currency: feeDetails.currency,
+        amount: effectiveFee.amount * 100,
+        currency: effectiveFee.currency,
         name: 'MindRain Thesis Award Registration',
-        description: `${feeDetails.registrationType} Registration`,
+        description: `${effectiveFee.registrationType} Registration`,
         handler: async function (response: any) {
           try {
             const verifyRes = await fetch('/api/verifyOrder2', {
@@ -290,9 +399,23 @@ function PaymentContent() {
                   value={registration.group === 'A' ? 'Group A — Monetary Award' : 'Group B — No Monetary Award'}
                   highlight
                 />
+                {couponApplied && discountedFee && discountedFee.amount !== feeDetails.amount && discountPercent && (
+                  <SummaryRow
+                    label="Discount"
+                    value={`${discountPercent}% off (-₹${(feeDetails.amount - discountedFee.amount).toLocaleString('en-IN')})`}
+                  />
+                )}
+                {couponApplied && discountedFee && discountedFee.amount !== feeDetails.amount && (
+                  <div className="flex items-center justify-between py-3 border-b border-[#E5E3D7] last:border-0">
+                    <span className="text-sm text-[#6B6B6B] font-medium">Original Amount</span>
+                    <span className="text-sm text-[#8B8B8B] line-through">
+                      ₹{feeDetails.amount.toLocaleString('en-IN')}
+                    </span>
+                  </div>
+                )}
                 <SummaryRow
                   label="Total Amount"
-                  value={`₹${feeDetails.amount.toLocaleString('en-IN')}`}
+                  value={`₹${(couponApplied && discountedFee ? discountedFee.amount : feeDetails.amount).toLocaleString('en-IN')}`}
                 />
               </div>
 
@@ -305,6 +428,72 @@ function PaymentContent() {
                   You're registering under the <strong className="text-[#2C5F5F]">{feeDetails.registrationType}</strong> period.
                   The registration fee is <strong>non-refundable</strong> once payment is complete.
                 </p>
+              </div>
+
+              {/* Coupon/Referral section */}
+              <div>
+                <SectionHeading>Coupon/Referral Code (Optional)</SectionHeading>
+
+                <div className="mt-3 space-y-2">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={couponCode}
+                      onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(null); if (couponApplied) removeCoupon(); }}
+                      placeholder="Enter coupon or referral code"
+                      disabled={couponApplied || isVerifying}
+                      className="flex-1 px-4 py-2.5 rounded-xl border border-[#D0CEC2] bg-white text-sm font-mono font-semibold text-[#1A1A1A] outline-none focus:border-[#2C5F5F] focus:ring-2 focus:ring-[#2C5F5F]/10 transition-all disabled:opacity-60 disabled:cursor-not-allowed tracking-widest placeholder:tracking-normal placeholder:font-normal"
+                    />
+                    {couponApplied ? (
+                      <button
+                        type="button"
+                        onClick={removeCoupon}
+                        className="px-4 py-2.5 rounded-xl bg-[#C85D3E]/10 border border-[#C85D3E]/30 text-[#C85D3E] text-sm font-bold hover:bg-[#C85D3E]/20 transition-colors"
+                      >
+                        Remove
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={applyCoupon}
+                        disabled={!couponCode.trim() || isVerifying}
+                        className="px-4 py-2.5 w-24 rounded-xl bg-[#2C5F5F] text-white text-sm font-bold hover:bg-[#1A4D4D] transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center"
+                      >
+                        {isVerifying ? (
+                          <span className="w-4 h-4 border-2 border-white/50 border-t-white rounded-full animate-spin" />
+                        ) : 'Apply'}
+                      </button>
+                    )}
+                  </div>
+
+                  {couponError && (
+                    <p className="text-xs text-[#C85D3E] font-semibold flex items-center gap-1.5">
+                      <span>⚠</span> {couponError}
+                    </p>
+                  )}
+
+                  {couponApplied && discountedFee && discountPercent && (
+                    <div className="flex items-center gap-2 p-3 bg-[#2D5F4F]/10 border border-[#2D5F4F]/25 rounded-xl">
+                      <svg className="w-4 h-4 text-[#2D5F4F] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <p className="text-xs font-semibold text-[#2D5F4F]">
+                        Code applied — {discountPercent}% off.
+                      </p>
+                    </div>
+                  )}
+
+                  {couponApplied && referralId && (
+                    <div className="flex items-center gap-2 p-3 bg-[#2D5F4F]/10 border border-[#2D5F4F]/25 rounded-xl">
+                      <svg className="w-4 h-4 text-[#2D5F4F] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <p className="text-xs font-semibold text-[#2D5F4F]">
+                        Referral applied — verified successfully.
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="border-t border-[#E5E3D7]" />
@@ -326,7 +515,7 @@ function PaymentContent() {
                       <span className="w-4 h-4 border-2 border-[#8B8B8B] border-t-transparent rounded-full animate-spin" />
                       Processing...
                     </span>
-                  : `Pay ₹${feeDetails.amount.toLocaleString('en-IN')} →`
+                  : `Pay ₹${(couponApplied && discountedFee ? discountedFee.amount : feeDetails.amount).toLocaleString('en-IN')} →`
                 }
               </button>
 
@@ -337,6 +526,34 @@ function PaymentContent() {
           )}
         </div>
       </div>
+
+      {/* Coupon Success Popup Modal */}
+      {showCouponPopup && (
+        <div className="fixed inset-0 bg-[#1A1A1A]/40 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
+          <div
+            className="bg-[#F8F7F2] rounded-2xl border border-[#D0CEC2] w-full max-w-sm p-8 text-center shadow-2xl"
+            style={{
+              animation: 'couponPopupIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            }}
+          >
+            <style>{`
+              @keyframes couponPopupIn {
+                0% { opacity: 0; transform: scale(0.85) translateY(10px); }
+                100% { opacity: 1; transform: scale(1) translateY(0); }
+              }
+            `}</style>
+            <div className="w-14 h-14 bg-[#2D5F4F] rounded-full flex items-center justify-center mx-auto mb-5">
+              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">{couponPopupTitle}</h3>
+            <p className="text-sm text-[#6B6B6B] leading-relaxed">
+              {couponPopupMessage}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Success dialog */}
       {showSuccessDialog && (
