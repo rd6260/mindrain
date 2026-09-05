@@ -6,7 +6,7 @@ import Footer from '@/app/components/Footer';
 import Timeline from '@/app/components/Timeline';
 import Navigation from '@/app/components/Navigation';
 import BriefModal from '@/app/components/BriefModal';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import localFont from 'next/font/local';
 import { getCompetitionMeta } from '@/data/competitionBriefFiles';
 import {
@@ -88,6 +88,116 @@ function RegistrationComingSoonPopup({ onClose }: { onClose: () => void }) {
         >
           support@mindrain.org
         </a>
+      </div>
+    </div>
+  );
+}
+
+// ─── Promo Discount Popup ─────────────────────────────────────────────────────
+
+function PromoPopup({ onClose }: { onClose: () => void }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText('MINDRAIN20');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+      style={{ backgroundColor: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)' }}
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-md rounded-2xl shadow-2xl overflow-hidden"
+        style={{
+          animation: 'promoSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <style>{`
+          @keyframes promoSlideUp {
+            0% { opacity: 0; transform: translateY(24px) scale(0.96); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+          }
+          @keyframes promoShine {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+          }
+        `}</style>
+
+        {/* Accent header strip */}
+        <div
+          className="px-6 py-5 text-center"
+          style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})` }}
+        >
+          <span className="text-xs font-bold uppercase tracking-[0.25em] text-white/70">Limited Time Offer</span>
+          <h2 className="text-2xl font-black text-white mt-1 tracking-tight">Student Discount</h2>
+        </div>
+
+        {/* Body */}
+        <div className="bg-[#FAFAF7] px-6 pt-6 pb-5">
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full text-white/60 hover:text-white hover:bg-white/20 transition-all"
+            aria-label="Close"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M2 2l12 12M14 2L2 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </button>
+
+          {/* Discount rows */}
+          <div className="space-y-3 mb-6">
+            <div className="flex items-center gap-4 p-4 rounded-xl border border-[#2C5F5F]/15 bg-[#2C5F5F]/5">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 font-black text-lg text-white" style={{ backgroundColor: colors.accent }}>
+                20%
+              </div>
+              <div>
+                <p className="text-sm font-bold text-[#1A1A1A]">Previously Participated Students</p>
+                <p className="text-xs text-[#6B6B6B] mt-0.5">Get 20% off on your registration</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 p-4 rounded-xl border border-[#D97757]/15 bg-[#D97757]/5">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 font-black text-lg text-white bg-[#D97757]">
+                10%
+              </div>
+              <div>
+                <p className="text-sm font-bold text-[#1A1A1A]">New Student Registrations</p>
+                <p className="text-xs text-[#6B6B6B] mt-0.5">Get 10% off on your first registration</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Promo code */}
+          <div className="mb-5">
+            <p className="text-xs font-bold uppercase tracking-widest text-[#6B6B6B] text-center mb-2">Use Promo Code</p>
+            <button
+              onClick={handleCopy}
+              className="w-full flex items-center justify-center gap-3 py-3.5 rounded-xl border-2 border-dashed border-[#2C5F5F]/30 bg-[#2C5F5F]/5 hover:bg-[#2C5F5F]/10 transition-all group"
+            >
+              <span className="font-mono text-xl font-black tracking-[0.3em] text-[#2C5F5F]">MINDRAIN20</span>
+              <span className="text-xs font-semibold text-[#2C5F5F]/60 group-hover:text-[#2C5F5F] transition-colors">
+                {copied ? '✓ Copied!' : 'Copy'}
+              </span>
+            </button>
+          </div>
+
+          {/* CTA */}
+          <button
+            onClick={onClose}
+            className="w-full py-3.5 rounded-xl text-white font-bold text-sm transition-all duration-200 hover:opacity-90 shadow-lg"
+            style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})` }}
+          >
+            Got it, let me register! →
+          </button>
+
+          <p className="text-[10px] text-[#8B8B8B] text-center mt-3">Apply the code during payment checkout</p>
+        </div>
       </div>
     </div>
   );
@@ -417,6 +527,19 @@ function RegistrationFees({ onRegisterClick }: { onRegisterClick: () => void }) 
 
 export default function CompetitionPage() {
   const [isBriefOpen, setIsBriefOpen] = useState(false);
+  const [isPromoOpen, setIsPromoOpen] = useState(false);
+
+  // Show promo popup once per session
+  useEffect(() => {
+    const key = 'aop_promo_seen';
+    if (!sessionStorage.getItem(key)) {
+      const timer = setTimeout(() => {
+        setIsPromoOpen(true);
+        sessionStorage.setItem(key, '1');
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const handleRegisterClick = () => {
     window.location.href = REGISTRATION_URL;
@@ -467,6 +590,10 @@ export default function CompetitionPage() {
         onClose={() => setIsBriefOpen(false)}
         eventId={REGISTRATION_EVENT_ID}
       />
+
+      {isPromoOpen && (
+        <PromoPopup onClose={() => setIsPromoOpen(false)} />
+      )}
     </>
   );
 }
