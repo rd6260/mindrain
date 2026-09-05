@@ -283,7 +283,7 @@ export default function HomePage() {
             findOutMoreHref="/competition/the-architecture-of-play"
             briefModalTitle="Download Brief"
             briefModalSubtitle="The Architecture of Play — select files to download"
-            eventId="b2e94f01-3c7a-4d8e-a512-9f6d2b1c0e47"
+            eventId="1389f7d3-e98a-40dd-819a-5b756e3c2ada"
           />
 
           <div className="h-6" />
