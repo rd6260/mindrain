@@ -6,6 +6,9 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Script from 'next/script';
 import confetti from 'canvas-confetti';
 
+/** Thesis Award 2026 competition ended on 01 September 2026 — block all payments. */
+const COMPETITION_CLOSED = true;
+
 interface RegistrationData {
   id: string;
   registration_by: string;
@@ -47,6 +50,32 @@ function SummaryRow({ label, value, highlight }: { label: string; value: string;
 function PaymentContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+
+  // ── Competition closed guard ──
+  if (COMPETITION_CLOSED) {
+    return (
+      <div className="min-h-screen bg-[#EDEBDF] flex items-center justify-center p-6">
+        <div className="w-full max-w-sm bg-[#F8F7F2] rounded-2xl border border-[#D0CEC2] p-8 text-center shadow-xl">
+          <div className="w-14 h-14 bg-[#D97757]/10 rounded-full flex items-center justify-center mx-auto mb-5">
+            <svg className="w-7 h-7 text-[#D97757]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v.01M12 9v3m9-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-bold text-[#1A1A1A] mb-2">Competition Closed</h2>
+          <p className="text-sm text-[#6B6B6B] mb-7 leading-relaxed">
+            Registration and payment for the Thesis Award 2026 have ended.
+            Results will be announced on 01 October 2026.
+          </p>
+          <button
+            onClick={() => router.push('/')}
+            className="w-full py-3.5 rounded-xl bg-[#2C5F5F] text-white text-sm font-bold hover:bg-[#1A4D4D] transition-colors shadow-lg shadow-[#2C5F5F]/20"
+          >
+            Go to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
   const registrationId = searchParams.get('registration_id');
 
   const [registration, setRegistration] = useState<RegistrationData | null>(null);

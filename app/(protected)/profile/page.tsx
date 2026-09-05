@@ -21,6 +21,9 @@ function getSubmissionLink(teamId: string): string | null {
 }
 
 
+/** Thesis Award 2026 competition ended on 01 September 2026 — block payments & submissions. */
+const THESIS_AWARD_CLOSED = true;
+
 // Types
 interface UserInfo {
   id: string;
@@ -322,7 +325,8 @@ const ProfilePage = () => {
     window.location.href = '/login';
   };
 
-  const hasPendingPayments = registrations.some(reg => !reg.paid) || registrations2.some(reg => !reg.paid) || registrations3.some(reg => !reg.paid);
+  // Exclude thesis-award (registrations_2) from the pending-payments check when the competition is closed
+  const hasPendingPayments = registrations.some(reg => !reg.paid) || (!THESIS_AWARD_CLOSED && registrations2.some(reg => !reg.paid)) || registrations3.some(reg => !reg.paid);
 
   const formatAcademicLevel = (level: string | null) => {
     if (level === 'UG') return 'Under Graduate';
@@ -662,7 +666,17 @@ const ProfilePage = () => {
                             </p>
                           </div>
                           <div className="flex flex-col items-end gap-2">
-                            {!registration.paid ? (
+                            {THESIS_AWARD_CLOSED ? (
+                              <span
+                                className="px-3 py-1.5 rounded-lg text-xs font-bold cursor-not-allowed"
+                                style={{
+                                  backgroundColor: '#D0CEC2',
+                                  color: '#8B8B8B',
+                                }}
+                              >
+                                Competition Closed
+                              </span>
+                            ) : !registration.paid ? (
                               <a
                                 href={`/payment-2?registration_id=${registration.id}`}
                                 className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:shadow-md"

@@ -25,6 +25,9 @@ const REGISTRATION_EVENT_ID = 'c4a201ae-8bfe-48bc-a526-4ac1288dd937';
 const meta = getCompetitionMeta(REGISTRATION_EVENT_ID)!;
 const REGISTRATION_URL = `/registration-form-2?event_id=${REGISTRATION_EVENT_ID}`;
 
+/** Competition ended on 01 September 2026 — block all registration & payment. */
+const COMPETITION_CLOSED = true;
+
 const SUBMISSION_LINKS: Record<string, string> = {
   TUH: 'https://forms.gle/ZcnqVNnbVNazzAW5A',
   MRTA2: 'https://forms.gle/gnjPH2TBZk8P1RYXA',
@@ -93,6 +96,30 @@ function getCurrentTier(): Tier {
   if (today <= new Date('2026-03-31')) return 'Early Bird Registration';
   if (today <= new Date('2026-06-30')) return 'Regular Registration';
   return 'Late Registration';
+}
+
+// ─── Closed Banner ────────────────────────────────────────────────────────────
+
+function ClosedBanner({ message = 'Registration for this competition is now closed.' }: { message?: string }) {
+  return (
+    <div className="flex items-center gap-3 px-5 py-4 rounded-xl border border-[#D97757]/20 bg-[#D97757]/5">
+      <svg className="w-5 h-5 flex-shrink-0 text-[#D97757]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v.01M12 9v3m9-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span className="text-sm font-medium text-[#D97757]">{message}</span>
+    </div>
+  );
+}
+
+function ClosedButton({ label = 'Registration Closed' }: { label?: string }) {
+  return (
+    <button
+      disabled
+      className="px-12 py-3.5 rounded-lg font-bold text-sm cursor-not-allowed opacity-50 bg-gray-300 text-gray-500 shadow-none"
+    >
+      {label}
+    </button>
+  );
 }
 
 // ─── Small Shared Components ──────────────────────────────────────────────────
@@ -204,6 +231,9 @@ function RegistrationFees({
   const amount = FEES[activeTier][group];
 
   const renderCTA = () => {
+    if (COMPETITION_CLOSED) {
+      return <ClosedButton />;
+    }
     if (userRegistration?.paid) {
       const link = getSubmissionLink(userRegistration.team_id);
       return (
@@ -243,6 +273,10 @@ function RegistrationFees({
 
   return (
     <div className="rounded-lg p-6 space-y-7" style={{ backgroundColor: colors.white }}>
+      {COMPETITION_CLOSED && (
+        <ClosedBanner message="Registration & submissions for the Thesis Award 2026 are now closed. Results will be announced on 01 October 2026." />
+      )}
+
       <div>
         <SectionHeading>Select Group</SectionHeading>
         <div className="flex gap-2">
@@ -304,7 +338,14 @@ export default function CompetitionPage() {
     });
   }, []);
 
-  const heroCTA = userRegistration?.paid ? (
+  const heroCTA = COMPETITION_CLOSED ? (
+    <button
+      disabled
+      className="w-full md:w-auto px-6 md:px-16 py-4 md:py-5 rounded-lg font-bold text-base md:text-xl cursor-not-allowed opacity-50 bg-gray-300 text-gray-500 shadow-none"
+    >
+      Registration Closed
+    </button>
+  ) : userRegistration?.paid ? (
     <a
       href={getSubmissionLink(userRegistration.team_id) || '#'}
       target="_blank"
@@ -519,14 +560,23 @@ export default function CompetitionPage() {
                 </ul>
               </div>
               <div className="text-center">
-                <a
-                  href="mailto:support@mindrain.org"
-                  className="inline-block px-8 py-3 rounded-lg text-white font-medium transition-all hover:opacity-90"
-                  style={{ backgroundColor: colors.accent }}
-                  data-testid="discount-email-link"
-                >
-                  Contact for Group Discounts
-                </a>
+                {COMPETITION_CLOSED ? (
+                  <button
+                    disabled
+                    className="inline-block px-8 py-3 rounded-lg font-medium cursor-not-allowed opacity-50 bg-gray-300 text-gray-500"
+                  >
+                    Registration Closed
+                  </button>
+                ) : (
+                  <a
+                    href="mailto:support@mindrain.org"
+                    className="inline-block px-8 py-3 rounded-lg text-white font-medium transition-all hover:opacity-90"
+                    style={{ backgroundColor: colors.accent }}
+                    data-testid="discount-email-link"
+                  >
+                    Contact for Group Discounts
+                  </a>
+                )}
               </div>
             </div>
           </div>
