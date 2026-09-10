@@ -6,60 +6,14 @@ interface WinnerCardProps {
   winner: NewWinner;
 }
 
-// Prize-specific theme colors
-function getPrizeTheme(position: string | undefined) {
-  if (!position) return null;
-  const pos = position.toLowerCase();
-
-  if (pos.includes('1st')) {
-    return {
-      borderColor: '#C9A84C',
-      glowColor: 'rgba(201, 168, 76, 0.35)',
-      badgeGradient: 'linear-gradient(135deg, #D4AF37, #F5D76E, #C9A84C)',
-      badgeText: '#3D2B00',
-      icon: '🥇',
-    };
-  }
-  if (pos.includes('2nd')) {
-    return {
-      borderColor: '#A8A8A8',
-      glowColor: 'rgba(168, 168, 168, 0.30)',
-      badgeGradient: 'linear-gradient(135deg, #B0B0B0, #E0E0E0, #A8A8A8)',
-      badgeText: '#2A2A2A',
-      icon: '🥈',
-    };
-  }
-  if (pos.includes('3rd')) {
-    return {
-      borderColor: '#B87333',
-      glowColor: 'rgba(184, 115, 51, 0.30)',
-      badgeGradient: 'linear-gradient(135deg, #B87333, #D4976A, #A0622E)',
-      badgeText: '#3D2200',
-      icon: '🥉',
-    };
-  }
-  return null;
-}
-
 export default function WinnerCard({ winner }: WinnerCardProps) {
   const displayMembers = winner.members || [];
   const projectImage = winner.entry?.big || '';
-  const prizeTheme = getPrizeTheme(winner.position);
-
-  const cardStyle: React.CSSProperties = {
-    backgroundColor: colors.white,
-    ...(prizeTheme
-      ? {
-          border: `2px solid ${prizeTheme.borderColor}`,
-          boxShadow: `0 4px 24px ${prizeTheme.glowColor}, 0 1px 4px rgba(0,0,0,0.06)`,
-        }
-      : {}),
-  };
 
   return (
     <div
-      className="rounded-2xl overflow-hidden shadow-lg hover-lift group flex flex-col h-full transition-shadow duration-300"
-      style={cardStyle}
+      className="rounded-2xl overflow-hidden shadow-lg hover-lift group flex flex-col h-full"
+      style={{ backgroundColor: colors.white }}
       data-testid="winner-card"
     >
       {/* Project Image */}
@@ -82,15 +36,12 @@ export default function WinnerCard({ winner }: WinnerCardProps) {
         {winner.position && (
           <div className="mb-4">
             <div
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold shadow-md"
+              className="inline-block px-4 py-2 rounded-full text-xs font-bold shadow-md"
               style={{
-                background: prizeTheme
-                  ? prizeTheme.badgeGradient
-                  : `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`,
-                color: prizeTheme ? prizeTheme.badgeText : colors.white,
+                background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`,
+                color: colors.white
               }}
             >
-              {prizeTheme && <span className="text-sm">{prizeTheme.icon}</span>}
               {winner.position}
             </div>
           </div>
@@ -104,10 +55,7 @@ export default function WinnerCard({ winner }: WinnerCardProps) {
                 <div
                   key={index}
                   className="relative w-12 h-12 rounded-full border border-solid shadow-md transition-transform hover:scale-110"
-                  style={{
-                    borderColor: prizeTheme ? prizeTheme.borderColor : colors.accent,
-                    borderWidth: '3px',
-                  }}
+                  style={{ borderColor: colors.accent, borderWidth: '3px' }}
                   title={member.name}
                 >
                   <Image
