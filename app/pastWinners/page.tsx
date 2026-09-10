@@ -5,10 +5,10 @@ import Navigation from '@/app/components/Navigation';
 import Footer from '@/app/components/Footer';
 import WinnerCard from '@/app/components/WinnerCard';
 import { colors } from '@/utils/colors';
-import { previousWinners2019, previousWinners2018, previousWinners2017 } from '@/data/winners';
+import { previousWinners2026, previousWinners2019, previousWinners2018, previousWinners2017 } from '@/data/winners';
 
 export default function PastWinnersPage() {
-  const allYearsData = [previousWinners2019, previousWinners2018, previousWinners2017];
+  const allYearsData = [previousWinners2026, previousWinners2019, previousWinners2018, previousWinners2017];
   const [selectedYear, setSelectedYear] = useState<string>(allYearsData[0].year);
 
   const selectedData = allYearsData.find((data) => data.year === selectedYear) || allYearsData[0];

@@ -33,6 +33,7 @@ export interface Competition {
 export interface Entry {
   big: string;
   small: string;
+  pdf?: string;
 }
 
 export interface Member {
