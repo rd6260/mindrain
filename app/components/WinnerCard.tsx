@@ -25,7 +25,7 @@ export default function WinnerCard({ winner }: WinnerCardProps) {
         {winner.entry?.pdf ? (
           <button 
             onClick={() => setIsPdfModalOpen(true)} 
-            className="block relative w-full aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden flex-shrink-0 cursor-pointer"
+            className="block relative w-full aspect-[5/4] bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden flex-shrink-0 cursor-pointer"
           >
             {projectImage && (
               <Image
@@ -40,7 +40,7 @@ export default function WinnerCard({ winner }: WinnerCardProps) {
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </button>
         ) : (
-          <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden flex-shrink-0">
+          <div className="relative w-full aspect-[5/4] bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden flex-shrink-0">
             {projectImage && (
               <Image
                 src={projectImage}
@@ -94,7 +94,7 @@ export default function WinnerCard({ winner }: WinnerCardProps) {
                   ) : null
                 ))}
               </div>
-              <h3 className="font-bold text-lg leading-tight" style={{ color: colors.textPrimary }}>
+              <h3 className="font-bold text-xl leading-tight" style={{ color: colors.textPrimary }}>
                 {displayMembers.map(m => m.name).filter(Boolean).join(', ')}
               </h3>
             </div>
@@ -109,12 +109,42 @@ export default function WinnerCard({ winner }: WinnerCardProps) {
           
           {winner.description && (
             <p
-              className="text-sm leading-relaxed text-balance mt-auto pt-2"
+              className="text-sm leading-relaxed text-balance pt-2 mb-6"
               style={{ color: colors.textSecondary }}
             >
               {winner.description}
             </p>
           )}
+
+          {/* Footer with Title and Button */}
+          <div className="mt-auto pt-4 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+            <div className="flex flex-col">
+              {/* Short two-toned bar */}
+              <div className="flex w-16 h-[2px] mb-3">
+                <div className="w-1/3 bg-gray-800"></div>
+                <div className="w-2/3 bg-gray-300"></div>
+              </div>
+              <span className="text-xs font-bold tracking-[0.2em] text-gray-400 uppercase mb-1">
+                Project Title
+              </span>
+              <span className="text-lg text-gray-900 tracking-wide uppercase font-semibold">
+                {winner.title || winner.description || 'UNTITLED'}
+              </span>
+            </div>
+            
+            {winner.entry?.pdf && (
+              <button
+                onClick={() => setIsPdfModalOpen(true)}
+                className="whitespace-nowrap px-4 py-2 rounded-lg text-white font-medium flex items-center gap-2 hover:bg-[#113333] transition-colors text-sm shadow-md"
+                style={{ backgroundColor: '#1A4D4D' }}
+              >
+                View Full Panel
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -125,7 +155,7 @@ export default function WinnerCard({ winner }: WinnerCardProps) {
             {/* Modal Header */}
             <div className="flex justify-between items-center p-4 border-b border-gray-200" style={{ backgroundColor: colors.background }}>
               <h3 className="font-bold text-lg truncate pr-4" style={{ color: colors.textPrimary }}>
-                {winner.institute} - {winner.position}
+                {winner.title || winner.description || winner.institute}
               </h3>
               <button
                 onClick={() => setIsPdfModalOpen(false)}

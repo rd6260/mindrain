@@ -45,6 +45,7 @@ export interface NewWinner {
   position: string;
   institute: string;
   description: string;
+  title?: string;
   entry: Entry;
   members: Member[];
 }

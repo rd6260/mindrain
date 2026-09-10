@@ -658,6 +658,7 @@ export const previousWinners2026: PastWinners = {
         {
           "position": "1st Prize",
           "institute": "GZSSAP MRSPTU BATHINDA",
+          "title": "The Amphibious Eco Pod",
           "description": "",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Category_1_Group_A_1_TUH-A-I-GRP-0017.png",
@@ -682,6 +683,7 @@ export const previousWinners2026: PastWinners = {
         {
           "position": "2nd Prize",
           "institute": "Measi academy of architecture",
+          "title": "Habitat 3024",
           "description": "",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Category_1_Group_A_2_TUH-A-I-GRP-0110.png",
@@ -706,6 +708,7 @@ export const previousWinners2026: PastWinners = {
         {
           "position": "3rd Prize",
           "institute": "Allana College Of Architecture",
+          "title": "The Dynamic Triangle",
           "description": "",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Category_1_Group_A_3_TUH-A-I-GRP-0118.png",
@@ -731,6 +734,7 @@ export const previousWinners2026: PastWinners = {
         {
           "position": "1st Prize",
           "institute": "SAID/SRM",
+          "title": "The unreal house",
           "description": "",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Category_1_Group_B_1_TUH-B-I-IND-0198.png",
@@ -747,6 +751,7 @@ export const previousWinners2026: PastWinners = {
         {
           "position": "2nd Prize",
           "institute": "Maulana Azad National Institute of Technology",
+          "title": "Aquatic Ray",
           "description": "",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Category_1_Group_B_2_TUH-B-I-GRP-0206.png",
@@ -776,6 +781,7 @@ export const previousWinners2026: PastWinners = {
         {
           "position": "1st Prize",
           "institute": "School of Planning and Architecture Bhopal",
+          "title": "Corallis - The Unreal Home",
           "description": "",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Category_2_Group_A_1_TUH-A-II-IND-0164.png",
@@ -792,6 +798,7 @@ export const previousWinners2026: PastWinners = {
         {
           "position": "2nd Prize",
           "institute": "School of Planning and Architecture Bhopal & Malviya National Institute of Technology, Jaipur",
+          "title": "CLOVE. a nomadic home for titan",
           "description": "",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Category_2_Group_A_2_TUH-A-II-GRP-0188.png",
@@ -816,6 +823,7 @@ export const previousWinners2026: PastWinners = {
         {
           "position": "3rd Prize",
           "institute": "gateway college of architecture and design",
+          "title": "The Martian house / the unreal house",
           "description": "",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Category_2_Group_A_3_TUH-A-II-GRP-0129.png",
@@ -844,7 +852,29 @@ export const previousWinners2026: PastWinners = {
       "winners": [
         {
           "position": "1st Prize",
+          "institute": "D Y Patil deemed to be university, Navi Mumbai & L S Raheja School of Architecture",
+          "title": "Aetherio",
+          "description": "",
+          "entry": {
+            "big": "/past-winners/entry/2026/thumb/Category_2_Group_B_3_TUH-B-II-GRP-0124.png",
+            "small": "/past-winners/entry/2026/thumb/Category_2_Group_B_3_TUH-B-II-GRP-0124.png",
+            "pdf": "/past-winners/entry/2026/pdf/Category_2_Group_B_3_TUH-B-II-GRP-0124.pdf"
+          },
+          "members": [
+            {
+              "name": "Dirba Yatin Parab",
+              "pfp": ""
+            },
+            {
+              "name": "Tanvi Apoorva Shah",
+              "pfp": ""
+            }
+          ]
+        },
+        {
+          "position": "2nd Prize",
           "institute": "SMEF'S BSOA, PUNE",
+          "title": "Mycelium house",
           "description": "",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Category_2_Group_B_1_TUH-B-II-IND-0202.png",
@@ -859,8 +889,9 @@ export const previousWinners2026: PastWinners = {
           ]
         },
         {
-          "position": "2nd Prize",
+          "position": "3rd Prize",
           "institute": "MEASI Academy of Architecture",
+          "title": "-",
           "description": "",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Category_2_Group_B_2_TUH-B-II-IND-0099.png",
@@ -870,26 +901,6 @@ export const previousWinners2026: PastWinners = {
           "members": [
             {
               "name": "Vijayalakshmi Sekar",
-              "pfp": ""
-            }
-          ]
-        },
-        {
-          "position": "3rd Prize",
-          "institute": "D Y Patil deemed to be university, Navi Mumbai & L S Raheja School of Architecture",
-          "description": "",
-          "entry": {
-            "big": "/past-winners/entry/2026/thumb/Category_2_Group_B_3_TUH-B-II-GRP-0124.png",
-            "small": "/past-winners/entry/2026/thumb/Category_2_Group_B_3_TUH-B-II-GRP-0124.png",
-            "pdf": "/past-winners/entry/2026/pdf/Category_2_Group_B_3_TUH-B-II-GRP-0124.pdf"
-          },
-          "members": [
-            {
-              "name": "Dirba Yatin Parab",
-              "pfp": ""
-            },
-            {
-              "name": "Tanvi Apoorva Shah",
               "pfp": ""
             }
           ]
