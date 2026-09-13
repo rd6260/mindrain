@@ -158,8 +158,15 @@ function PaymentContent() {
       return;
     }
 
-    // 2. Check MINDRAIN20 (only valid during Early Bird Registration)
+    // 2. Check MINDRAIN20 (only valid during Early Bird Registration, monetary option only)
     if (code === 'MINDRAIN20' && registration) {
+      if (registration.form_data.group !== 'A') {
+        setCouponError('This coupon is only valid for monetary award (Group A) registrations.');
+        setCouponApplied(false);
+        setDiscountedFee(null);
+        setIsVerifying(false);
+        return;
+      }
       if (getCurrentTier() !== 'Early Bird Registration') {
         setCouponError('This coupon is only valid during the Early Bird Registration period.');
         setCouponApplied(false);
