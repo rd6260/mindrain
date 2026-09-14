@@ -51,7 +51,7 @@ export const TIER_META: Record<Tier, { shortLabel: string; color: string; bg: st
     bg: 'bg-[#F8F7F2]',
     border: 'border-[#D0CEC2]',
     dot: 'bg-[#6B6B6B]',
-    endsOn: '14 December 2026',
+    endsOn: '15 December 2026',
   },
   'Last Minute Registration': {
     shortLabel: 'Last Minute',
