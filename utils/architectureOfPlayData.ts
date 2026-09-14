@@ -2,7 +2,7 @@ import { ImportantDate } from '@/types';
 
 export const IMPORTANT_DATES: ImportantDate[] = [
   { label: 'Early Bird Registration Starts', date: '10 August 2026' },
-  { label: 'Regular Registration Starts', date: '15 September 2026' },
+  { label: 'Regular Registration Starts', date: '16 September 2026' },
   { label: 'Last Minute Registration Starts', date: '15 December 2026' },
   { label: 'Last Minute Registration Ends', date: '5 January 2027' },
   { label: 'Final Submission', date: '20 January 2027' },
@@ -43,7 +43,7 @@ export const TIER_META: Record<Tier, { shortLabel: string; color: string; bg: st
     bg: 'bg-[#2D5F4F]/8',
     border: 'border-[#2D5F4F]/20',
     dot: 'bg-[#2D5F4F]',
-    endsOn: '14 September 2026',
+    endsOn: '15 September 2026',
   },
   'Regular Registration': {
     shortLabel: 'Regular',
@@ -64,8 +64,12 @@ export const TIER_META: Record<Tier, { shortLabel: string; color: string; bg: st
 };
 
 export function getCurrentTier(): Tier {
-  const today = new Date();
-  if (today <= new Date('2026-09-14')) return 'Early Bird Registration';
-  if (today <= new Date('2026-12-14')) return 'Regular Registration';
+  const now = new Date();
+  // Early Bird ends 15 Sept 11:59 PM IST → cutoff is 16 Sept 00:00:00 IST (UTC+5:30)
+  const earlyBirdEnd = new Date('2026-09-16T00:00:00+05:30');
+  // Regular ends 15 Dec 11:59 PM IST → cutoff is 16 Dec 00:00:00 IST
+  const regularEnd = new Date('2026-12-16T00:00:00+05:30');
+  if (now < earlyBirdEnd) return 'Early Bird Registration';
+  if (now < regularEnd) return 'Regular Registration';
   return 'Last Minute Registration';
 }

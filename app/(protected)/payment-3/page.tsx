@@ -99,8 +99,8 @@ function PaymentContent() {
 
   const VALID_COUPONS: Record<string, { from: Date; to: Date; tierOverride: Tier; label: string }> = {
     'MR-EARLY': {
-      from: new Date('2026-09-15T00:00:00'),
-      to: new Date('2026-09-17T23:59:59'),
+      from: new Date('2026-09-15T00:00:00+05:30'),
+      to: new Date('2026-09-17T23:59:59+05:30'),
       tierOverride: 'Early Bird Registration',
       label: 'Early Bird price applied',
     },
