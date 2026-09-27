@@ -25,8 +25,8 @@ const REGISTRATION_EVENT_ID = 'c4a201ae-8bfe-48bc-a526-4ac1288dd937';
 const meta = getCompetitionMeta(REGISTRATION_EVENT_ID)!;
 const REGISTRATION_URL = `/registration-form-2?event_id=${REGISTRATION_EVENT_ID}`;
 
-/** Competition ended on 01 September 2026 — block all registration & payment. */
-const COMPETITION_CLOSED = true;
+/** Competition closes after 27 September 2026 23:59 IST — block all registration & payment. */
+const isCompetitionClosed = () => new Date() > new Date('2026-09-27T23:59:59+05:30');
 
 const SUBMISSION_LINKS: Record<string, string> = {
   TUH: 'https://forms.gle/ZcnqVNnbVNazzAW5A',
@@ -48,8 +48,8 @@ const importantDates: ImportantDate[] = [
   { label: 'Regular Registration Ends', date: '30 June 2026' },
   { label: 'Late Registration Starts', date: '01 July 2026' },
   { label: 'Last date for questions & answers', date: '20 August 2026' },
-  { label: 'Late Registration Ends', date: '01 September 2026' },
-  { label: 'Final Submission Ends', date: '01 September 2026' },
+  { label: 'Late Registration Ends', date: '27 September 2026' },
+  { label: 'Final Submission Ends', date: '27 September 2026' },
   { label: 'Announcement of Result', date: '01 October 2026' },
 ];
 
@@ -87,7 +87,7 @@ const TIER_META: Record<Tier, { shortLabel: string; color: string; bg: string; b
     bg: 'bg-[#D97757]/8',
     border: 'border-[#D97757]/20',
     dot: 'bg-[#D97757]',
-    endsOn: '01 September 2026',
+    endsOn: '27 September 2026',
   },
 };
 
@@ -231,7 +231,7 @@ function RegistrationFees({
   const amount = FEES[activeTier][group];
 
   const renderCTA = () => {
-    if (COMPETITION_CLOSED) {
+    if (isCompetitionClosed()) {
       return <ClosedButton />;
     }
     if (userRegistration?.paid) {
@@ -273,7 +273,7 @@ function RegistrationFees({
 
   return (
     <div className="rounded-lg p-6 space-y-7" style={{ backgroundColor: colors.white }}>
-      {COMPETITION_CLOSED && (
+      {isCompetitionClosed() && (
         <ClosedBanner message="Registration & submissions for the Thesis Award 2026 are now closed. Results will be announced on 01 October 2026." />
       )}
 
@@ -338,7 +338,7 @@ export default function CompetitionPage() {
     });
   }, []);
 
-  const heroCTA = COMPETITION_CLOSED ? (
+  const heroCTA = isCompetitionClosed() ? (
     <button
       disabled
       className="w-full md:w-auto px-6 md:px-16 py-4 md:py-5 rounded-lg font-bold text-base md:text-xl cursor-not-allowed opacity-50 bg-gray-300 text-gray-500 shadow-none"
@@ -560,7 +560,7 @@ export default function CompetitionPage() {
                 </ul>
               </div>
               <div className="text-center">
-                {COMPETITION_CLOSED ? (
+                {isCompetitionClosed() ? (
                   <button
                     disabled
                     className="inline-block px-8 py-3 rounded-lg font-medium cursor-not-allowed opacity-50 bg-gray-300 text-gray-500"

@@ -6,8 +6,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Script from 'next/script';
 import confetti from 'canvas-confetti';
 
-/** Thesis Award 2026 competition ended on 01 September 2026 — block all payments. */
-const COMPETITION_CLOSED = true;
+/** Thesis Award 2026 competition closes after 27 September 2026 23:59 IST — block all payments. */
+const isCompetitionClosed = () => new Date() > new Date('2026-09-27T23:59:59+05:30');
 
 interface RegistrationData {
   id: string;
@@ -52,7 +52,7 @@ function PaymentContent() {
   const router = useRouter();
 
   // ── Competition closed guard ──
-  if (COMPETITION_CLOSED) {
+  if (isCompetitionClosed()) {
     return (
       <div className="min-h-screen bg-[#EDEBDF] flex items-center justify-center p-6">
         <div className="w-full max-w-sm bg-[#F8F7F2] rounded-2xl border border-[#D0CEC2] p-8 text-center shadow-xl">
