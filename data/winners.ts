@@ -1204,3 +1204,359 @@ export const previousWinners2026: PastWinners = {
     }
   ]
 };
+
+export const previousWinnersMRTA2: PastWinners = {
+  "name": "Mind Rain Thesis Award #2",
+  "year": "2026",
+  "categories": [
+    {
+      "category": "Winners",
+      "winners": [
+        {
+          "position": "Group A Winner",
+          "institute": "Thakur School of Architecture and Planning",
+          "title": "Forging a New Dawn - Revitalization of Darukhana",
+          "description": "Located on Mumbai's Eastern Waterfront, Darukhana is a historic shipbreaking hub facing severe neglect, hazardous conditions, and displacement. This thesis reimagines the marginalized edge as a dignified, resilient, and integrated urban landscape through four targeted interventions: a terraced Community and Training Center providing vital civic infrastructure and healthcare; a public waterfront promenade reclaiming the industrial edge; a Shipyard Museum preserving maritime labor heritage with repurposed ship elements; and modernized, eco-conscious shipbreaking yards featuring enclosed dry docks. Together, these interventions act as catalysts, transforming Darukhana into an inclusive, sustainable contributor to Mumbai's urban future.",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Group_A_Winner_1_MRTA2-A-0002.jpg",
+            "small": "/past-winners/entry/mrta2/thumb/Group_A_Winner_1_MRTA2-A-0002.jpg"
+          },
+          "members": [
+            { "name": "Rishu Jaiswal", "pfp": "/past-winners/pfp/mrta2/Rishu Jaiswal.jpg" }
+          ]
+        },
+        {
+          "position": "Group B Winner",
+          "institute": "Avani institute of design",
+          "title": "Architecture of silence: A Deaf-Inclusive Center for Learning and Interaction",
+          "description": "Architecture of Silence responds to a fundamental gap in our cities: public environments continue to privilege hearing, making communication, navigation, and participation difficult for the Deaf community. The thesis asks, what if architecture could communicate visually? The project extends this question from the street into a Deaf-inclusive centre, transforming the approach into a Deafscape Street and organizing the campus as a sequence of public, community, learning, and research spaces. Clear sightlines, exposed corridors, courtyards, natural light, water, stepped gathering spaces, and visual connections create an environment where communication is intuitive. Rather than designing for disability, the project explores architecture that enables visibility, dignity, identity, and belonging.",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Group_B_Winner_1_MRTA2-B-0028.jpg",
+            "small": "/past-winners/entry/mrta2/thumb/Group_B_Winner_1_MRTA2-B-0028.jpg"
+          },
+          "members": [
+            { "name": "Nihala", "pfp": "/past-winners/pfp/mrta2/Nihala.jpeg" }
+          ]
+        }
+
+      ]
+    },
+    {
+      "category": "Honourable Mentions",
+      "winners": [
+        {
+          "position": "Honourable Mention",
+          "institute": "Lovely Professional University",
+          "title": "Wispering Tides - Oceanarium",
+          "description": "WHISPERING TIDES – Oceanarium, Mahabalipuram envisions an oceanarium that brings the mysteries of the ocean closer to people through architecture, experience, and interaction. Inspired by the gentle meeting of waves and shoreline at Mahabalipuram, the project transforms the movement of the sea into spaces that encourage exploration, learning, and discovery. Beyond being a space for marine life exhibition, the oceanarium aims to create a meaningful connection between people and the ocean, blending experiential learning with the cultural and coastal identity of its setting.",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_1_MRTA2-A-0004.jpg",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_1_MRTA2-A-0004.jpg"
+          },
+          "members": [
+            { "name": "Andria Joshy", "pfp": "/past-winners/pfp/mrta2/Andria Joshy.png" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "Lovely professional university",
+          "title": "Living monolith",
+          "description": "Inspired by the Nartiang Monoliths, the project translates Shillong's cultural identity into a contemporary architectural language. Rooted in the city's love for football and its relationship with rain, water and food, the stadium becomes a productive space through integrated rainwater harvesting and aquaponics. Bringing together culture, sport, ecology and community to create a living architecture – and a skyline that belongs to the people of Shillong.",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_2_MRTA2-A-0006.jpeg",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_2_MRTA2-A-0006.jpeg"
+          },
+          "members": [
+            { "name": "Aayush chouhan", "pfp": "/past-winners/pfp/mrta2/Aayush chouhan.jpeg" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "School of Environment and Architecture",
+          "title": "APARTMENTS AND CLIMATE ADAPTATION IN MUMBAI",
+          "description": "Mumbai's apartment housing faces rising temperatures, humidity, extreme rainfall, and recurrent flooding. This thesis investigates how Development Control Regulations have shaped apartment typologies and influenced their capacity to adapt to changing climate and everyday life. Located in Daulat Nagar, Borivali East, the proposal reimagines apartment housing as an active climatic system, integrating permeable landscapes, elevated community spaces, climate responsive facades, adaptable homes, and passive strategies.",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_3_MRTA2-A-0007.png",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_3_MRTA2-A-0007.png"
+          },
+          "members": [
+            { "name": "Akanksha Satpute", "pfp": "/past-winners/pfp/mrta2/Akanksha Satpute.png" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "Karnataka",
+          "title": "",
+          "description": "",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_4_MRTA2-A-0008.jpg",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_4_MRTA2-A-0008.jpg"
+          },
+          "members": [
+            { "name": "Akshaya Reddy", "pfp": "" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "School of Environment and Architecture",
+          "title": "Community Infrastructure for Women Entrepreneurs, Worli Koliwada",
+          "description": "The thesis argued that women within the community negotiate space through softer claims via both formal and informal economies. Using Worli Koliwada as the site, the design builds upon existing women-led enterprises, proposing a shared workspace where women can exchange resources, share knowledge, and responsibilities. Key programs include: seafood plaza, common kitchens, markets, workshops for women and a communal washing space.",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_5_MRTA2-A-0012.jpg",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_5_MRTA2-A-0012.jpg"
+          },
+          "members": [
+            { "name": "Akanksha Chandan Thakur", "pfp": "/past-winners/pfp/mrta2/Akanksha Chandan Thakur.jpg" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "School of Environment and Architecture",
+          "title": "Inhabiting the in-betweens",
+          "description": "Inhabiting the In-Betweens explores how architecture can be perceived beyond a human-centric perspective. It studies how a dog experiences a neighbourhood through its senses, revealing a landscape often invisible to humans. These sensory observations inform the redesign of the in-between spaces between buildings and major vehicular roads, transforming them into a continuous public landscape for multiple forms of inhabitation and conviviality.",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_6_MRTA2-A-0014.png",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_6_MRTA2-A-0014.png"
+          },
+          "members": [
+            { "name": "Devarsh Sheth", "pfp": "/past-winners/pfp/mrta2/Devarsh Sheth.jpg" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "Wadiyar Centre For Architecture",
+          "title": "",
+          "description": "",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_7_MRTA2-A-0015.jpg",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_7_MRTA2-A-0015.jpg"
+          },
+          "members": [
+            { "name": "Raheesh Mohammed", "pfp": "" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "Dr. B. N. College of Architecture for Women",
+          "title": "IIM Nagpur Satellite Campus at Moshi, Pune",
+          "description": "Vidya Vithi – a journey of learning envisions the IIM Nagpur Satellite Campus as a living environment where architecture itself becomes part of the learning experience. The design responds to the site's natural contours, hills and water bodies, allowing the landscape to shape the campus structure. A sequence of courtyards, shaded transitional spaces and social nodes creates opportunities for interaction, pause and informal learning.",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_8_MRTA2-A-0017.jpg",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_8_MRTA2-A-0017.jpg"
+          },
+          "members": [
+            { "name": "Rageshri Rajendra More", "pfp": "/past-winners/pfp/mrta2/Rageshri Rajendra More.jpeg" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "Rizvi College of Architecture",
+          "title": "",
+          "description": "",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_9_MRTA2-A-0020.jpg",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_9_MRTA2-A-0020.jpg"
+          },
+          "members": [
+            { "name": "Rizwan Behlim Iqbal Samina", "pfp": "" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "Rizvi College of Architecture",
+          "title": "",
+          "description": "",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_10_MRTA2-A-0022.jpg",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_10_MRTA2-A-0022.jpg"
+          },
+          "members": [
+            { "name": "SAHIL NOORALI SHAIKH", "pfp": "/past-winners/pfp/mrta2/SAHIL NOORALI SHAIKH.jpeg" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "Chandigarh College of Architecture",
+          "title": "",
+          "description": "",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_11_MRTA2-A-0025.jpg",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_11_MRTA2-A-0025.jpg"
+          },
+          "members": [
+            { "name": "Keerat Kaur Gill", "pfp": "/past-winners/pfp/mrta2/Keerat Kaur Gill.jpg" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "Symbiosis Institute of Technology, Pune",
+          "title": "",
+          "description": "",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_12_MRTA2-A-0034.jpg",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_12_MRTA2-A-0034.jpg"
+          },
+          "members": [
+            { "name": "RUTUJA SANTOSH MAHADIK", "pfp": "/past-winners/pfp/mrta2/RUTUJA SANTOSH MAHADIK.jpeg" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "Jawaharlal Nehru Architecture and Fine Arts University",
+          "title": "",
+          "description": "",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_13_MRTA2-A-0035.png",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_13_MRTA2-A-0035.png"
+          },
+          "members": [
+            { "name": "NIMMAGADDA UMA GAYATHRI", "pfp": "/past-winners/pfp/mrta2/NIMMAGADDA UMA GAYATHRI.jpeg" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "Jawaharlal Nehru Architecture and Fine Arts University",
+          "title": "",
+          "description": "",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_14_MRTA2-A-0036.jpg",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_14_MRTA2-A-0036.jpg"
+          },
+          "members": [
+            { "name": "Lohitha Rao", "pfp": "/past-winners/pfp/mrta2/Lohitha Rao.jpeg" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "School of Planning and Architecture, Bhopal",
+          "title": "Eco Tourist Resort | An Eco-Sensitive Resort Design in Champhai District, Mizoram",
+          "description": "The project explores an architectural response rooted in the cultural identity, history, and traditions of the Mizo community in Champhai, Mizoram. Drawing from research and architectural learning, it focuses on integrating local materials, traditional construction knowledge, and skilled craftsmanship into contemporary design. Rather than creating dominant 'hero' buildings, the development is conceived as a cohesive whole where architecture, landscape, and individual components work together.",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_15_MRTA2-A-0050.jpg",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_15_MRTA2-A-0050.jpg"
+          },
+          "members": [
+            { "name": "T Hangsonlian", "pfp": "/past-winners/pfp/mrta2/T Hangsonlian.jpg" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "SMEF's Brick School Of Architecture",
+          "title": "EMBRACING THE TEMPORAL SCAR: REVITALIZING POST-INDUSTRIAL LANDFORMS THROUGH ECOPOIETIC DESIGN",
+          "description": "At the threshold of forest and rapid globalization, beside the Navi Mumbai International Airport, an abandoned stone quarry becomes a ground for reimagining development. Rather than filling a void, the project asks how a damaged landscape can heal while becoming a meaningful place for people, community, and collective identity. Ecological patterns, terrain, water, biodiversity, and natural attractors shape the intervention, supported by Miyawaki forests, wetlands, riparian edges, and ecological corridors.",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_16_MRTA2-A-0051.jpg",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_16_MRTA2-A-0051.jpg"
+          },
+          "members": [
+            { "name": "Vedashri Indrayani Nitin Kulkarni", "pfp": "/past-winners/pfp/mrta2/Vedashri Indrayani Nitin Kulkarni.JPG" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "Lovely Professional University",
+          "title": "National Museum for Tribal Freedom Fighters",
+          "description": "The National Museum for Tribal Freedom Fighters is conceived as a living landscape of memory, identity, and discovery. The masterplan transforms the contoured site into a connected cultural journey, linking the museum, research center, restaurant, cottages, gardens, water bodies, and gathering spaces. Tribal craft, pattern, locally rooted materials, green roofs, filtered daylight, rainwater landscapes, and forested pathways merge architecture with nature.",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_17_MRTA2-B-0016.jpg",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_17_MRTA2-B-0016.jpg"
+          },
+          "members": [
+            { "name": "Anupama Kuppam", "pfp": "/past-winners/pfp/mrta2/Anupama Kuppam.jpg" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "Avani Institute of design",
+          "title": "",
+          "description": "",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_18_MRTA2-B-0021.jpg",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_18_MRTA2-B-0021.jpg"
+          },
+          "members": [
+            { "name": "Fathimath Hansina", "pfp": "" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "Avani Institute of Design",
+          "title": "Built Into The Everyday",
+          "description": "Built into the Everyday is an urban-scale thesis project focused on creating more inclusive and women-friendly public spaces in Kozhikode, Kerala. The project explores how small, context-sensitive interventions can transform women's everyday experience of the city. Instead of large-scale redevelopment, it reimagines existing spaces such as bus stops, waiting areas, streets, and other public spaces through a network of micro-interventions.",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_19_MRTA2-B-0026.png",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_19_MRTA2-B-0026.png"
+          },
+          "members": [
+            { "name": "Saniya Marva KP", "pfp": "/past-winners/pfp/mrta2/Saniya Marva KP.png" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "Avani institute of design",
+          "title": "WHERE LIVING BEGINS- Beyond shelter",
+          "description": "This thesis critically examines migrant worker housing through the government initiative ApnaGhar. While ApnaGhar provides affordable accommodation, the study identifies limitations in spatial quality, adaptability, privacy, and community interaction. The study highlights the gap between institutional housing provision and lived realities, proposing migrant housing as a responsive living environment that supports dignity, interaction, adaptability, and belonging beyond basic shelter.",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_20_MRTA2-B-0027.png",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_20_MRTA2-B-0027.png"
+          },
+          "members": [
+            { "name": "Varsha kp", "pfp": "/past-winners/pfp/mrta2/Varsha kp.jpeg" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "Wadiyar Centre For Architecture, Mysuru",
+          "title": "Transformation through dynamic occupancy - A case of Indiranagar BDA Complex, Bangalore",
+          "description": "This thesis project explores how the spatial configuration of buildings in cities can transform and adapt their programmes in response to the surrounding neighbourhood and urban context. Through small interventions, an abandoned building can be revived through the idea of dynamic transformation. Dynamic occupancy explores how overlooked spaces can adapt to changing needs, programmes, and technologies.",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_21_MRTA2-B-0039.png",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_21_MRTA2-B-0039.png"
+          },
+          "members": [
+            { "name": "Danush Selvakumar", "pfp": "/past-winners/pfp/mrta2/Danush Selvakumar.jpeg" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "College of Engineering Trivandrum",
+          "title": "Dehleez: Re Interpretation of Death on the Ghats of Varanasi",
+          "description": "Varanasi worships liberation yet marginalizes the Doms, the untouchable custodians of Manikarnika Ghat who sustain its sacred eternal flame. Reimagining this landscape, the project introduces a green crematorium powered by biogas and eco-wood briquettes. A Skill Development Centre empowers Dom women through fuel pressing, while an intergenerational crèche connects their children with elderly Kashivas. Design restores structured agency to the Dom community, transforming Manikarnika into a dignified sanctuary of social justice, empathy, and ecological renewal.",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_22_MRTA2-B-0040.jpg",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_22_MRTA2-B-0040.jpg"
+          },
+          "members": [
+            { "name": "Sharon Ramachandran", "pfp": "/past-winners/pfp/mrta2/Sharon Ramachandran.png" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "Dr. Baliram Hiray College of Architecture, Mumbai",
+          "title": "Developing Resilience through Architecture in the Anthropocene - The case of Gorai Koliwada",
+          "description": "This thesis investigates equity as an architectural framework for addressing unequal access to space, infrastructure, resources and opportunities in Gorai Koliwada. Rather than imposing redevelopment, the proposal enables incremental transformation through livelihood, healthcare, education, sanitation and cultural infrastructure. Architecture becomes a means of redistributing spatial opportunity, strengthening community agency and enabling residents to shape their settlement's future.",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_23_MRTA2-B-0055.jpg",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_23_MRTA2-B-0055.jpg"
+          },
+          "members": [
+            { "name": "Manas M. Malpekar", "pfp": "/past-winners/pfp/mrta2/Manas M. Malpekar.jpg" }
+          ]
+        },
+        {
+          "position": "Honourable Mention",
+          "institute": "Malaviya National Institute of Technology Jaipur (MNIT)",
+          "title": "",
+          "description": "",
+          "entry": {
+            "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_24_MRTA2-B-0058.jpg",
+            "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_24_MRTA2-B-0058.jpg"
+          },
+          "members": [
+            { "name": "kajal verma", "pfp": "" }
+          ]
+        }
+      ]
+    }
+  ]
+};

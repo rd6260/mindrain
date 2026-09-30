@@ -11,8 +11,11 @@ interface WinnerCardProps {
 
 export default function WinnerCard({ winner }: WinnerCardProps) {
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const displayMembers = winner.members || [];
   const projectImage = winner.entry?.big || '';
+  const hasPdf = !!winner.entry?.pdf;
+  const hasImage = !!projectImage;
 
   return (
     <>
@@ -22,12 +25,12 @@ export default function WinnerCard({ winner }: WinnerCardProps) {
         data-testid="winner-card"
       >
         {/* Project Image */}
-        {winner.entry?.pdf ? (
-          <button 
-            onClick={() => setIsPdfModalOpen(true)} 
+        {hasPdf ? (
+          <button
+            onClick={() => setIsPdfModalOpen(true)}
             className="block relative w-full aspect-[5/4] bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden flex-shrink-0 cursor-pointer"
           >
-            {projectImage && (
+            {hasImage && (
               <Image
                 src={projectImage}
                 alt={`${winner.institute} project`}
@@ -36,23 +39,24 @@ export default function WinnerCard({ winner }: WinnerCardProps) {
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
             )}
-            {/* Overlay gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          </button>
+        ) : hasImage ? (
+          <button
+            onClick={() => setIsImageModalOpen(true)}
+            className="block relative w-full aspect-[5/4] bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden flex-shrink-0 cursor-pointer"
+          >
+            <Image
+              src={projectImage}
+              alt={`${winner.institute} project`}
+              fill
+              className="object-contain transition-transform duration-500 group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </button>
         ) : (
-          <div className="relative w-full aspect-[5/4] bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden flex-shrink-0">
-            {projectImage && (
-              <Image
-                src={projectImage}
-                alt={`${winner.institute} project`}
-                fill
-                className="object-contain transition-transform duration-500 group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              />
-            )}
-            {/* Overlay gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          </div>
+          <div className="relative w-full aspect-[5/4] bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden flex-shrink-0" />
         )}
 
         {/* Winner Info */}
@@ -106,7 +110,7 @@ export default function WinnerCard({ winner }: WinnerCardProps) {
           >
             {winner.institute || 'Honorable Mention'}
           </div>
-          
+
           {winner.description && (
             <p
               className="text-sm leading-relaxed text-balance pt-2 mb-6"
@@ -131,8 +135,8 @@ export default function WinnerCard({ winner }: WinnerCardProps) {
                 {winner.title || 'UNTITLED'}
               </span>
             </div>
-            
-            {winner.entry?.pdf && (
+
+            {hasPdf && (
               <button
                 onClick={() => setIsPdfModalOpen(true)}
                 className="whitespace-nowrap px-4 py-2 rounded-lg text-white font-medium flex items-center gap-2 hover:bg-[#113333] transition-colors text-sm shadow-md"
@@ -152,7 +156,6 @@ export default function WinnerCard({ winner }: WinnerCardProps) {
       {isPdfModalOpen && winner.entry?.pdf && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4 pt-24 sm:p-8 sm:pt-28 backdrop-blur-sm animate-fade-in">
           <div className="relative w-full max-w-6xl h-full flex flex-col bg-white rounded-2xl overflow-hidden shadow-2xl">
-            {/* Modal Header */}
             <div className="flex justify-between items-center p-4 border-b border-gray-200" style={{ backgroundColor: colors.background }}>
               <h3 className="font-bold text-lg truncate pr-4" style={{ color: colors.textPrimary }}>
                 {winner.title || winner.institute}
@@ -167,7 +170,6 @@ export default function WinnerCard({ winner }: WinnerCardProps) {
                 </svg>
               </button>
             </div>
-            {/* Modal Body */}
             <div className="flex-grow w-full bg-gray-100">
               <iframe
                 src={`${winner.entry.pdf}#toolbar=0`}
@@ -175,6 +177,36 @@ export default function WinnerCard({ winner }: WinnerCardProps) {
                 title={`${winner.institute} Project PDF`}
               />
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Image Lightbox Modal */}
+      {isImageModalOpen && hasImage && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm animate-fade-in"
+          onClick={() => setIsImageModalOpen(false)}
+        >
+          <button
+            onClick={() => setIsImageModalOpen(false)}
+            className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+            aria-label="Close image"
+          >
+            <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <div
+            className="relative w-full h-full max-w-5xl max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              src={projectImage}
+              alt={winner.title || winner.institute || 'Project image'}
+              fill
+              className="object-contain"
+              sizes="100vw"
+            />
           </div>
         </div>
       )}
