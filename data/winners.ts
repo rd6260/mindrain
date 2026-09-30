@@ -666,18 +666,9 @@ export const previousWinners2026: PastWinners = {
             "pdf": "/past-winners/entry/2026/pdf/Category_1_Group_A_1_TUH-A-I-GRP-0017.pdf"
           },
           "members": [
-            {
-              "name": "Khushdeep Kour",
-              "pfp": ""
-            },
-            {
-              "name": "Mehakpreet Kaur Gill",
-              "pfp": ""
-            },
-            {
-              "name": "Komal",
-              "pfp": ""
-            }
+            { "name": "Khushdeep Kour", "pfp": "/past-winners/pfp/2026/Khushdeep Kour.jpg" },
+            { "name": "Mehakpreet Kaur Gill", "pfp": "/past-winners/pfp/2026/Mehakpreet Kaur Gill.jpg" },
+            { "name": "Komal", "pfp": "/past-winners/pfp/2026/Komal.jpg" }
           ]
         },
         {
@@ -691,18 +682,9 @@ export const previousWinners2026: PastWinners = {
             "pdf": "/past-winners/entry/2026/pdf/Category_1_Group_A_2_TUH-A-I-GRP-0110.pdf"
           },
           "members": [
-            {
-              "name": "Bhavajaa JV",
-              "pfp": ""
-            },
-            {
-              "name": "HARIKKRISH G",
-              "pfp": ""
-            },
-            {
-              "name": "Halima Tanzila",
-              "pfp": ""
-            }
+            { "name": "Bhavajaa JV", "pfp": "/past-winners/pfp/2026/Bhavajaa JV.png" },
+            { "name": "HARIKKRISH G", "pfp": "/past-winners/pfp/2026/HARIKKRISH G.jpeg" },
+            { "name": "Halima Tanzila", "pfp": "/past-winners/pfp/2026/Halima Tanzila.png" }
           ]
         },
         {
@@ -716,14 +698,8 @@ export const previousWinners2026: PastWinners = {
             "pdf": "/past-winners/entry/2026/pdf/Category_1_Group_A_3_TUH-A-I-GRP-0118.pdf"
           },
           "members": [
-            {
-              "name": "Priyadarshini . J. Janjot",
-              "pfp": ""
-            },
-            {
-              "name": "Ubaid Feroz Tamboli",
-              "pfp": ""
-            }
+            { "name": "Priyadarshini . J. Janjot", "pfp": "/past-winners/pfp/2026/Priyadarshini . J. Janjot.jpg" },
+            { "name": "Ubaid Feroz Tamboli", "pfp": "/past-winners/pfp/2026/Ubaid Feroz Tamboli.jpg" }
           ]
         }
       ]
@@ -742,10 +718,7 @@ export const previousWinners2026: PastWinners = {
             "pdf": "/past-winners/entry/2026/pdf/Category_1_Group_B_1_TUH-B-I-IND-0198.pdf"
           },
           "members": [
-            {
-              "name": "Diya Ajay",
-              "pfp": ""
-            }
+            { "name": "Diya Ajay", "pfp": "/past-winners/pfp/2026/Diya Ajay.jpg" }
           ]
         },
         {
@@ -759,18 +732,9 @@ export const previousWinners2026: PastWinners = {
             "pdf": "/past-winners/entry/2026/pdf/Category_1_Group_B_2_TUH-B-I-GRP-0206.pdf"
           },
           "members": [
-            {
-              "name": "Priyanshu Dahayat",
-              "pfp": ""
-            },
-            {
-              "name": "Shivendra patel",
-              "pfp": ""
-            },
-            {
-              "name": "Poorvi jain",
-              "pfp": ""
-            }
+            { "name": "Priyanshu Dahayat", "pfp": "/past-winners/pfp/2026/Priyanshu Dahayat.png" },
+            { "name": "Shivendra patel", "pfp": "/past-winners/pfp/2026/Shivendra patel.png" },
+            { "name": "Poorvi jain", "pfp": "/past-winners/pfp/2026/Poorvi jain.png" }
           ]
         }
       ]
@@ -789,10 +753,7 @@ export const previousWinners2026: PastWinners = {
             "pdf": "/past-winners/entry/2026/pdf/Category_2_Group_A_1_TUH-A-II-IND-0164.pdf"
           },
           "members": [
-            {
-              "name": "Geetu Singh",
-              "pfp": ""
-            }
+            { "name": "Geetu Singh", "pfp": "/past-winners/pfp/2026/Geetu Singh.jpg" }
           ]
         },
         {
@@ -806,18 +767,9 @@ export const previousWinners2026: PastWinners = {
             "pdf": "/past-winners/entry/2026/pdf/Category_2_Group_A_2_TUH-A-II-GRP-0188.pdf"
           },
           "members": [
-            {
-              "name": "Aniruddha Nirmal",
-              "pfp": ""
-            },
-            {
-              "name": "Kritika Maurya",
-              "pfp": ""
-            },
-            {
-              "name": "Riyad Khan",
-              "pfp": ""
-            }
+            { "name": "Aniruddha Nirmal", "pfp": "/past-winners/pfp/2026/Aniruddha Nirmal.jpeg" },
+            { "name": "Kritika Maurya", "pfp": "/past-winners/pfp/2026/Kritika Maurya.jpeg" },
+            { "name": "Riyad Khan", "pfp": "/past-winners/pfp/2026/Riyad Khan.jpeg" }
           ]
         },
         {
@@ -831,18 +783,9 @@ export const previousWinners2026: PastWinners = {
             "pdf": "/past-winners/entry/2026/pdf/Category_2_Group_A_3_TUH-A-II-GRP-0129.pdf"
           },
           "members": [
-            {
-              "name": "anshika keshri",
-              "pfp": ""
-            },
-            {
-              "name": "gauri verma",
-              "pfp": ""
-            },
-            {
-              "name": "AYUSH KUMAR",
-              "pfp": ""
-            }
+            { "name": "anshika keshri", "pfp": "/past-winners/pfp/2026/anshika keshri.jpg" },
+            { "name": "gauri verma", "pfp": "/past-winners/pfp/2026/gauri verma.jpg" },
+            { "name": "AYUSH KUMAR", "pfp": "/past-winners/pfp/2026/AYUSH KUMAR.jpg" }
           ]
         }
       ]
@@ -856,53 +799,41 @@ export const previousWinners2026: PastWinners = {
           "title": "Aetherio",
           "description": "",
           "entry": {
-            "big": "/past-winners/entry/2026/thumb/Category_2_Group_B_3_TUH-B-II-GRP-0124.png",
-            "small": "/past-winners/entry/2026/thumb/Category_2_Group_B_3_TUH-B-II-GRP-0124.png",
-            "pdf": "/past-winners/entry/2026/pdf/Category_2_Group_B_3_TUH-B-II-GRP-0124.pdf"
+            "big": "/past-winners/entry/2026/thumb/Category_2_Group_B_1_TUH-B-II-GRP-0124.png",
+            "small": "/past-winners/entry/2026/thumb/Category_2_Group_B_1_TUH-B-II-GRP-0124.png",
+            "pdf": "/past-winners/entry/2026/pdf/Category_2_Group_B_1_TUH-B-II-GRP-0124.pdf"
           },
           "members": [
-            {
-              "name": "Dirba Yatin Parab",
-              "pfp": ""
-            },
-            {
-              "name": "Tanvi Apoorva Shah",
-              "pfp": ""
-            }
+            { "name": "Dirba Yatin Parab", "pfp": "/past-winners/pfp/2026/Dirba Yatin Parab.jpg" },
+            { "name": "Tanvi Apoorva Shah", "pfp": "/past-winners/pfp/2026/Tanvi Apoorva Shah.jpg" }
           ]
         },
         {
           "position": "2nd Prize",
           "institute": "SMEF'S BSOA, PUNE",
-          "title": "Mycelium house",
+          "title": "The Unreal House",
           "description": "",
           "entry": {
-            "big": "/past-winners/entry/2026/thumb/Category_2_Group_B_1_TUH-B-II-IND-0202.png",
-            "small": "/past-winners/entry/2026/thumb/Category_2_Group_B_1_TUH-B-II-IND-0202.png",
-            "pdf": "/past-winners/entry/2026/pdf/Category_2_Group_B_1_TUH-B-II-IND-0202.pdf"
+            "big": "/past-winners/entry/2026/thumb/Category_2_Group_B_2_TUH-B-II-IND-0202.png",
+            "small": "/past-winners/entry/2026/thumb/Category_2_Group_B_2_TUH-B-II-IND-0202.png",
+            "pdf": "/past-winners/entry/2026/pdf/Category_2_Group_B_2_TUH-B-II-IND-0202.pdf"
           },
           "members": [
-            {
-              "name": "ANIKA SUKHIJA",
-              "pfp": ""
-            }
+            { "name": "ANIKA SUKHIJA", "pfp": "/past-winners/pfp/2026/ANIKA SUKHIJA.png" }
           ]
         },
         {
           "position": "3rd Prize",
           "institute": "MEASI Academy of Architecture",
-          "title": "-",
+          "title": "Mycelium house",
           "description": "",
           "entry": {
-            "big": "/past-winners/entry/2026/thumb/Category_2_Group_B_2_TUH-B-II-IND-0099.png",
-            "small": "/past-winners/entry/2026/thumb/Category_2_Group_B_2_TUH-B-II-IND-0099.png",
-            "pdf": "/past-winners/entry/2026/pdf/Category_2_Group_B_2_TUH-B-II-IND-0099.pdf"
+            "big": "/past-winners/entry/2026/thumb/Category_2_Group_B_3_TUH-B-II-IND-0099.png",
+            "small": "/past-winners/entry/2026/thumb/Category_2_Group_B_3_TUH-B-II-IND-0099.png",
+            "pdf": "/past-winners/entry/2026/pdf/Category_2_Group_B_3_TUH-B-II-IND-0099.pdf"
           },
           "members": [
-            {
-              "name": "Vijayalakshmi Sekar",
-              "pfp": ""
-            }
+            { "name": "Vijayalakshmi Sekar", "pfp": "/past-winners/pfp/2026/Vijayalakshmi Sekar.png" }
           ]
         }
       ]
@@ -913,6 +844,7 @@ export const previousWinners2026: PastWinners = {
         {
           "position": "Honorable Mention",
           "institute": "North Eastern Hill University, School of Architecture, Gaya College of Engineering",
+          "title": "THE BUBBLES IN A DROP",
           "description": "Story telling",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_1_TUH-A-I-GRP-0134.png",
@@ -920,23 +852,15 @@ export const previousWinners2026: PastWinners = {
             "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_1_TUH-A-I-GRP-0134.pdf"
           },
           "members": [
-            {
-              "name": "Afiza Khatun",
-              "pfp": ""
-            },
-            {
-              "name": "Swetambar",
-              "pfp": ""
-            },
-            {
-              "name": "Aditi Chandra",
-              "pfp": ""
-            }
+            { "name": "Afiza Khatun", "pfp": "/past-winners/pfp/2026/Afiza Khatun.jpg" },
+            { "name": "Swetambar", "pfp": "/past-winners/pfp/2026/Swetambar.jpg" },
+            { "name": "Aditi Chandra", "pfp": "/past-winners/pfp/2026/Aditi Chandra.jpg" }
           ]
         },
         {
           "position": "Honorable Mention",
           "institute": "Avani institute of design",
+          "title": "Amber Canyons",
           "description": "Experiantial design",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_2_TUH-A-I-IND-0212.png",
@@ -944,15 +868,13 @@ export const previousWinners2026: PastWinners = {
             "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_2_TUH-A-I-IND-0212.pdf"
           },
           "members": [
-            {
-              "name": "Amy Deepak",
-              "pfp": ""
-            }
+            { "name": "Amy Deepak", "pfp": "/past-winners/pfp/2026/Amy Deepak.jpeg" }
           ]
         },
         {
           "position": "Honorable Mention",
           "institute": "Measi academy of architecture",
+          "title": "The Unreal House :The Ruvans",
           "description": "Story telling",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_3_TUH-A-I-GRP-0101.png",
@@ -960,23 +882,15 @@ export const previousWinners2026: PastWinners = {
             "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_3_TUH-A-I-GRP-0101.pdf"
           },
           "members": [
-            {
-              "name": "Shaashinee.R",
-              "pfp": ""
-            },
-            {
-              "name": "Vishalini.S",
-              "pfp": ""
-            },
-            {
-              "name": "Dharshini.S",
-              "pfp": ""
-            }
+            { "name": "Shaashinee.R", "pfp": "/past-winners/pfp/2026/Shaashinee.R.jpeg" },
+            { "name": "Vishalini.S", "pfp": "/past-winners/pfp/2026/Vishalini.S.jpeg" },
+            { "name": "Dharshini.S", "pfp": "/past-winners/pfp/2026/Dharshini.S.jpeg" }
           ]
         },
         {
           "position": "Honorable Mention",
           "institute": "Madhav Institute of Technology and Science",
+          "title": "BLACK NEIGHBOURHOOD",
           "description": "Story telling & Form development",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_4_TUH-A-I-GRP-0038.png",
@@ -984,23 +898,15 @@ export const previousWinners2026: PastWinners = {
             "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_4_TUH-A-I-GRP-0038.pdf"
           },
           "members": [
-            {
-              "name": "AVANI SINGH",
-              "pfp": ""
-            },
-            {
-              "name": "KARTIK UNNITHAN",
-              "pfp": ""
-            },
-            {
-              "name": "YASH DHARMADHIKARI",
-              "pfp": ""
-            }
+            { "name": "AVANI SINGH", "pfp": "/past-winners/pfp/2026/AVANI SINGH.jpg" },
+            { "name": "KARTIK UNNITHAN", "pfp": "/past-winners/pfp/2026/KARTIK UNNITHAN.jpg" },
+            { "name": "YASH DHARMADHIKARI", "pfp": "/past-winners/pfp/2026/YASH DHARMADHIKARI.jpg" }
           ]
         },
         {
           "position": "Honorable Mention",
           "institute": "MEASI Academy of Architecture",
+          "title": "The Unreal House - The Vance's Residence",
           "description": "Presentation",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_5_TUH-A-I-GRP-0193.png",
@@ -1008,43 +914,30 @@ export const previousWinners2026: PastWinners = {
             "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_5_TUH-A-I-GRP-0193.pdf"
           },
           "members": [
-            {
-              "name": "Srinitha Krishna Kumar",
-              "pfp": ""
-            },
-            {
-              "name": "Iswarya J",
-              "pfp": ""
-            }
+            { "name": "Srinitha Krishna Kumar", "pfp": "/past-winners/pfp/2026/Srinitha Krishna Kumar.jpeg" },
+            { "name": "Iswarya J", "pfp": "/past-winners/pfp/2026/Iswarya J.jpeg" }
           ]
         },
         {
           "position": "Honorable Mention",
           "institute": "MITS, GWALIOR",
-          "description": "Imaginative design",
+          "title": "Unreal house competition",
+          "description": "Imaginative Design",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_6_TUH-A-I-GRP-0039.png",
             "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_6_TUH-A-I-GRP-0039.png",
             "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_6_TUH-A-I-GRP-0039.pdf"
           },
           "members": [
-            {
-              "name": "Ayushi Choudhary",
-              "pfp": ""
-            },
-            {
-              "name": "Methli Agarwal",
-              "pfp": ""
-            },
-            {
-              "name": "Anshika Singh",
-              "pfp": ""
-            }
+            { "name": "Ayushi Choudhary", "pfp": "/past-winners/pfp/2026/Ayushi Choudhary.jpg" },
+            { "name": "Methli Agarwal", "pfp": "/past-winners/pfp/2026/Methli Agarwal.jpg" },
+            { "name": "Anshika Singh", "pfp": "/past-winners/pfp/2026/Anshika Singh.jpg" }
           ]
         },
         {
           "position": "Honorable Mention",
           "institute": "Sister Nivedita University",
+          "title": "SWIS",
           "description": "",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_7_TUH-A-I-GRP-0051.png",
@@ -1052,47 +945,31 @@ export const previousWinners2026: PastWinners = {
             "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_7_TUH-A-I-GRP-0051.pdf"
           },
           "members": [
-            {
-              "name": "Satrishna Saha",
-              "pfp": ""
-            },
-            {
-              "name": "Swastika Mandal",
-              "pfp": ""
-            },
-            {
-              "name": "Jumana Pirwala",
-              "pfp": ""
-            }
+            { "name": "Satrishna Saha", "pfp": "/past-winners/pfp/2026/Satrishna Saha.jpeg" },
+            { "name": "Swastika Mandal", "pfp": "/past-winners/pfp/2026/Swastika Mandal.jpeg" },
+            { "name": "Jumana Pirwala", "pfp": "/past-winners/pfp/2026/Jumana Pirwala.jpeg" }
           ]
         },
         {
           "position": "Honorable Mention",
           "institute": "Measi Academy Of Architecture",
-          "description": "design Exploration",
+          "title": "Echo bloom villa",
+          "description": "Design Exploration",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_8_TUH-A-I-GRP-0108.png",
             "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_8_TUH-A-I-GRP-0108.png",
             "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_8_TUH-A-I-GRP-0108.pdf"
           },
           "members": [
-            {
-              "name": "Jeffrein Jose Malar",
-              "pfp": ""
-            },
-            {
-              "name": "Harshiga M",
-              "pfp": ""
-            },
-            {
-              "name": "Siddiqua Noorayn",
-              "pfp": ""
-            }
+            { "name": "Jeffrein Jose Malar", "pfp": "/past-winners/pfp/2026/Jeffrein Jose Malar.jpeg" },
+            { "name": "Harshiga M", "pfp": "/past-winners/pfp/2026/Harshiga M.jpg" },
+            { "name": "Siddiqua Noorayn", "pfp": "/past-winners/pfp/2026/Siddiqua Noorayn.jpg" }
           ]
         },
         {
           "position": "Honorable Mention",
           "institute": "SRM Institute of Science and Technology",
+          "title": "The Unreal House",
           "description": "",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_9_TUH-A-I-IND-0196.png",
@@ -1100,55 +977,43 @@ export const previousWinners2026: PastWinners = {
             "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_9_TUH-A-I-IND-0196.pdf"
           },
           "members": [
-            {
-              "name": "P Kanika Deep",
-              "pfp": ""
-            }
+            { "name": "P Kanika Deep", "pfp": "/past-winners/pfp/2026/P Kanika Deep.jpg" }
           ]
         },
         {
           "position": "Honorable Mention",
           "institute": "GZS School of Architecture and Planning, MRSPTU",
-          "description": "imaginative design",
+          "title": "JELLYFISH RESIDENCE",
+          "description": "Imaginative Design",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_10_TUH-A-I-GRP-0020.png",
             "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_10_TUH-A-I-GRP-0020.png",
             "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_10_TUH-A-I-GRP-0020.pdf"
           },
           "members": [
-            {
-              "name": "Ratti Kanishka Rajput",
-              "pfp": ""
-            },
-            {
-              "name": "Ashita Goyal",
-              "pfp": ""
-            },
-            {
-              "name": "Deepam Goyal",
-              "pfp": ""
-            }
+            { "name": "Ratti Kanishka Rajput", "pfp": "/past-winners/pfp/2026/Ratti Kanishka Rajput.jpeg" },
+            { "name": "Ashita Goyal", "pfp": "/past-winners/pfp/2026/Ashita Goyal.png" },
+            { "name": "Deepam Goyal", "pfp": "/past-winners/pfp/2026/Deepam Goyal.jpeg" }
           ]
         },
         {
           "position": "Honorable Mention",
           "institute": "Saveetha College of Architecture and Design",
+          "title": "The Unreal House",
           "description": "",
           "entry": {
-            "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_11_TUH-A-I-IND-0175.png",
-            "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_11_TUH-A-I-IND-0175.png",
-            "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_11_TUH-A-I-IND-0175.pdf"
+            "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_11_TUH-A-I-IND-0179.png",
+            "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_11_TUH-A-I-IND-0179.png",
+            "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_11_TUH-A-I-IND-0179.pdf"
           },
           "members": [
-            {
-              "name": "Keerthi",
-              "pfp": ""
-            }
+            { "name": "Keerthi", "pfp": "/past-winners/pfp/2026/Keerthi.png" }
           ]
         },
         {
           "position": "Honorable Mention",
           "institute": "MEASI ACADEMY OF ARCHITECTURE, CHENNAI",
+          "title": "The Sentient Home",
           "description": "Rendering & Presentation",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_12_TUH-A-I-GRP-0119.png",
@@ -1156,23 +1021,15 @@ export const previousWinners2026: PastWinners = {
             "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_12_TUH-A-I-GRP-0119.pdf"
           },
           "members": [
-            {
-              "name": "Logeshwari V",
-              "pfp": ""
-            },
-            {
-              "name": "Harshan S",
-              "pfp": ""
-            },
-            {
-              "name": "Cerena G",
-              "pfp": ""
-            }
+            { "name": "Logeshwari V", "pfp": "/past-winners/pfp/2026/Logeshwari V.png" },
+            { "name": "Harshan S", "pfp": "/past-winners/pfp/2026/Harshan S.png" },
+            { "name": "Cerena G", "pfp": "/past-winners/pfp/2026/Cerena G.png" }
           ]
         },
         {
           "position": "Honorable Mention",
           "institute": "Lovely Professional University",
+          "title": "HELIOVELLE",
           "description": "Form Exploration",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_13_TUH-A-I-GRP-0183.png",
@@ -1180,194 +1037,167 @@ export const previousWinners2026: PastWinners = {
             "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_13_TUH-A-I-GRP-0183.pdf"
           },
           "members": [
-            {
-              "name": "Ningthiba Maibam",
-              "pfp": ""
-            },
-            {
-              "name": "Aarushi Kotwal",
-              "pfp": ""
-            },
-            {
-              "name": "Yasmin Sania Islam",
-              "pfp": ""
-            }
+            { "name": "Ningthiba Maibam", "pfp": "/past-winners/pfp/2026/Ningthiba Maibam.jpeg" },
+            { "name": "Aarushi Kotwal", "pfp": "/past-winners/pfp/2026/Aarushi Kotwal.png" },
+            { "name": "Yasmin Sania Islam", "pfp": "/past-winners/pfp/2026/Yasmin Sania Islam.png" }
           ]
         },
         {
           "position": "Honorable Mention",
           "institute": "Asia Pacific University",
-          "description": "Imaginative design",
+          "title": "Underwater cave House",
+          "description": "Imaginative Design",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_14_TUH-A-I-IND-0125.png",
             "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_14_TUH-A-I-IND-0125.png",
             "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_14_TUH-A-I-IND-0125.pdf"
           },
           "members": [
-            {
-              "name": "Sakshi Reyan",
-              "pfp": ""
-            }
+            { "name": "Sakshi Reyan", "pfp": "/past-winners/pfp/2026/Sakshi Reyan.png" }
           ]
         },
         {
           "position": "Honorable Mention",
           "institute": "Smmca college of architecture nagpur",
-          "description": "design Exploration",
+          "title": "The Unreal House",
+          "description": "Design Exploration",
           "entry": {
-            "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_15_TUH A-I-IND-0122.png",
-            "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_15_TUH A-I-IND-0122.png",
-            "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_15_TUH A-I-IND-0122.pdf"
+            "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_15_TUH-A-I-IND-0122.png",
+            "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_15_TUH-A-I-IND-0122.png",
+            "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_15_TUH-A-I-IND-0122.pdf"
           },
           "members": [
-            {
-              "name": "Sanskruti Lohiya",
-              "pfp": ""
-            }
+            { "name": "Sanskruti Lohiya", "pfp": "/past-winners/pfp/2026/Sanskruti Lohiya.png" }
           ]
         },
         {
           "position": "Honorable Mention",
           "institute": "Saveetha College Of Architecture",
-          "description": "Form Development & Presentation (Prespective views were good)",
+          "title": "The Unreal House",
+          "description": "Form Development & Presentation",
           "entry": {
             "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_16_TUH-A-I-IND-0171.png",
             "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_16_TUH-A-I-IND-0171.png",
             "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_16_TUH-A-I-IND-0171.pdf"
           },
           "members": [
-            {
-              "name": "Nanditha Vinod",
-              "pfp": ""
-            }
+            { "name": "Nanditha Vinod", "pfp": "/past-winners/pfp/2026/Nanditha Vinod.png" }
+          ]
+        },
+        {
+          "position": "Honorable Mention",
+          "institute": "Srm school of architecture",
+          "title": "EVENT HORIZON HOUSE",
+          "description": "Imaginative Design",
+          "entry": {
+            "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_17_TUH-A-I-IND-0197.png",
+            "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_17_TUH-A-I-IND-0197.png",
+            "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_17_TUH-A-I-IND-0197.pdf"
+          },
+          "members": [
+            { "name": "Aishwarya", "pfp": "/past-winners/pfp/2026/Aishwarya.png" }
           ]
         },
         {
           "position": "Honorable Mention",
           "institute": "Sir JJ college of architecture",
+          "title": "",
           "description": "Form Exploration & Material detailing",
           "entry": {
-            "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_17_TUH-B-II-GRP-0184.png",
-            "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_17_TUH-B-II-GRP-0184.png",
-            "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_17_TUH-B-II-GRP-0184.pdf"
+            "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_18_TUH-A-II-GRP-0184.png",
+            "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_18_TUH-A-II-GRP-0184.png",
+            "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_18_TUH-A-II-GRP-0184.pdf"
           },
           "members": [
-            {
-              "name": "Tanisha Sawant",
-              "pfp": ""
-            },
-            {
-              "name": "Tanushri Ghogale",
-              "pfp": ""
-            },
-            {
-              "name": "Manava Mainkar",
-              "pfp": ""
-            }
+            { "name": "Tanisha Sawant", "pfp": "/past-winners/pfp/2026/Tanisha Sawant.png" },
+            { "name": "Tanushri Ghogale", "pfp": "/past-winners/pfp/2026/Tanushri Ghogale.png" },
+            { "name": "Manava Mainkar", "pfp": "/past-winners/pfp/2026/Manava Mainkar.png" }
           ]
         },
         {
           "position": "Honorable Mention",
           "institute": "chandigarh college of architecture",
+          "title": "THE PHAGE - The Vance Expedition",
           "description": "Story telling & presentation",
           "entry": {
-            "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_18_TUH-A-II-IND-0201.png",
-            "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_18_TUH-A-II-IND-0201.png",
-            "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_18_TUH-A-II-IND-0201.pdf"
+            "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_19_TUH-A-II-IND-0201.png",
+            "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_19_TUH-A-II-IND-0201.png",
+            "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_19_TUH-A-II-IND-0201.pdf"
           },
           "members": [
-            {
-              "name": "ANMOL",
-              "pfp": ""
-            }
+            { "name": "ANMOL", "pfp": "/past-winners/pfp/2026/ANMOL.jpeg" }
           ]
         },
         {
           "position": "Honorable Mention",
           "institute": "Maulana Azad National Institute of Technology",
+          "title": "HER DESHSER",
           "description": "Story telling & presentation",
           "entry": {
-            "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_19_TUH-A-II-IND-0100.png",
-            "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_19_TUH-A-II-IND-0100.png",
-            "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_19_TUH-A-II-IND-0100.pdf"
+            "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_20_TUH-A-II-IND-0100.png",
+            "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_20_TUH-A-II-IND-0100.png",
+            "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_20_TUH-A-II-IND-0100.pdf"
           },
           "members": [
-            {
-              "name": "Prakrati Singh",
-              "pfp": ""
-            }
+            { "name": "Prakrati Singh", "pfp": "/past-winners/pfp/2026/Prakrati Singh.png" }
           ]
         },
         {
           "position": "Honorable Mention",
           "institute": "school of planning and architecture bhopal",
+          "title": "SOLACE",
           "description": "Story telling & presentation",
           "entry": {
-            "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_20_TUH-A-II-IND-0132.png",
-            "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_20_TUH-A-II-IND-0132.png",
-            "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_20_TUH-A-II-IND-0132.pdf"
+            "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_21_TUH-A-II-IND-0132.png",
+            "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_21_TUH-A-II-IND-0132.png",
+            "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_21_TUH-A-II-IND-0132.pdf"
           },
           "members": [
-            {
-              "name": "Harshita Yadav",
-              "pfp": ""
-            }
+            { "name": "Harshita Yadav", "pfp": "/past-winners/pfp/2026/Harshita Yadav.png" }
           ]
         },
         {
           "position": "Honorable Mention",
           "institute": "Sushant school of Art and Architecture",
+          "title": "The Folded Horizon",
           "description": "Presentation",
           "entry": {
-            "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_21_TUH-A-II-GRP-0082.png",
-            "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_21_TUH-A-II-GRP-0082.png",
-            "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_21_TUH-A-II-GRP-0082.pdf"
+            "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_22_TUH-A-II-GRP-0082.png",
+            "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_22_TUH-A-II-GRP-0082.png",
+            "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_22_TUH-A-II-GRP-0082.pdf"
           },
           "members": [
-            {
-              "name": "Palak mediratta",
-              "pfp": ""
-            },
-            {
-              "name": "Rudra Kumar Jha",
-              "pfp": ""
-            }
+            { "name": "Palak mediratta", "pfp": "/past-winners/pfp/2026/Palak mediratta.png" },
+            { "name": "Rudra Kumar Jha", "pfp": "/past-winners/pfp/2026/Rudra Kumar Jha.png" }
           ]
         },
         {
           "position": "Honorable Mention",
           "institute": "MEASI ACADEMY OF ARCHITECTURE CHENNAI",
+          "title": "The Matka House",
           "description": "Presentation & 3D Modeling",
           "entry": {
-            "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_22_TUH-B-II-IND-0116.png",
-            "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_22_TUH-B-II-IND-0116.png",
-            "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_22_TUH-B-II-IND-0116.pdf"
+            "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_23_TUH-B-II-IND-0116.png",
+            "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_23_TUH-B-II-IND-0116.png",
+            "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_23_TUH-B-II-IND-0116.pdf"
           },
           "members": [
-            {
-              "name": "Rahaman",
-              "pfp": ""
-            }
+            { "name": "Rahaman", "pfp": "/past-winners/pfp/2026/Rahaman.jpeg" }
           ]
         },
         {
           "position": "Honorable Mention",
           "institute": "University Institute of architecture, chandigarh university",
+          "title": "THE LIVING RIFT",
           "description": "Story telling",
           "entry": {
-            "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_23_TUH-B-II-GRP-0208.png",
-            "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_23_TUH-B-II-GRP-0208.png",
-            "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_23_TUH-B-II-GRP-0208.pdf"
+            "big": "/past-winners/entry/2026/thumb/Honorable_Mentions_24_TUH-B-II-GRP-0208.png",
+            "small": "/past-winners/entry/2026/thumb/Honorable_Mentions_24_TUH-B-II-GRP-0208.png",
+            "pdf": "/past-winners/entry/2026/pdf/Honorable_Mentions_24_TUH-B-II-GRP-0208.pdf"
           },
           "members": [
-            {
-              "name": "Anshika",
-              "pfp": ""
-            },
-            {
-              "name": "Veerpal kaur",
-              "pfp": ""
-            }
+            { "name": "Anshika", "pfp": "/past-winners/pfp/2026/Anshika.jpeg" },
+            { "name": "Veerpal kaur", "pfp": "/past-winners/pfp/2026/Veerpal kaur.jpeg" }
           ]
         }
       ]
