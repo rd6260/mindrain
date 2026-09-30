@@ -128,7 +128,7 @@ export default function WinnerCard({ winner }: WinnerCardProps) {
                 Project Title
               </span>
               <span className="text-lg text-gray-900 tracking-wide uppercase font-semibold">
-                {winner.title || winner.description || 'UNTITLED'}
+                {winner.title || 'UNTITLED'}
               </span>
             </div>
             
@@ -155,7 +155,7 @@ export default function WinnerCard({ winner }: WinnerCardProps) {
             {/* Modal Header */}
             <div className="flex justify-between items-center p-4 border-b border-gray-200" style={{ backgroundColor: colors.background }}>
               <h3 className="font-bold text-lg truncate pr-4" style={{ color: colors.textPrimary }}>
-                {winner.title || winner.description || winner.institute}
+                {winner.title || winner.institute}
               </h3>
               <button
                 onClick={() => setIsPdfModalOpen(false)}
