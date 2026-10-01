@@ -1363,9 +1363,9 @@ export const previousWinnersMRTA2: PastWinners = {
         },
         {
           "position": "Honourable Mention",
-          "institute": "Rizvi College of Architecture",
-          "title": "",
-          "description": "",
+          "institute": "YASHODA COLLEGE OF ARCHITECTURE",
+          "title": "URBAN LOGISTICS AS ARCHITECTURE",
+          "description": "Urban Logistics as Architecture proposes a new urban workplace typology where infrastructure, commerce, and human experience converge. The project transforms the conventional office block into a vertically integrated, climate-responsive urban ecosystem. A porous landscaped podium establishes a civic interface with the city, while the building rises as a progressively articulated volume, balancing efficiency, identity, and environmental performance. The curved geometry is generated through solar response, circulation, and programmatic transitions, rather than form-making alone. A responsive kinetic facade modulates solar radiation and daylight, creating a dynamic building envelope. Terraces, green spaces, and shared amenities extend the workplace beyond the conventional floor plate, positioning logistics architecture as an active contributor to the contemporary city.",
           "entry": {
             "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_10_MRTA2-A-0022.jpg",
             "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_10_MRTA2-A-0022.jpg"
@@ -1376,9 +1376,9 @@ export const previousWinnersMRTA2: PastWinners = {
         },
         {
           "position": "Honourable Mention",
-          "institute": "Chandigarh College of Architecture",
-          "title": "",
-          "description": "",
+          "institute": "School of Environment & Architecture",
+          "title": "Urban Commons: Space beneath Transit Infrastructure",
+          "description": "The thesis explores transit infrastructure as an extension of its locality, continuously transforming to accommodate evolving uses and practices. Focusing on the National Park Flyover in Borivali, Mumbai, it documents existing practices including interstate bus services, travel agencies, informal inhabitation, and a tow chowky. These observations inform a context-sensitive proposal that reallocates crossroads, improves pedestrian movement through footpaths and crosswalks, introduces elevated connections, and reorganizes spaces beneath the flyover. Programs include travel facilities, passenger waiting areas, spaces for informal vendors, and a community area. The project proposes context-sensitive by-laws to integrate locally grounded urban practices beneath transit infrastructure into the city’s social and spatial continuum.",
           "entry": {
             "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_11_MRTA2-A-0025.jpg",
             "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_11_MRTA2-A-0025.jpg"
@@ -1389,9 +1389,9 @@ export const previousWinnersMRTA2: PastWinners = {
         },
         {
           "position": "Honourable Mention",
-          "institute": "Symbiosis Institute of Technology, Pune",
-          "title": "",
-          "description": "",
+          "institute": "L.S.Raheja School of Architecture",
+          "title": "UNFOLDING THE ISSUES OF PUBLIC TOILET IN VARYING URBAN CONTEXT",
+          "description": "The toilet blocks we often see are small, dark, and dingy structures, placed haphazardly without any consideration for their context which we use only in cases of extreme urgency. While architectural considerations demonstrate an awareness of the need for high-quality public toilets, they often do not receive dedicated attention during the design process. Unfortunately, public toilets are often seen merely as unattractive and functional necessities. However, it is important to challenge this perception and recognize that public toilets have the potential to be aesthetically pleasing and dignified spaces. They can be designed with good aesthetics and considered as places for innovative design and architectural excellence.",
           "entry": {
             "big": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_12_MRTA2-A-0034.jpg",
             "small": "/past-winners/entry/mrta2/thumb/Honourable_Mentions_12_MRTA2-A-0034.jpg"
