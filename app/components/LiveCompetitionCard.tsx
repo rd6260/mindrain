@@ -2,16 +2,11 @@
 
 import Image from "next/image";
 import { colors } from '@/utils/colors';
-import { Changa } from "next/font/google";
 import { useEffect, useState } from "react";
 import DownloadBriefModal, { BriefFile } from "./DownloadModal";
 import BriefModal from "./BriefModal";
 import { createClient } from '@/lib/supabase/client';
 
-const changa = Changa({
-  subsets: ["latin"],
-  weight: ["200", "300", "500"],
-})
 
 // --- Props interface ---
 export interface CompetitionCardProps {
@@ -142,7 +137,10 @@ export default function LiveCompetitionCard({
 
         {/* Bottom / Right Content */}
         <div className="flex flex-col justify-center px-6 sm:px-10 py-8 gap-2">
-          <h1 className={`${changa.className} text-4xl sm:text-5xl font-black leading-tight tracking-tight text-gray-950 uppercase`}>
+          <h1
+            className="text-4xl sm:text-5xl font-black leading-tight tracking-tight text-gray-950 uppercase"
+            style={{ fontFamily: "var(--font-changa), sans-serif" }}
+          >
             {title}
           </h1>
 

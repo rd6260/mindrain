@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Playfair_Display, Inter, Changa } from "next/font/google";
 import PolicyConsentModalLoader from "@/app/components/PolicyConsentModalLoader";
 import "./globals.css";
 
@@ -20,6 +20,12 @@ export const metadata: Metadata = {
   description: "Architecture design competitions and events hosting organization",
 };
 
+const changa = Changa({
+  variable: "--font-changa",
+  subsets: ["latin"],
+  weight: ["200", "300", "500"],
+});
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${playfair.variable} ${inter.variable} antialiased`}>
+      <body className={`${playfair.variable} ${inter.variable} ${changa.variable} antialiased`}>
         {children}
         <PolicyConsentModalLoader />
       </body>
