@@ -182,7 +182,7 @@ function MobileCTAButtons({ onBriefClick, onRegisterClick }: { onBriefClick: () 
           style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})` }}
           data-testid="register-now-button-mobile"
         >
-          Register Now →
+          Apply Now →
         </button>
         <button
           className="w-full px-6 py-4 rounded-lg text-white font-bold text-base transition-all duration-300 active:scale-95 shadow-xl"
@@ -225,7 +225,7 @@ function DesktopHero({ onBriefClick, onRegisterClick }: { onBriefClick: () => vo
         <div className="mt-20 animate-fade-in">
           <div className="flex gap-8">
             <GradientButton onClick={onRegisterClick} testId="register-now-button">
-              Register Now →
+              Apply Now →
             </GradientButton>
             <GradientButton onClick={onBriefClick} testId="download-brief-button">
               Download Brief ↓
@@ -331,7 +331,7 @@ function RegistrationFeeCalculator({ onRegisterClick }: { onRegisterClick: () =>
 
       <div className="flex items-center justify-center">
         <GradientButton onClick={onRegisterClick} className="!px-12 !py-3.5 !text-sm" testId="register-now-button">
-          Register Now →
+          Apply Now →
         </GradientButton>
       </div>
     </div>
