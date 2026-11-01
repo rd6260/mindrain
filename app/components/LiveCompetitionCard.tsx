@@ -6,18 +6,41 @@ import { useEffect, useState } from "react";
 import DownloadBriefModal, { BriefFile } from "./DownloadModal";
 import BriefModal from "./BriefModal";
 import { createClient } from '@/lib/supabase/client';
+import localFont from "next/font/local";
+
+
+const AptosDisplay = localFont({
+  src: [
+    { path: '../fonts/Aptos Display/Aptos-Display.ttf',             weight: '400', style: 'normal' },
+    { path: '../fonts/Aptos Display/Aptos-Display-Italic.ttf',      weight: '400', style: 'italic' },
+    { path: '../fonts/Aptos Display/Aptos-Display-Bold.ttf',        weight: '700', style: 'normal' },
+    { path: '../fonts/Aptos Display/Aptos-Display-Bold-Italic.ttf', weight: '700', style: 'italic' },
+  ],
+  display: 'swap',
+});
 
 
 // --- Props interface ---
+export interface CompetitionDetail {
+  label: React.ReactNode;
+  value: React.ReactNode;
+}
+
+export interface CompetitionHighlight {
+  icon: React.ReactNode; // e.g. an <svg />, an <Image />, or an icon component
+  text: React.ReactNode; // e.g. "6 Winners"
+}
+
 export interface CompetitionCardProps {
   title: React.ReactNode;
-  subtitle: string;
-  imageSrc: string;
-  imageAlt: string;
+  subtitle: React.ReactNode;
+  imageSrc: string; // must stay a string: next/image requires it
+  imageAlt: string; // must stay a string: used for the alt attribute
   prizeLabel: React.ReactNode;
-  details: { label: string; value: string }[];
-  deadlineLabel: string;
-  deadlineValue: string;
+  details: CompetitionDetail[];
+  highlights?: CompetitionHighlight[]; // row of icon + text
+  deadlineLabel: React.ReactNode;
+  deadlineValue: React.ReactNode;
   findOutMoreHref: string;
   briefFiles?: BriefFile[];
   briefModalTitle?: string;
@@ -90,6 +113,7 @@ export default function LiveCompetitionCard({
   imageAlt,
   prizeLabel,
   details,
+  highlights,
   deadlineLabel,
   deadlineValue,
   findOutMoreHref,
@@ -126,27 +150,28 @@ export default function LiveCompetitionCard({
         style={{ backgroundColor: colors.borderLight }}
       >
         {/* Top / Left Image */}
-        <div className="w-full lg:w-[425px] lg:min-w-[425px] h-[260px] sm:h-[340px] lg:h-[475px] relative overflow-hidden flex-shrink-0">
+        <div className="w-full lg:w-[425px] lg:min-w-[425px] h-[260px] sm:h-[340px] lg:h-auto lg:min-h-[475px] relative overflow-hidden flex-shrink-0 self-stretch rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none">
           <Image
             src={imageSrc}
             alt={imageAlt}
             fill
-            className="object-cover rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none"
+            sizes="(min-width: 1024px) 425px, 100vw"
+            className="object-cover"
           />
         </div>
 
         {/* Bottom / Right Content */}
-        <div className="flex flex-col justify-center px-6 sm:px-10 py-8 gap-2">
+        <div className="flex flex-col justify-center flex-1 px-6 sm:px-10 py-8 gap-2">
           <h1
-            className="text-4xl sm:text-5xl font-black leading-tight tracking-tight text-gray-950 uppercase"
-            style={{ fontFamily: "var(--font-changa), sans-serif" }}
+            className={`${AptosDisplay.className} text-4xl sm:text-5xl font-black leading-tight tracking-tight text-gray-950 uppercase`}
           >
             {title}
           </h1>
 
-          <p className="text-base text-gray-700">
+          {/* div instead of p so ReactNode content (block elements) is valid */}
+          <div className="text-base text-gray-700">
             {subtitle}
-          </p>
+          </div>
 
           <div className="flex flex-row gap-2 mb-4">
             <span
@@ -159,16 +184,41 @@ export default function LiveCompetitionCard({
 
           <div className="flex flex-col gap-1 mt-2 mb-4 text-sm text-gray-800 font-semibold">
             {details.map((detail, index) => (
-              <p key={index}>
+              <div key={index}>
                 <span className="text-gray-600">{detail.label}</span>{" "}{detail.value}
-              </p>
+              </div>
             ))}
           </div>
 
-          <p className="text-sm text-gray-600 mt-1 mb-4">
+          {/* Highlights: row of icon + text */}
+          {highlights && highlights.length > 0 && (
+            <div className="border-t border-gray-400/60 pt-5 mb-3">
+              <div
+                className="grid gap-4 text-center"
+                style={{ gridTemplateColumns: `repeat(${highlights.length}, minmax(0, 1fr))` }}
+              >
+                {highlights.map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex flex-col items-center gap-2 text-sm text-gray-800"
+                  >
+                    <span
+                      className="flex items-center justify-center w-6 h-6 [&>svg]:w-full [&>svg]:h-full"
+                      style={{ color: colors.accent }}
+                    >
+                      {item.icon}
+                    </span>
+                    <span>{item.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="text-sm text-gray-600 mt-1 mb-4">
             {deadlineLabel}{" "}
             <span className="font-semibold text-gray-900">{deadlineValue}</span>
-          </p>
+          </div>
 
           <div className="flex flex-row items-center gap-5 mt-3">
             <a
@@ -225,3 +275,4 @@ export default function LiveCompetitionCard({
     </>
   );
 }
+

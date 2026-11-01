@@ -36,6 +36,7 @@ const navItems: NavItem[] = [
         href: '#',
         subSubItems: [
           { label: 'The Architecture of Play', href: '/competition/the-architecture-of-play' },
+          { label: 'The Unreal House', href: '/competition/the-unreal-house-2025-2026' },
         ],
       },
       {

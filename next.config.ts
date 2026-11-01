@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
         hostname: 'web.archive.org',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn.jsdelivr.net',
+        pathname: '/**'
+      }
     ],
   },
 };

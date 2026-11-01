@@ -14,10 +14,24 @@ import localFont from "next/font/local";
 import GuestJury from '../components/GuestJuryComponent';
 import { createClient } from '@/lib/supabase/client';
 import { isOnboardingComplete } from '@/utils/onboarding';
+import { getCdnUrl } from '@/utils/cdn'
+import { Trophy, Medal, Images } from 'lucide-react';
+
 
 const FEARLogo = localFont({
   src: "../fonts/FEARLogo-Regular.woff2"
 })
+
+const AptosDisplay = localFont({
+  src: [
+    { path: '../fonts/Aptos Display/Aptos-Display.ttf',             weight: '400', style: 'normal' },
+    { path: '../fonts/Aptos Display/Aptos-Display-Italic.ttf',      weight: '400', style: 'italic' },
+    { path: '../fonts/Aptos Display/Aptos-Display-Bold.ttf',        weight: '700', style: 'normal' },
+    { path: '../fonts/Aptos Display/Aptos-Display-Bold-Italic.ttf', weight: '700', style: 'italic' },
+  ],
+  display: 'swap',
+});
+
 
 
 
@@ -283,6 +297,53 @@ export default function HomePage() {
             briefModalTitle="Download Brief"
             briefModalSubtitle="The Architecture of Play — select files to download"
             eventId="1389f7d3-e98a-40dd-819a-5b756e3c2ada"
+          />
+
+          <div className="h-6" />
+
+          <LiveCompetitionCard
+            title= "Function Follows Form"
+            subtitle="An Immersive Architectural Design Workshop"
+            imageSrc= {getCdnUrl("public/workshops/function-follows-form/function-follows-form-ratio-3-4.png")}
+            imageAlt="FFF"
+            prizeLabel={<span className="font-bold text-sm">Limited to 15 Participants</span>}
+            details={[
+              { label: "Date", value: "17-22 December 2026" },
+              { label: "Mode", value: "3 Day Online + 6 Days Offline" },
+              { label: "Location", value: "Hydrabad, India" },
+            ]}
+            deadlineLabel="Registration Ends on"
+            deadlineValue="10 December 2026"
+            findOutMoreHref="/competition/the-architecture-of-play"
+            briefModalTitle="Download Brief"
+            briefModalSubtitle="The Architecture of Play — select files to download"
+            eventId=""
+          />
+
+          <div className="h-6" />
+
+          <LiveCompetitionCard
+            title="THE MINDRAIN LENS TROPHY"
+            subtitle="An Open Photography & Architecture Photography Competition"
+            imageSrc={getCdnUrl("public/competitions/the-mr-lens-trophy-26/the-mr-lens-trophy-ratio-3-4.webp")}
+            imageAlt="The Mindrain Lens Trophy"
+            prizeLabel={<span className="font-bold text-sm">Edition 02 · 2026–27</span>}
+            details={[
+              { label: "Categories", value: "Open Photography & Architecture Photography" },
+              { label: "Eligibility", value: "Open to everyone" },
+              { label: "Recognition", value: "3 Winners per Category · 20+ Honourable Mentions" },
+            ]}
+            highlights={[
+              { icon: <Trophy strokeWidth={1.6} />, text: "6 Winners" },
+              { icon: <Medal strokeWidth={1.6} />, text: "20+ Mentions" },
+              { icon: <Images strokeWidth={1.6} />, text: "10 Entries Max." },
+            ]}
+            deadlineLabel="Registration closes"
+            deadlineValue="18 January 2027"
+            findOutMoreHref="/competition/the-mindrain-lens-trophy"
+            briefModalTitle="Download Brief"
+            briefModalSubtitle="The Mindrain Lens Trophy — select files to download"
+            eventId="" // TODO: add the real event id so "Download brief" shows
           />
 
           <div className="h-6" />
