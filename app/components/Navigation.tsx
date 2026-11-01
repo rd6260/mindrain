@@ -11,8 +11,22 @@ const FEARLogo = localFont({
   src: "../fonts/FEARLogo-Regular.woff2"
 })
 
+type SubSubItem = { label: string; href: string };
 
-const navItems = [
+type SubItem = {
+  label: string;
+  href: string;
+  subSubItems?: SubSubItem[];
+};
+
+type NavItem = {
+  label: string;
+  href: string;
+  subItems?: SubItem[];
+};
+
+
+const navItems: NavItem[] = [
   {
     label: 'Competitions',
     href: '#',
