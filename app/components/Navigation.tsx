@@ -40,6 +40,16 @@ const navItems = [
       },
     ],
   },
+  {
+    label: 'Workshops',
+    href: '#',
+    subItems: [
+      {
+        label: 'Function Follows Form',
+        href: '/workshops/function-follows-form',
+      },
+    ],
+  },
   { label: 'Winners', href: '/pastWinners' },
   { label: 'Earn with Us', href: '/earn' },
   { label: 'About us', href: '/about' },
