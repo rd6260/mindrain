@@ -20,6 +20,24 @@ interface CompetitionData {
 // ─── Registry ─────────────────────────────────────────────────────────────────
 
 const COMPETITIONS: Record<string, CompetitionData> = {
+  // Function Follows Form
+  '6159b71a-f973-453a-a383-6b2bbfca707a': {
+    meta: {
+      title: 'Function Follows Form',
+      subtitle: 'Think beyond the box. Design with intent',
+      category: 'Architecture Deign Workhop',
+      edition: 'Edition 02',
+      registrationUrl: 'https://www.mindrain.org/competition/the-unreal-house-2025-2026',
+    },
+    briefFiles: [
+       {
+        name: 'Function Follows Form',
+        description: 'Complete Brief',
+        url: 'https://cdn.jsdelivr.net/gh/rd6260/mindrain@main/public/brief/function-follows-form/Function-Follows-Form-29.10.2026.pdf',
+      },
+    ]
+  },
+
   // The Unreal House
   '3f123e78-60d6-494d-b307-18c5b4c8ab7f': {
     meta: {
