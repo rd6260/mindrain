@@ -267,7 +267,6 @@ export default function HomePage() {
             className="h-px flex-1 bg-black mt-4 mb-16"
           />
 
-
           <LiveCompetitionCard
             title="THE ARCHITECTURE OF PLAY"
             subtitle="A Design Competition for Young Minds"
@@ -287,32 +286,6 @@ export default function HomePage() {
           />
 
           <div className="h-6" />
-
-          <LiveCompetitionCard
-            title={<>MIND RAIN<br />THESIS AWARD <span className="font-thin text-3xl">#02</span></>}
-            subtitle="India's Premier Thesis Recognition Award"
-            imageSrc="/thesis-award-2026/live-thumbnail.webp"
-            imageAlt="Thesis Award 2026"
-            prizeLabel={<>Overall Winner Prize <span className="font-bold text-sm">₹15,000</span></>}
-            details={[
-              { label: "Origin", value: "India" },
-              { label: "Eligibility", value: "Students Completed UG from 2019-2026" },
-            ]}
-            deadlineLabel="Regular Registration Ends"
-            deadlineValue="30 June 2026"
-            findOutMoreHref="/competition/thesis-award-2026"
-            briefFiles={[
-              { name: "MR Thesis Award Detailed PDF", description: "Full competition brief document", url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/thesis_award_26/MindRain%20Thesis%20Award%20(Detailed%20PDF).pdf" },
-              { name: "Important Dates & Calendar", description: "Key deadlines and schedule", url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/thesis_award_26/Important%20Dates-Calender.pdf" },
-              { name: "Terms & Conditions", description: "Important rules and regulations", url: "https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/thesis_award_26/T%26C%20doc..pdf" },
-            ]}
-            briefModalTitle="Download Brief"
-            briefModalSubtitle="Thesis Award 2026 — select files to download"
-            eventId="c4a201ae-8bfe-48bc-a526-4ac1288dd937"
-          />
-
-          <div className="h-6" />
-
 
           <div className='flex justify-center items-center py-4 text-sm'>
             <span>
