@@ -10,6 +10,18 @@ import { useEffect, useState } from 'react';
 import localFont from 'next/font/local';
 import { getCompetitionMeta } from '@/data/competitionBriefFiles';
 import { IMPORTANT_DATES } from '@/utils/functionFollowsFormData';
+import {
+  MapPin,
+  Clock,
+  Users,
+  CalendarCheck,
+  Building2,
+  Utensils,
+  PencilRuler,
+  Laptop,
+  Gift,
+  Award,
+} from 'lucide-react';
 
 // ─── Font ─────────────────────────────────────────────────────────────────────
 const AptosDisplay = localFont({
@@ -28,18 +40,54 @@ const REGISTRATION_EVENT_ID = '6159b71a-f973-453a-a383-6b2bbfca707a';
 const meta = getCompetitionMeta(REGISTRATION_EVENT_ID)!;
 const REGISTRATION_URL = `/registration-3?event_id=${REGISTRATION_EVENT_ID}`;
 
-const REGISTRATION_FEES = {
-  india: { label: 'India', amount: '₹15,999' },
-  international: { label: 'International', amount: '$330' },
-} as const;
+const INTRODUCTION_TEXT =
+  'An immersive architectural design workshop that challenges conventional thinking through concept development, form exploration, spatial experimentation and hands-on model making. Discover how ideas evolve into meaningful architectural spaces through guided design exercises and critical discussions.';
 
-type FeeOrigin = keyof typeof REGISTRATION_FEES;
+const DESIGNED_FOR = [
+  'First- and second-year architecture students.',
+  'Open to students from all years of architectural education.',
+  'Beginners welcome. No advanced design experience required.',
+];
 
-const WORKSHOP_DETAILS = [
-  { label: 'Online Sessions', value: '12–14 December 2026' },
-  { label: 'Offline Workshop', value: '17–22 December 2026' },
-  { label: 'Offline Workshop Location', value: 'Hyderabad, Telangana, India' },
-  { label: 'Limited Seats', value: '15 Participants' },
+const WORKSHOP_OVERVIEW = [
+  { label: 'Duration', icon: Clock, values: ['3 Days Online', '6 Days Offline'] },
+  { label: 'Location', icon: MapPin, values: ['Hyderabad, India'] },
+  { label: 'Capacity', icon: Users, values: ['15 Participants'] },
+];
+
+const WORKSHOP_SCHEDULE = [
+  {
+    mode: 'Online',
+    dates: '12–14 December 2026',
+    description: '3 Days of Online Classes',
+    badgeBg: 'rgba(59, 130, 246, 0.12)',
+    badgeColor: '#3B82F6',
+  },
+  {
+    mode: 'Offline',
+    dates: '17–22 December 2026',
+    description: '6 Days of On-site Workshop',
+    badgeBg: 'rgba(34, 197, 94, 0.12)',
+    badgeColor: '#22A55A',
+  },
+];
+
+const REGISTRATION_WINDOW = {
+  range: '01 Nov – 10 Dec 2026',
+  note: 'Applications close on 10 December 2026.',
+};
+
+const FACILITIES_HEADING = 'Your Workshop Experience';
+const FACILITIES_DESCRIPTION =
+  'More than just a workshop. Everything arranged to make your design journey comfortable, engaging and rewarding.';
+
+const FACILITIES = [
+  { icon: Building2,   title: 'Accommodation',    description: '3-star or above hotel stay' },
+  { icon: Utensils,    title: 'Daily Meals',      description: 'Breakfast, lunch & evening snacks' },
+  { icon: PencilRuler, title: 'Design Materials', description: 'Stationery & model-making supplies' },
+  { icon: Laptop,      title: 'Online Sessions',  description: '3 days of online classes' },
+  { icon: Gift,        title: 'Goodies',          description: 'Workshop merchandise & surprises' },
+  { icon: Award,       title: 'Certification',    description: 'Completion / Best Design Certificates' },
 ];
 
 // ─── Small Shared Components ──────────────────────────────────────────────────
@@ -60,83 +108,6 @@ function GradientButton({ href, onClick, children, className = '', testId }: {
   return <button onClick={onClick} className={baseClass} style={style} data-testid={testId}>{children}</button>;
 }
 
-// ─── Registration Coming Soon Popup ───────────────────────────────────────────
-
-function RegistrationComingSoonPopup({ onClose }: { onClose: () => void }) {
-  return (
-    <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
-      style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
-      onClick={onClose}
-    >
-      <div
-        className="relative w-full max-w-md rounded-2xl p-8 shadow-2xl animate-fade-in-up text-center"
-        style={{ backgroundColor: '#FAFAF7', border: '1px solid #E5E3D7' }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full text-[#6B6B6B] hover:text-[#1A1A1A] hover:bg-[#E5E3D7] transition-all"
-          aria-label="Close"
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M2 2l12 12M14 2L2 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-        </button>
-
-        <h2 className="text-2xl font-bold mb-2" style={{ color: '#1A1A1A' }}>Something went wrong!</h2>
-        <p className="text-base leading-relaxed mb-6" style={{ color: '#6B6B6B' }}>
-          Please try again later, or reach out to us at:
-        </p>
-
-        <a
-          href="mailto:support@mindrain.org"
-          className="inline-block px-6 py-3 rounded-lg text-white font-semibold text-base transition-all hover:scale-105 shadow-lg"
-          style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})` }}
-          data-testid="registration-coming-soon-email-link"
-        >
-          support@mindrain.org
-        </a>
-      </div>
-    </div>
-  );
-}
-
-
-function SectionHeading({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex items-center gap-3 mb-3">
-      <div className="relative flex-shrink-0 w-2.5 h-2.5">
-        <span className="absolute inset-0 rounded-full bg-[#2C5F5F]" />
-        <span className="absolute inset-0 rounded-full bg-[#2C5F5F] animate-ping opacity-50" />
-      </div>
-      <h2 className="text-xs font-bold uppercase tracking-widest text-[#2C5F5F]">{children}</h2>
-    </div>
-  );
-}
-
-function ToggleButton({ active, onClick, children }: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`
-        flex-1 py-3 px-4 rounded-xl text-sm font-semibold border transition-all duration-200
-        ${active
-          ? 'bg-[#2C5F5F] text-white border-[#2C5F5F] shadow-md shadow-[#2C5F5F]/20'
-          : 'bg-[#F8F7F2] text-[#6B6B6B] border-[#D0CEC2] hover:border-[#2C5F5F] hover:text-[#2C5F5F]'
-        }
-      `}
-    >
-      {children}
-    </button>
-  );
-}
 
 // ─── Sections ─────────────────────────────────────────────────────────────────
 
@@ -237,32 +208,189 @@ function DesktopHero({ onBriefClick, onRegisterClick }: { onBriefClick: () => vo
   );
 }
 
-function WorkshopOverview({ onBriefClick }: { onBriefClick: () => void }) {
+function Introduction() {
   return (
-    <section id="overview" className="py-24 px-4 sm:px-6 lg:px-8 relative">
+    <section id="introduction" className="pt-24 pb-6 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto animate-fade-in-up">
+        <h2 className="text-3xl md:text-4xl font-bold mb-5" style={{ color: colors.textPrimary }}>
+          Introduction
+        </h2>
+        <p className="text-lg md:text-xl leading-relaxed" style={{ color: colors.textSecondary }}>
+          {INTRODUCTION_TEXT}
+        </p>
+      </div>
+    </section>
+  );
+}
+
+function DesignedFor() {
+  return (
+    <section id="designed-for" className="py-6 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto animate-fade-in-up">
+        <h2
+          className="text-sm md:text-base font-bold uppercase tracking-widest mb-5"
+          style={{ color: colors.textPrimary }}
+        >
+          Designed For
+        </h2>
+        <ul className="space-y-3">
+          {DESIGNED_FOR.map((item) => (
+            <li key={item} className="flex items-start gap-3 text-lg" style={{ color: colors.textSecondary }}>
+              <span
+                className="mt-2.5 w-1.5 h-1.5 rounded-full flex-shrink-0"
+                style={{ backgroundColor: colors.accent }}
+              />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+function WorkshopOverview() {
+  return (
+    <section id="overview" className="py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
-        {/* Workshop Details */}
         <div
-          className="rounded-lg p-8 md:p-10 shadow-xl mb-10 border-2 animate-fade-in-up"
+          className="rounded-lg p-8 md:p-10 animate-fade-in-up"
           style={{ backgroundColor: colors.white, borderColor: colors.borderLight }}
         >
           <h3 className="text-2xl font-bold mb-6 pb-4 border-b-2" style={{ color: colors.textPrimary }}>
-            Workshop Details
+            Workshop Overview
           </h3>
-          <dl className="space-y-1">
-            {WORKSHOP_DETAILS.map(({ label, value }) => (
-              <div
-                key={label}
-                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 py-4 border-b border-[#E5E3D7] last:border-b-0"
-              >
-                <dt className="text-base font-medium" style={{ color: colors.textSecondary }}>{label}</dt>
-                <dd className="text-lg font-bold sm:text-right" style={{ color: colors.textPrimary }}>{value}</dd>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-10 gap-y-8">
+            {WORKSHOP_OVERVIEW.map(({ label, icon: Icon, values }) => (
+              <div key={label}>
+                <div className="flex items-center gap-3 mb-3">
+                  <Icon size={20} style={{ color: colors.textSecondary }} />
+                  <h4 className="text-lg font-bold uppercase" style={{ color: colors.textPrimary }}>
+                    {label}
+                  </h4>
+                </div>
+                <div className="space-y-1">
+                  {values.map((v) => (
+                    <p key={v} className="text-lg" style={{ color: colors.textSecondary }}>
+                      {v}
+                    </p>
+                  ))}
+                </div>
               </div>
             ))}
-          </dl>
+          </div>
         </div>
+      </div>
+    </section>
+  );
+}
 
-        {/* Interested in Applying */}
+function WorkshopSchedule() {
+  return (
+    <section id="schedule" className="py-6 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto">
+        <div
+          className="rounded-lg p-8 md:p-10 animate-fade-in-up"
+          style={{ backgroundColor: colors.white, borderColor: colors.borderLight }}
+        >
+          <h3 className="text-2xl font-bold mb-6 pb-4 border-b-2" style={{ color: colors.textPrimary }}>
+            Workshop Schedule
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-8">
+            {WORKSHOP_SCHEDULE.map(({ mode, dates, description, badgeBg, badgeColor }) => (
+              <div key={mode}>
+                <span
+                  className="inline-block px-3 py-1 rounded-full text-sm font-medium uppercase tracking-wide mb-3"
+                  style={{ backgroundColor: badgeBg, color: badgeColor }}
+                >
+                  {mode}
+                </span>
+                <h4 className="text-lg font-bold mb-1" style={{ color: colors.textPrimary }}>
+                  {dates}
+                </h4>
+                <p className="text-lg" style={{ color: colors.textSecondary }}>
+                  {description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function RegistrationWindow() {
+  return (
+    <section id="registration-window" className="py-6 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto">
+        <div
+          className="rounded-lg p-8 md:p-10 animate-fade-in-up"
+          style={{ backgroundColor: colors.white, borderColor: colors.borderLight }}
+        >
+          <h3 className="text-2xl font-bold mb-6 pb-4 border-b-2" style={{ color: colors.textPrimary }}>
+            Registration Window
+          </h3>
+          <div>
+            <div className="flex items-center gap-3 mb-3">
+              <CalendarCheck size={20} style={{ color: colors.textSecondary }} />
+              <h4 className="text-lg font-bold uppercase" style={{ color: colors.textPrimary }}>
+                {REGISTRATION_WINDOW.range}
+              </h4>
+            </div>
+            <p className="text-lg" style={{ color: colors.textSecondary }}>
+              {REGISTRATION_WINDOW.note}
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Facilities() {
+  return (
+    <section id="facilities" className="py-6 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto">
+        <div
+          className="rounded-lg p-8 md:p-10 animate-fade-in-up"
+          style={{ backgroundColor: colors.white, borderColor: colors.borderLight }}
+        >
+          <h3 className="text-2xl font-bold mb-3" style={{ color: colors.textPrimary }}>
+            {FACILITIES_HEADING}
+          </h3>
+          <p className="text-lg leading-relaxed mb-6 pb-6 border-b-2" style={{ color: colors.textSecondary }}>
+            {FACILITIES_DESCRIPTION}
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-10">
+            {FACILITIES.map(({ icon: Icon, title, description }) => (
+              <div key={title}>
+                <Icon size={26} className="mb-5" style={{ color: colors.textSecondary }} />
+                <h4 className="text-xl font-bold mb-1" style={{ color: colors.textPrimary }}>
+                  {title}
+                </h4>
+                <p className="text-lg" style={{ color: colors.textSecondary }}>
+                  {description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function InterestedInApplying({
+  onBriefClick,
+  onRegisterClick,
+}: {
+  onBriefClick: () => void;
+  onRegisterClick: () => void;
+}) {
+  return (
+    <section id="apply" className="pt-6 pb-24 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto">
         <div
           className="rounded-lg p-8 md:p-10 animate-fade-in-up"
           style={{ backgroundColor: colors.cardBackground }}
@@ -279,62 +407,27 @@ function WorkshopOverview({ onBriefClick }: { onBriefClick: () => void }) {
             questions, and submit a LOR (Letter of Recommendation) from an Architectural Design
             faculty member who has taught them.
           </p>
-          <button
-            onClick={onBriefClick}
-            className="px-8 py-3 rounded-lg text-white font-semibold transition-all hover:opacity-90"
-            style={{ backgroundColor: colors.accent }}
-            data-testid="overview-download-brief-button"
-          >
-            Download Brief ↓
-          </button>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <button
+              onClick={onRegisterClick}
+              className="px-8 py-3 rounded-lg text-white font-semibold transition-all hover:opacity-90"
+              style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})` }}
+              data-testid="overview-apply-now-button"
+            >
+              Apply Now →
+            </button>
+            <button
+              onClick={onBriefClick}
+              className="px-8 py-3 rounded-lg text-white font-semibold transition-all hover:opacity-90"
+              style={{ backgroundColor: colors.accent }}
+              data-testid="overview-download-brief-button"
+            >
+              Download Brief ↓
+            </button>
+          </div>
         </div>
       </div>
     </section>
-  );
-}
-
-function RegistrationFeeCalculator({ onRegisterClick }: { onRegisterClick: () => void }) {
-  const [origin, setOrigin] = useState<FeeOrigin>('india');
-  const { label, amount } = REGISTRATION_FEES[origin];
-
-  return (
-    <div className="rounded-lg p-6 space-y-7" style={{ backgroundColor: colors.white }}>
-
-      {/* Application Type */}
-      <div>
-        <SectionHeading>Application Type</SectionHeading>
-        <div className="flex gap-2">
-          <ToggleButton active={origin === 'india'} onClick={() => setOrigin('india')}>Indian Application</ToggleButton>
-          <ToggleButton active={origin === 'international'} onClick={() => setOrigin('international')}>International</ToggleButton>
-        </div>
-      </div>
-
-      <div className="border-t border-[#E5E3D7]" />
-
-      {/* Registration Fee */}
-      <div>
-        <SectionHeading>Registration Fee</SectionHeading>
-        <div className="flex items-center justify-between px-4 py-3.5 rounded-xl border bg-[#F8F7F2] border-[#D0CEC2]">
-          <div className="flex items-center gap-3">
-            <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#2C5F5F]" />
-            <span className="text-sm text-[#6B6B6B] font-medium">{label}</span>
-          </div>
-          <span className="text-base font-bold tabular-nums text-[#2C5F5F]" data-testid="registration-fee-amount">
-            {amount}
-          </span>
-        </div>
-
-        <p className="text-[10px] text-[#8B8B8B] mt-3 text-center">
-          Limited to 15 participants
-        </p>
-      </div>
-
-      <div className="flex items-center justify-center">
-        <GradientButton onClick={onRegisterClick} className="!px-12 !py-3.5 !text-sm" testId="register-now-button">
-          Apply Now →
-        </GradientButton>
-      </div>
-    </div>
   );
 }
 
@@ -372,21 +465,22 @@ export default function CompetitionPage() {
           style={{ backgroundColor: colors.accent }}
         />
 
+        {/* Hero */}
         <MobileHero />
         <DesktopHero onBriefClick={() => setIsBriefOpen(true)} onRegisterClick={handleRegisterClick} />
-
         <MobileCTAButtons onBriefClick={() => setIsBriefOpen(true)} onRegisterClick={handleRegisterClick} />
-        <WorkshopOverview onBriefClick={() => setIsBriefOpen(true)} />
 
-
-        <section id="register" className="py-20 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-4xl md:text-5xl font-bold text-center mb-12" style={{ color: colors.textPrimary }}>
-              Registration Fees
-            </h2>
-            <RegistrationFeeCalculator onRegisterClick={handleRegisterClick} />
-          </div>
-        </section>
+        {/* Content flow */}
+        <Introduction />
+        <DesignedFor />
+        <WorkshopOverview />
+        <WorkshopSchedule />
+        <RegistrationWindow />
+        <Facilities />
+        <InterestedInApplying
+          onBriefClick={() => setIsBriefOpen(true)}
+          onRegisterClick={handleRegisterClick}
+        />
 
         <Footer />
       </div>
@@ -396,7 +490,6 @@ export default function CompetitionPage() {
         onClose={() => setIsBriefOpen(false)}
         eventId={REGISTRATION_EVENT_ID}
       />
-
     </>
   );
 }
