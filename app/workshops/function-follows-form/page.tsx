@@ -38,7 +38,7 @@ type FeeOrigin = keyof typeof REGISTRATION_FEES;
 const WORKSHOP_DETAILS = [
   { label: 'Online Sessions', value: '12–14 December 2026' },
   { label: 'Offline Workshop', value: '17–22 December 2026' },
-  { label: 'Location', value: 'Hyderabad, Telangana, India' },
+  { label: 'Offline Workshop Location', value: 'Hyderabad, Telangana, India' },
   { label: 'Limited Seats', value: '15 Participants' },
 ];
 
