@@ -276,8 +276,8 @@ function WorkshopOverview({ onBriefClick }: { onBriefClick: () => void }) {
           </p>
           <p className="text-lg leading-relaxed mb-6" style={{ color: colors.textSecondary }}>
             Applicants are required to complete the application form, answer the design reflection
-            questions, and submit a Letter of Recommendation from an Architectural Design faculty
-            member who has taught them.
+            questions, and submit a LOR (Letter of Recommendation) from an Architectural Design
+            faculty member who has taught them.
           </p>
           <button
             onClick={onBriefClick}
