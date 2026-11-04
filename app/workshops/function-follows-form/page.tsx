@@ -8,6 +8,7 @@ import Navigation from '@/app/components/Navigation';
 import BriefModal from '@/app/components/BriefModal';
 import { useEffect, useState } from 'react';
 import localFont from 'next/font/local';
+import { FUNCTION_FOLLOWS_FORM } from '@/config/projects';
 import { getCompetitionMeta } from '@/data/competitionBriefFiles';
 import {
   MapPin,
@@ -35,9 +36,9 @@ const AptosDisplay = localFont({
 
 // ─── Static Data ──────────────────────────────────────────────────────────────
 
-const REGISTRATION_EVENT_ID = '6159b71a-f973-453a-a383-6b2bbfca707a';
+const REGISTRATION_EVENT_ID = FUNCTION_FOLLOWS_FORM.eventId;
 const meta = getCompetitionMeta(REGISTRATION_EVENT_ID)!;
-const REGISTRATION_URL = `/registration-3?event_id=${REGISTRATION_EVENT_ID}`;
+const REGISTRATION_URL = FUNCTION_FOLLOWS_FORM.registrationPath;
 
 const INTRODUCTION_TEXT =
   'An immersive architectural design workshop that challenges conventional thinking through concept development, form exploration, spatial experimentation and hands-on model making. Discover how ideas evolve into meaningful architectural spaces through guided design exercises and critical discussions.';

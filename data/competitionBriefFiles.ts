@@ -1,3 +1,5 @@
+import { ARCHITECTURE_OF_PLAY, FUNCTION_FOLLOWS_FORM } from '@/config/projects';
+
 export interface BriefFile {
   name: string;
   description: string;
@@ -21,7 +23,7 @@ interface CompetitionData {
 
 const COMPETITIONS: Record<string, CompetitionData> = {
   // Function Follows Form
-  '6159b71a-f973-453a-a383-6b2bbfca707a': {
+  [FUNCTION_FOLLOWS_FORM.eventId]: {
     meta: {
       title: 'Function Follows Form',
       subtitle: 'Think beyond the box. Design with intent',
@@ -72,7 +74,7 @@ const COMPETITIONS: Record<string, CompetitionData> = {
   },
 
   // The Architecture of Play
-  '1389f7d3-e98a-40dd-819a-5b756e3c2ada': {
+  [ARCHITECTURE_OF_PLAY.eventId]: {
     meta: {
       title: 'The Architecture of Play',
       subtitle: 'A Kindergarten Design Challenge',

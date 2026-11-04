@@ -8,6 +8,7 @@ import Navigation from '@/app/components/Navigation';
 import BriefModal from '@/app/components/BriefModal';
 import { useEffect, useState } from 'react';
 import localFont from 'next/font/local';
+import { ARCHITECTURE_OF_PLAY } from '@/config/projects';
 import { getCompetitionMeta } from '@/data/competitionBriefFiles';
 import {
   IMPORTANT_DATES,
@@ -26,9 +27,9 @@ const NiceSchool = localFont({ src: '../../fonts/Nice-School.otf' });
 
 // ─── Static Data ──────────────────────────────────────────────────────────────
 
-const REGISTRATION_EVENT_ID = '1389f7d3-e98a-40dd-819a-5b756e3c2ada';
+const REGISTRATION_EVENT_ID = ARCHITECTURE_OF_PLAY.eventId;
 const meta = getCompetitionMeta(REGISTRATION_EVENT_ID)!;
-const REGISTRATION_URL = `/registration-3?event_id=${REGISTRATION_EVENT_ID}`;
+const REGISTRATION_URL = ARCHITECTURE_OF_PLAY.registrationPath;
 
 
 

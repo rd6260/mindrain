@@ -15,6 +15,7 @@ import GuestJury from '../components/GuestJuryComponent';
 import { createClient } from '@/lib/supabase/client';
 import { isOnboardingComplete } from '@/utils/onboarding';
 import { getCdnUrl } from '@/utils/cdn'
+import { ARCHITECTURE_OF_PLAY } from '@/config/projects';
 import { Trophy, Medal, Images } from 'lucide-react';
 
 
@@ -296,7 +297,7 @@ export default function HomePage() {
             findOutMoreHref="/competition/the-architecture-of-play"
             briefModalTitle="Download Brief"
             briefModalSubtitle="The Architecture of Play — select files to download"
-            eventId="1389f7d3-e98a-40dd-819a-5b756e3c2ada"
+            eventId={ARCHITECTURE_OF_PLAY.eventId}
           />
 
           <div className="h-6" />

@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 import ArchitectureOfPlayForm from './ArchitectureOfPlayForm';
+import { ARCHITECTURE_OF_PLAY } from '@/config/projects';
 import type { RegistrationFormProps } from './types';
 
 /**
@@ -9,7 +10,7 @@ import type { RegistrationFormProps } from './types';
  * Function Follows Form is intentionally absent until its form is built.
  */
 const REGISTRATION_FORMS: Record<string, ComponentType<RegistrationFormProps>> = {
-  '1389f7d3-e98a-40dd-819a-5b756e3c2ada': ArchitectureOfPlayForm,
+  [ARCHITECTURE_OF_PLAY.eventId]: ArchitectureOfPlayForm,
 };
 
 export function getRegistrationForm(eventId: string) {

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { ARCHITECTURE_OF_PLAY } from '@/config/projects';
 import { FloatingInput, SectionHeading, ToggleBtn } from './ui';
 import type { RegistrationFormProps } from './types';
 
@@ -15,7 +16,7 @@ interface MemberData {
   institute_id_url?: string;
 }
 
-const STORAGE_BUCKET = 'college_id/architecture_of_play';
+const STORAGE_BUCKET = ARCHITECTURE_OF_PLAY.idUploadBucket;
 
 const emptyMember = (year: number): MemberData => ({
   name: '', email: '', phone: '', institute: '', academic_year: year, institute_id_file: null,

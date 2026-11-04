@@ -5,9 +5,8 @@ import {
   type FeeKey,
   type Tier,
 } from '@/utils/architectureOfPlayData';
+import { ARCHITECTURE_OF_PLAY } from '@/config/projects';
 import type { BaseFee, ProjectConfig } from './types';
-
-export const ARCHITECTURE_OF_PLAY_EVENT_ID = '1389f7d3-e98a-40dd-819a-5b756e3c2ada';
 
 function feeFor(formData: Record<string, any>, tier: Tier): BaseFee {
   const isIndian = String(formData.country ?? '').toLowerCase() === 'india';
@@ -28,8 +27,8 @@ function feeFor(formData: Record<string, any>, tier: Tier): BaseFee {
 }
 
 export const architectureOfPlay: ProjectConfig = {
-  eventId: ARCHITECTURE_OF_PLAY_EVENT_ID,
-  title: 'The Architecture of Play',
+  eventId: ARCHITECTURE_OF_PLAY.eventId,
+  title: ARCHITECTURE_OF_PLAY.title,
 
   validateFormData(fd) {
     if (!fd.country || typeof fd.country !== 'string') return 'Country is required';
