@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense, createElement } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { getProjectConfig } from '@/config/projects';
 import { isOnboardingComplete } from '@/utils/onboarding';
 import { getRegistrationForm, hasRegistrationForm } from '@/app/components/registration/registry';
 
@@ -56,6 +57,7 @@ function RegistrationContent() {
   const [initialData, setInitialData] = useState<Record<string, any> | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [showAlreadyPaid, setShowAlreadyPaid] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const supabase = createClient();
 
@@ -116,7 +118,11 @@ function RegistrationContent() {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Registration failed');
-    window.location.href = `/payment-3?registration_id=${data.registration_id}`;
+    if (data.payment_required) {
+      window.location.href = `/payment-3?registration_id=${data.registration_id}`;
+    } else {
+      setSubmitted(true);
+    }
   };
 
   if (!onboardingChecked || loadingEvents) return <Spinner label="Loading..." />;
@@ -139,6 +145,16 @@ function RegistrationContent() {
           </div>
         </div>
       </div>
+    );
+  }
+
+  if (submitted) {
+    return (
+      <Notice
+        title="Application Submitted"
+        body="Thank you! We've received your application. We'll be in touch with next steps."
+        action={{ label: 'Go to Home', onClick: () => { window.location.href = '/'; } }}
+      />
     );
   }
 
@@ -192,6 +208,8 @@ function RegistrationContent() {
     );
   }
 
+  const paymentEnabled = !!getProjectConfig(selectedEventId)?.paymentEnabled;
+
   return (
     <div className="min-h-screen bg-[#EDEBDF] py-10 px-4">
       <div className="max-w-2xl mx-auto">
@@ -209,7 +227,9 @@ function RegistrationContent() {
             {isEditMode ? 'Update Registration' : 'Event Registration'}
           </h1>
           <p className="text-[#6B6B6B] mt-1 text-sm">
-            {isEditMode ? 'Update your details below and proceed to payment' : 'Complete all sections to secure your spot'}
+            {isEditMode
+              ? `Update your details below${paymentEnabled ? ' and proceed to payment' : ''}`
+              : 'Complete all sections to secure your spot'}
           </p>
         </div>
 

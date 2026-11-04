@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getProject } from '@/lib/projects';
+import { getProjectConfig } from '@/config/projects';
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,6 +20,8 @@ export async function POST(req: NextRequest) {
     if (!project) {
       return NextResponse.json({ error: 'Registration is not open for this event' }, { status: 400 });
     }
+
+    const paymentRequired = !!getProjectConfig(event_id)?.paymentEnabled;
 
     const validationError = project.validateFormData(form_data);
     if (validationError) {
@@ -63,7 +66,7 @@ export async function POST(req: NextRequest) {
         console.error('Update error:', updateError);
         return NextResponse.json({ error: 'Failed to update registration' }, { status: 500 });
       }
-      return NextResponse.json({ registration_id: updatedReg.id, team_id: updatedReg.team_id });
+      return NextResponse.json({ registration_id: updatedReg.id, team_id: updatedReg.team_id, payment_required: paymentRequired });
     }
 
     let referralId: string | null = null;
@@ -106,7 +109,7 @@ export async function POST(req: NextRequest) {
         console.error('Insert error:', error);
         return NextResponse.json({ error: 'Failed to create registration' }, { status: 500 });
       }
-      return NextResponse.json({ registration_id: data.id, team_id: data.team_id });
+      return NextResponse.json({ registration_id: data.id, team_id: data.team_id, payment_required: paymentRequired });
     }
 
     return NextResponse.json({ error: 'Failed to generate unique team ID after retries' }, { status: 500 });

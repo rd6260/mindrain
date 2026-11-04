@@ -9,6 +9,7 @@ export const ARCHITECTURE_OF_PLAY = {
   kind: 'competition',
   pagePath: '/competition/the-architecture-of-play',
   registrationPath: registrationPath(eventId),
+  paymentEnabled: true,
   /** Supabase storage bucket for institute ID uploads. */
   idUploadBucket: 'college_id/architecture_of_play',
 } as const satisfies ProjectBaseConfig & { idUploadBucket: string };

@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { getProjectConfig } from '@/config/projects';
 import { getProject } from '@/lib/projects';
 import type { BaseFee, SummaryRow } from '@/lib/projects';
 
@@ -43,11 +44,17 @@ export async function quoteRegistration(args: {
   if (reg.paid) return { ok: false, status: 400, error: 'Registration already paid' };
 
   const project = getProject(reg.event_id);
-  if (!project) return { ok: false, status: 400, error: 'Payments are not available for this event' };
+  if (!project || !getProjectConfig(reg.event_id)?.paymentEnabled) return { ok: false, status: 400, error: 'Payments are not available for this event' };
 
   const now = new Date();
   const formData = reg.form_data ?? {};
-  const base = project.getBaseFee(formData, now);
+  let base: BaseFee;
+  try {
+    base = project.getBaseFee(formData, now);
+  } catch (e) {
+    console.error('Pricing unavailable for event', reg.event_id, e);
+    return { ok: false, status: 400, error: 'Payments are not open for this event yet' };
+  }
   let fee: BaseFee = base;
   let discountPercent: number | undefined;
   let applied: Quote['applied'];

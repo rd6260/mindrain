@@ -9,6 +9,8 @@ export interface ProjectBaseConfig {
   pagePath: string;
   /** Generic v3 registration entry point for this project. */
   registrationPath: string;
+  /** false = registration only; no payment step after submitting the form. */
+  paymentEnabled: boolean;
 }
 
 export const registrationPath = (eventId: string) => `/registration-3?event_id=${eventId}`;

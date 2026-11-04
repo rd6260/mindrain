@@ -71,6 +71,8 @@ export async function sendInvoiceEmail(i: InvoiceInput) {
     const statusLabel = ok ? 'PAYMENT SUCCESSFUL' : 'PAYMENT FAILED';
     const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
+    const detailRows = formDataRows(i.formData, ['referral_code', ...(i.hiddenKeys ?? [])]);
+
     const htmlBody = `<!DOCTYPE html>
 <html><head><meta charset="utf-8"></head>
 <body style="margin:0;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f4f4f0;">
@@ -103,10 +105,10 @@ export async function sendInvoiceEmail(i: InvoiceInput) {
           <td style="padding:10px 0;color:#1A1A1A;font-size:13px;font-weight:500;text-align:right;border-top:1px solid #f0f0f0;">${esc(timestamp)}</td>
         </tr>
       </table>
-      <div style="font-size:15px;color:#2C5F5F;font-weight:700;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #2C5F5F;display:inline-block;">Registration Details</div>
+      ${detailRows ? `<div style="font-size:15px;color:#2C5F5F;font-weight:700;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #2C5F5F;display:inline-block;">Registration Details</div>
       <table style="width:100%;border-collapse:collapse;background:#fafaf7;border-radius:8px;overflow:hidden;border:1px solid #e5e3d7;">
-        ${formDataRows(i.formData, ['referral_code', ...(i.hiddenKeys ?? [])])}
-      </table>
+        ${detailRows}
+      </table>` : ''}
     </div>
     <div style="background:#fafaf7;padding:20px 32px;text-align:center;border-top:1px solid #e5e3d7;">
       <p style="margin:0 0 4px;color:#888;font-size:12px;">Questions? Contact <a href="mailto:support@mindrain.org" style="color:#2C5F5F;">support@mindrain.org</a></p>

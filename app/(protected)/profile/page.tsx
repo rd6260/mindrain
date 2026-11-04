@@ -1,5 +1,7 @@
 'use client';
 
+import { getProjectConfig, FUNCTION_FOLLOWS_FORM } from '@/config/projects';
+import FunctionFollowsFormProgress from '@/app/components/progress/FunctionFollowsFormProgress';
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
@@ -326,7 +328,8 @@ const ProfilePage = () => {
   };
 
   // Exclude thesis-award (registrations_2) from the pending-payments check when the competition is closed
-  const hasPendingPayments = registrations.some(reg => !reg.paid) || (!THESIS_AWARD_CLOSED && registrations2.some(reg => !reg.paid)) || registrations3.some(reg => !reg.paid);
+  const needsPayment = (reg: Registration3) => !reg.paid && (getProjectConfig(reg.event_id)?.paymentEnabled ?? true);
+  const hasPendingPayments = registrations.some(reg => !reg.paid) || (!THESIS_AWARD_CLOSED && registrations2.some(reg => !reg.paid)) || registrations3.some(needsPayment);
 
   const formatAcademicLevel = (level: string | null) => {
     if (level === 'UG') return 'Under Graduate';
@@ -754,13 +757,14 @@ const ProfilePage = () => {
                     {registrations3.map((registration) => {
                       const fd = registration.form_data || {};
                       const members = fd.members || [];
+                      const payNow = needsPayment(registration);
                       return (
                         <div
                           key={registration.id}
                           className="rounded-lg p-4 border"
                           style={{
                             backgroundColor: '#FFFFFF',
-                            borderColor: registration.paid ? '#D0CEC2' : '#D97757'
+                            borderColor: payNow ? '#D97757' : '#D0CEC2'
                           }}
                         >
                           {/* Card Header */}
@@ -773,14 +777,14 @@ const ProfilePage = () => {
                                 Mind ID:{' '}
                                 <span
                                   className="px-1.5 py-0.5 rounded font-mono"
-                                  style={{ backgroundColor: '#EDEBDF', color: registration.paid ? '#2C5F5F' : '#8B8B8B' }}
+                                  style={{ backgroundColor: '#EDEBDF', color: payNow ? '#8B8B8B' : '#2C5F5F' }}
                                 >
-                                  {registration.paid ? registration.team_id : 'Not applicable'}
+                                  {payNow ? 'Not applicable' : registration.team_id}
                                 </span>
                               </p>
                             </div>
                             <div className="flex flex-col items-end gap-2">
-                              {!registration.paid ? (
+                              {payNow ? (
                                 <a
                                   href={`/payment-3?registration_id=${registration.id}`}
                                   className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:shadow-md"
@@ -876,6 +880,10 @@ const ProfilePage = () => {
                                 ))}
                               </div>
                             </div>
+                          )}
+
+                          {registration.event_id === FUNCTION_FOLLOWS_FORM.eventId && (
+                            <FunctionFollowsFormProgress registrationId={registration.id} />
                           )}
                         </div>
                       );
