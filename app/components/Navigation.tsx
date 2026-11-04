@@ -50,7 +50,7 @@ const navItems: NavItem[] = [
         label: 'Photography',
         href: '#',
         subSubItems: [
-          // { label: 'Example Photography Event', href: '/competition/photography-event' }
+          { label: 'The MR Lens Trophy 2026', href: '/competition/the-mr-lens-trophy-26' }
         ],
       },
     ],

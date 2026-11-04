@@ -1,46 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-
-function buildTeamId(
-  codeName: string,
-  group: string,
-  category: string,
-  teamType: string,
-  sequence: number
-): string {
-  const categoryPart = category === '1' ? 'I' : 'II';
-  const teamPart = teamType === 'solo' ? 'IND' : 'GRP';
-  const paddedNumber = sequence.toString().padStart(4, '0');
-  return `${codeName}-${group}-${categoryPart}-${teamPart}-${paddedNumber}`;
-}
+import { getProject } from '@/lib/projects';
 
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { event_id, form_data } = await req.json();
-
-    if (!event_id || !form_data) {
+    if (!event_id || !form_data || typeof form_data !== 'object') {
       return NextResponse.json({ error: 'Missing event_id or form_data' }, { status: 400 });
     }
 
-    // Verify event exists
+    const project = getProject(event_id);
+    if (!project) {
+      return NextResponse.json({ error: 'Registration is not open for this event' }, { status: 400 });
+    }
+
+    const validationError = project.validateFormData(form_data);
+    if (validationError) {
+      return NextResponse.json({ error: validationError }, { status: 400 });
+    }
+
     const { data: event, error: eventError } = await supabase
       .from('events')
       .select('id, code_name')
       .eq('id', event_id)
       .single();
-
     if (eventError || !event) {
       return NextResponse.json({ error: 'Event not found' }, { status: 404 });
     }
 
-    // Check for existing registration
     const { data: existingReg } = await supabase
       .from('registrations_v3')
       .select('id, paid, team_id')
@@ -52,23 +45,16 @@ export async function POST(req: NextRequest) {
       if (existingReg.paid) {
         return NextResponse.json({ error: 'Already registered and paid' }, { status: 400 });
       }
-      // Update existing unpaid registration
-      // Keep the same 4-digit sequence but regenerate the team_id prefix based on new form_data
-      const oldSequence = existingReg.team_id 
-        ? parseInt(existingReg.team_id.split('-').pop() || '0', 10) 
-        : Math.floor(Math.random() * 10000);
-        
-      const newTeamId = buildTeamId(
-        event.code_name,
-        form_data.group || 'A',
-        form_data.category || '1',
-        form_data.team_type || 'solo',
-        oldSequence
-      );
+      // Keep the same sequence, regenerate the rest in case form_data changed.
+      const oldSequence = parseInt(existingReg.team_id?.split('-').pop() || '', 10);
+      const sequence = Number.isNaN(oldSequence) ? Math.floor(Math.random() * 10000) : oldSequence;
 
       const { data: updatedReg, error: updateError } = await supabase
         .from('registrations_v3')
-        .update({ form_data, team_id: newTeamId })
+        .update({
+          form_data,
+          team_id: project.buildTeamId({ codeName: event.code_name, formData: form_data, sequence }),
+        })
         .eq('id', existingReg.id)
         .select('id, team_id')
         .single();
@@ -80,7 +66,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ registration_id: updatedReg.id, team_id: updatedReg.team_id });
     }
 
-    // Validate referral code if provided
     let referralId: string | null = null;
     if (form_data.referral_code) {
       const { data: referral } = await supabase
@@ -89,27 +74,19 @@ export async function POST(req: NextRequest) {
         .eq('code', form_data.referral_code)
         .eq('status', 'active')
         .maybeSingle();
-
       if (!referral) {
         return NextResponse.json({ error: 'Invalid or inactive referral code' }, { status: 400 });
       }
       referralId = referral.id;
     }
 
-    // Insert with retry on unique constraint collision
-    let registrationData = null;
-    
+    // Retry on team_id collision (unique violation)
     for (let attempt = 0; attempt < 10; attempt++) {
-      // Generate a random 4-digit number (0000-9999)
-      const sequence = Math.floor(Math.random() * 10000);
-
-      const teamId = buildTeamId(
-        event.code_name,
-        form_data.group || 'A',
-        form_data.category || '1',
-        form_data.team_type || 'solo',
-        sequence
-      );
+      const teamId = project.buildTeamId({
+        codeName: event.code_name,
+        formData: form_data,
+        sequence: Math.floor(Math.random() * 10000),
+      });
 
       const { data, error } = await supabase
         .from('registrations_v3')
@@ -125,27 +102,15 @@ export async function POST(req: NextRequest) {
         .single();
 
       if (error) {
-        // 23505 is PostgreSQL's unique violation error code
-        if (error.code === '23505') {
-          continue; // Try again with a new random number
-        }
+        if (error.code === '23505') continue;
         console.error('Insert error:', error);
         return NextResponse.json({ error: 'Failed to create registration' }, { status: 500 });
       }
-
-      registrationData = data;
-      break;
+      return NextResponse.json({ registration_id: data.id, team_id: data.team_id });
     }
 
-    if (!registrationData) {
-      return NextResponse.json({ error: 'Failed to generate unique team ID after retries' }, { status: 500 });
-    }
-
-    return NextResponse.json({
-      registration_id: registrationData.id,
-      team_id: registrationData.team_id,
-    });
-  } catch (error: any) {
+    return NextResponse.json({ error: 'Failed to generate unique team ID after retries' }, { status: 500 });
+  } catch (error) {
     console.error('Registration error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

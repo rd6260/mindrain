@@ -5,26 +5,20 @@ import { createClient } from '@/lib/supabase/client';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Script from 'next/script';
 import confetti from 'canvas-confetti';
-import { FEES, getCurrentTier, type Tier, type FeeKey, type EntryType } from '@/utils/architectureOfPlayData';
 
-interface RegistrationData {
-  id: string;
-  form_data: {
-    country: string;
-    team_type: 'solo' | 'group';
-    group: 'A' | 'B';
-    [key: string]: any;
-  };
-  registration_by: string;
-  paid: boolean;
+interface Quote {
+  amountMinor: number;
+  originalAmountMinor: number;
+  currency: 'INR' | 'USD';
+  badge?: string;
+  description: string;
+  eventTitle: string;
+  summary: { label: string; value: string }[];
+  discountPercent?: number;
+  applied?: { title: string; message: string };
 }
 
-interface FeeCalculation {
-  amount: number; // raw value like 449
-  currency: string;
-  registrationType: Tier;
-  mindrain_fee: number;
-}
+const money = (minor: number) => (minor / 100).toLocaleString();
 
 // Section heading with accent dot
 function SectionHeading({ children }: { children: React.ReactNode }) {
@@ -56,54 +50,32 @@ function PaymentContent() {
   const router = useRouter();
   const registrationId = searchParams.get('registration_id');
 
-  const [registration, setRegistration] = useState<RegistrationData | null>(null);
-  const [feeDetails, setFeeDetails] = useState<FeeCalculation | null>(null);
+  const [quote, setQuote] = useState<Quote | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [alreadyPaid, setAlreadyPaid] = useState(false);
 
-  // Coupon state
+  // Coupon state — `quote` is always what the server says will be charged
   const [couponCode, setCouponCode] = useState('');
-  const [couponApplied, setCouponApplied] = useState(false);
+  const [appliedCode, setAppliedCode] = useState<string | null>(null);
   const [couponError, setCouponError] = useState<string | null>(null);
-  const [discountedFee, setDiscountedFee] = useState<FeeCalculation | null>(null);
-  const [referralId, setReferralId] = useState<string | null>(null);
   const [showCouponPopup, setShowCouponPopup] = useState(false);
   const [couponPopupMessage, setCouponPopupMessage] = useState('');
   const [couponPopupTitle, setCouponPopupTitle] = useState('');
-  const [discountPercent, setDiscountPercent] = useState<number | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
 
   const supabase = createClient();
 
-  const calculateFee = (
-    country: string,
-    awardGroup: 'A' | 'B',
-    teamType: 'solo' | 'group',
-    overrideTier?: Tier
-  ): FeeCalculation => {
-    const registrationType = overrideTier ?? getCurrentTier();
-    const isIndian = country.toLowerCase() === 'india';
-    const currency = isIndian ? 'INR' : 'USD';
-
-    const feeKey: FeeKey = !isIndian ? 'international' : (awardGroup === 'A' ? 'india_monetary' : 'india_no_monetary');
-    const entryType: EntryType = teamType;
-
-    const amountStr = FEES[registrationType][feeKey][entryType];
-    const amount = parseInt(amountStr.replace(/[^0-9]/g, ''), 10);
-
-    return { amount, currency, registrationType, mindrain_fee: amount };
-  };
-
-  const VALID_COUPONS: Record<string, { from: Date; to: Date; tierOverride: Tier; label: string }> = {
-    'MR-EARLY': {
-      from: new Date('2026-09-15T00:00:00+05:30'),
-      to: new Date('2026-09-17T23:59:59+05:30'),
-      tierOverride: 'Early Bird Registration',
-      label: 'Early Bird price applied',
-    },
+  const fetchQuote = async (code?: string): Promise<{ quote: Quote } | { error: string }> => {
+    const res = await fetch('/api/v3/quote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ registration_id: registrationId, ...(code && { code }) }),
+    });
+    const data = await res.json();
+    return res.ok ? { quote: data.quote as Quote } : { error: (data.error as string) || 'Failed to calculate fee' };
   };
 
   const fireConfetti = () => {
@@ -123,188 +95,69 @@ function PaymentContent() {
   };
 
   const applyCoupon = async () => {
-    setCouponError(null);
     const code = couponCode.trim().toUpperCase();
     if (!code) return;
-
+    setCouponError(null);
     setIsVerifying(true);
-    const now = new Date();
 
-    // 1. Check tier-override coupons first (MR-EARLY etc)
-    const coupon = VALID_COUPONS[code];
-    if (coupon) {
-      if (now < coupon.from || now > coupon.to) {
-        setCouponError('This coupon is not valid at this time.');
-        setCouponApplied(false);
-        setDiscountedFee(null);
-        setIsVerifying(false);
-        return;
-      }
-      if (!registration) {
-        setIsVerifying(false);
-        return;
-      }
-      const newFee = calculateFee(registration.form_data.country, registration.form_data.group, registration.form_data.team_type, coupon.tierOverride);
-      setDiscountedFee(newFee);
-      setCouponApplied(true);
-      setDiscountPercent(null);
-      setReferralId(null);
-      setCouponPopupTitle('Code Applied!');
-      setCouponPopupMessage(`${coupon.label}`);
+    const result = await fetchQuote(code);
+    if ('error' in result) {
+      setCouponError(result.error);
+    } else {
+      setQuote(result.quote);
+      setAppliedCode(code);
+      setCouponPopupTitle(result.quote.applied?.title ?? 'Code Applied!');
+      setCouponPopupMessage(result.quote.applied?.message ?? '');
       setShowCouponPopup(true);
       fireConfetti();
       setTimeout(() => setShowCouponPopup(false), 2500);
-      setIsVerifying(false);
-      return;
     }
-
-    // 2. Check MINDRAIN20 (only valid during Early Bird Registration, monetary option only)
-    if (code === 'MINDRAIN20' && registration) {
-      if (registration.form_data.group !== 'A') {
-        setCouponError('This coupon is only valid for monetary award (Group A) registrations.');
-        setCouponApplied(false);
-        setDiscountedFee(null);
-        setIsVerifying(false);
-        return;
-      }
-      if (getCurrentTier() !== 'Early Bird Registration') {
-        setCouponError('This coupon is only valid during the Early Bird Registration period.');
-        setCouponApplied(false);
-        setDiscountedFee(null);
-        setIsVerifying(false);
-        return;
-      }
-      try {
-        const { data: v1Reg } = await supabase
-          .from('registrations')
-          .select('id')
-          .eq('registration_by', registration.registration_by)
-          .eq('paid', true)
-          .limit(1)
-          .maybeSingle();
-
-        const { data: v2Reg } = await supabase
-          .from('registrations_2')
-          .select('id')
-          .eq('registration_by', registration.registration_by)
-          .eq('paid', true)
-          .limit(1)
-          .maybeSingle();
-
-        const hasExisting = v1Reg || v2Reg;
-        const discountPct = hasExisting ? 20 : 10;
-        if (feeDetails) {
-          const discountedAmount = Math.round(feeDetails.amount * (1 - discountPct / 100));
-          setDiscountedFee({ ...feeDetails, amount: discountedAmount });
-        }
-        setDiscountPercent(discountPct);
-        setCouponApplied(true);
-        setReferralId(null);
-
-        setCouponPopupTitle('Code Applied!');
-        setCouponPopupMessage(`MINDRAIN20 verified! You get ${discountPct}% off${hasExisting ? ' as a returning participant' : ' as a new participant'}.`);
-        setShowCouponPopup(true);
-        fireConfetti();
-        setTimeout(() => setShowCouponPopup(false), 2500);
-      } catch (err) {
-        setCouponError('Error verifying coupon.');
-      }
-      setIsVerifying(false);
-      return;
-    }
-
-    // 3. Check referral codes
-    try {
-      const { data: referral } = await supabase
-        .from('referral_account')
-        .select('id')
-        .eq('code', code)
-        .eq('status', 'active')
-        .maybeSingle();
-
-      if (referral) {
-        setReferralId(referral.id);
-        setCouponApplied(true);
-        setDiscountedFee(null);
-        setDiscountPercent(null);
-        setCouponPopupTitle('Referral Applied!');
-        setCouponPopupMessage('Referral code verified successfully.');
-        setShowCouponPopup(true);
-        fireConfetti();
-        setTimeout(() => setShowCouponPopup(false), 2500);
-        setIsVerifying(false);
-        return;
-      }
-    } catch (err) {
-      console.error(err);
-    }
-
-    // 4. Nothing matched
-    setCouponError('Invalid coupon or referral code.');
-    setCouponApplied(false);
-    setDiscountedFee(null);
     setIsVerifying(false);
   };
 
-  const removeCoupon = () => {
-    setCouponApplied(false);
+  const removeCoupon = async () => {
+    setAppliedCode(null);
     setCouponCode('');
     setCouponError(null);
-    setDiscountedFee(null);
-    setDiscountPercent(null);
-    setReferralId(null);
+    const result = await fetchQuote();
+    if ('quote' in result) setQuote(result.quote);
   };
 
   useEffect(() => {
-    const loadRegistration = async () => {
+    const load = async () => {
       if (!registrationId) { setError('No registration ID provided'); setIsLoading(false); return; }
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) { setError('User not authenticated'); setIsLoading(false); return; }
 
-        const { data: regData, error: regError } = await supabase
-          .from('registrations_v3')
-          .select('id, form_data, registration_by, paid')
-          .eq('id', registrationId)
-          .single();
+        const { data: reg } = await supabase
+          .from('registrations_v3').select('paid, registration_by').eq('id', registrationId).maybeSingle();
+        if (!reg) { setError('Registration not found'); setIsLoading(false); return; }
+        if (reg.registration_by !== user.id) { setError('Unauthorized access'); setIsLoading(false); return; }
+        if (reg.paid) { setAlreadyPaid(true); setIsLoading(false); return; }
 
-        if (regError || !regData) { setError('Registration not found'); setIsLoading(false); return; }
-        if (regData.registration_by !== user.id) { setError('Unauthorized access'); setIsLoading(false); return; }
-
-        if (regData.paid) {
-          setAlreadyPaid(true);
-          setIsLoading(false);
-          return;
-        }
-
-        setRegistration(regData as RegistrationData);
-        setFeeDetails(calculateFee(regData.form_data.country, regData.form_data.group, regData.form_data.team_type));
-        setIsLoading(false);
+        const result = await fetchQuote();
+        if ('error' in result) setError(result.error);
+        else setQuote(result.quote);
       } catch (err) {
         console.error('Error loading registration:', err);
         setError('Failed to load registration details');
-        setIsLoading(false);
       }
+      setIsLoading(false);
     };
-    loadRegistration();
+    load();
   }, [registrationId]);
 
   const createOrder = async () => {
-    if (!feeDetails || !registration) return;
+    if (!quote) return;
     setIsProcessing(true);
     setError(null);
     try {
-      const effectiveFee = couponApplied && discountedFee ? discountedFee : feeDetails;
+      // The server recomputes the amount; we only tell it which code to apply.
       const res = await fetch('/api/v3/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: effectiveFee.amount * 100, // Pass in paisa/cents
-          currency: effectiveFee.currency,
-          registration_id: registrationId,
-          ...(referralId && { referral_id: referralId }),
-          ...(couponApplied && couponCode && !referralId && { coupon_code: couponCode }),
-        }),
+        body: JSON.stringify({ registration_id: registrationId, ...(appliedCode && { code: appliedCode }) }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to create order');
@@ -315,7 +168,7 @@ function PaymentContent() {
         amount: data.amount,
         currency: data.currency,
         name: 'MindDrain Event Registration',
-        description: `${effectiveFee.registrationType} Registration - ${registration.form_data.team_type}`,
+        description: `${data.event_title} - ${data.description}`,
         handler: async function (response: any) {
           try {
             const verifyRes = await fetch('/api/v3/verify-payment', {
@@ -343,11 +196,9 @@ function PaymentContent() {
           }
         },
         modal: {
-          ondismiss: async () => { 
-            setIsProcessing(false); 
-            setError('Payment cancelled'); 
-            
-            // Log cancellation in database
+          ondismiss: async () => {
+            setIsProcessing(false);
+            setError('Payment cancelled');
             try {
               await fetch('/api/v3/cancel-payment', {
                 method: 'POST',
@@ -362,8 +213,7 @@ function PaymentContent() {
         theme: { color: '#2C5F5F' },
       };
 
-      const payment = new (window as any).Razorpay(paymentData);
-      payment.open();
+      new (window as any).Razorpay(paymentData).open();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to initiate payment');
       setIsProcessing(false);
@@ -408,7 +258,7 @@ function PaymentContent() {
   }
 
   // Fatal error
-  if (error && !feeDetails) {
+  if (error && !quote) {
     return (
       <div className="min-h-screen bg-[#EDEBDF] flex items-center justify-center p-6">
         <div className="w-full max-w-sm bg-[#F8F7F2] rounded-2xl border border-[#D0CEC2] p-8 text-center shadow-xl">
@@ -428,7 +278,8 @@ function PaymentContent() {
     );
   }
 
-  const currencySymbol = feeDetails?.currency === 'INR' ? '₹' : '$';
+  const currencySymbol = quote?.currency === 'INR' ? '₹' : '$';
+  const discounted = !!quote && quote.amountMinor !== quote.originalAmountMinor;
 
   return (
     <div className="min-h-screen bg-[#EDEBDF] py-10 px-4">
@@ -461,47 +312,38 @@ function PaymentContent() {
 
         <div className="bg-[#F8F7F2] rounded-2xl border border-[#D0CEC2] p-6 space-y-7">
 
-          {registration && feeDetails && (
+          {quote && (
             <>
               {/* Registration period badge */}
               <div className="flex items-center justify-between">
                 <SectionHeading>Registration Summary</SectionHeading>
                 <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#2C5F5F]/10 text-[#2C5F5F] border border-[#2C5F5F]/20">
-                  {feeDetails.registrationType}
+                  {quote.badge ?? quote.eventTitle}
                 </span>
               </div>
 
               {/* Summary card */}
               <div className="bg-white rounded-xl border border-[#E5E3D7] px-5 py-1">
-                <SummaryRow label="Registration Period" value={feeDetails.registrationType} highlight />
-                <SummaryRow
-                  label="Entry Type"
-                  value={registration.form_data.team_type === 'solo' ? 'Solo (1 member)' : 'Group (up to 3 members)'}
-                  highlight
-                />
-                <SummaryRow label="Country" value={registration.form_data.country} highlight />
-                <SummaryRow
-                  label="Award Category"
-                  value={registration.form_data.group === 'A' ? 'Group A — Monetary Award' : 'Group B — No Monetary Award'}
-                  highlight
-                />
-                {couponApplied && discountedFee && discountedFee.amount !== feeDetails.amount && discountPercent && (
+                {quote.summary.map((row) => (
+                  <SummaryRow key={row.label} label={row.label} value={row.value} highlight />
+                ))}
+                {discounted && quote.discountPercent && (
                   <SummaryRow
                     label="Discount"
-                    value={`${discountPercent}% off (-${currencySymbol}${(feeDetails.amount - discountedFee.amount).toLocaleString()})`}
+                    value={`${quote.discountPercent}% off (-${currencySymbol}${money(quote.originalAmountMinor - quote.amountMinor)})`}
                   />
                 )}
-                {couponApplied && discountedFee && discountedFee.amount !== feeDetails.amount && (
+                {discounted && (
                   <div className="flex items-center justify-between py-3 border-b border-[#E5E3D7] last:border-0">
                     <span className="text-sm text-[#6B6B6B] font-medium">Original Amount</span>
                     <span className="text-sm text-[#8B8B8B] line-through">
-                      {currencySymbol}{feeDetails.amount.toLocaleString()}
+                      {currencySymbol}{money(quote.originalAmountMinor)}
                     </span>
                   </div>
                 )}
                 <SummaryRow
                   label="Total Amount"
-                  value={`${currencySymbol}${(couponApplied && discountedFee ? discountedFee.amount : feeDetails.amount).toLocaleString()}`}
+                  value={`${currencySymbol}${money(quote.amountMinor)}`}
                 />
               </div>
 
@@ -511,7 +353,7 @@ function PaymentContent() {
                   <span className="text-white text-xs font-bold">i</span>
                 </div>
                 <p className="text-sm text-[#4B4B4B] leading-relaxed">
-                  You're registering under the <strong className="text-[#2C5F5F]">{feeDetails.registrationType}</strong> period.
+                  {quote.badge && <>You&apos;re registering under the <strong className="text-[#2C5F5F]">{quote.badge}</strong> period. </>}
                   The registration fee is <strong>non-refundable</strong> once payment is complete.
                 </p>
               </div>
@@ -525,12 +367,12 @@ function PaymentContent() {
                     <input
                       type="text"
                       value={couponCode}
-                      onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(null); if (couponApplied) removeCoupon(); }}
+                      onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(null); if (appliedCode) removeCoupon(); }}
                       placeholder="Enter coupon or referral code"
-                      disabled={couponApplied || isVerifying}
+                      disabled={!!appliedCode || isVerifying}
                       className="flex-1 px-4 py-2.5 rounded-xl border border-[#D0CEC2] bg-white text-sm font-mono font-semibold text-[#1A1A1A] outline-none focus:border-[#2C5F5F] focus:ring-2 focus:ring-[#2C5F5F]/10 transition-all disabled:opacity-60 disabled:cursor-not-allowed tracking-widest placeholder:tracking-normal placeholder:font-normal"
                     />
-                    {couponApplied ? (
+                    {appliedCode ? (
                       <button
                         type="button"
                         onClick={removeCoupon}
@@ -558,36 +400,12 @@ function PaymentContent() {
                     </p>
                   )}
 
-                  {couponApplied && discountedFee && !discountPercent && (
+                  {appliedCode && quote.applied && (
                     <div className="flex items-center gap-2 p-3 bg-[#2D5F4F]/10 border border-[#2D5F4F]/25 rounded-xl">
                       <svg className="w-4 h-4 text-[#2D5F4F] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                       </svg>
-                      <p className="text-xs font-semibold text-[#2D5F4F]">
-                        Coupon applied — Early Bird price ({currencySymbol}{discountedFee.amount.toLocaleString()}) will be charged.
-                      </p>
-                    </div>
-                  )}
-
-                  {couponApplied && discountedFee && discountPercent && (
-                    <div className="flex items-center gap-2 p-3 bg-[#2D5F4F]/10 border border-[#2D5F4F]/25 rounded-xl">
-                      <svg className="w-4 h-4 text-[#2D5F4F] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <p className="text-xs font-semibold text-[#2D5F4F]">
-                        Code applied — {discountPercent === 20 ? 'Returning participant — 20% off' : 'New participant — 10% off'}.
-                      </p>
-                    </div>
-                  )}
-
-                  {couponApplied && referralId && (
-                    <div className="flex items-center gap-2 p-3 bg-[#2D5F4F]/10 border border-[#2D5F4F]/25 rounded-xl">
-                      <svg className="w-4 h-4 text-[#2D5F4F] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <p className="text-xs font-semibold text-[#2D5F4F]">
-                        Referral applied — verified successfully.
-                      </p>
+                      <p className="text-xs font-semibold text-[#2D5F4F]">{quote.applied.message}</p>
                     </div>
                   )}
                 </div>
@@ -612,7 +430,7 @@ function PaymentContent() {
                       <span className="w-4 h-4 border-2 border-[#8B8B8B] border-t-transparent rounded-full animate-spin" />
                       Processing...
                     </span>
-                  : `Pay ${currencySymbol}${(couponApplied && discountedFee ? discountedFee.amount : feeDetails.amount).toLocaleString()} →`
+                  : `Pay ${currencySymbol}${money(quote.amountMinor)} →`
                 }
               </button>
 
@@ -663,7 +481,7 @@ function PaymentContent() {
             </div>
             <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">Payment Successful!</h3>
             <p className="text-sm text-[#6B6B6B] mb-6 leading-relaxed">
-              Your spot is confirmed. You'll be redirected to your profile shortly.
+              Your spot is confirmed. You&apos;ll be redirected to your profile shortly.
             </p>
             <div className="flex items-center justify-center gap-2 text-[#2C5F5F] font-semibold text-sm animate-pulse">
               <span className="w-4 h-4 border-2 border-[#2C5F5F] border-t-transparent rounded-full animate-spin" />
