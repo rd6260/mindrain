@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { getProjectConfig } from '@/config/projects';
+import { getProjectConfig, fromStoredFormData } from '@/config/projects';
 import { getProject } from '@/lib/projects';
 import type { BaseFee, SummaryRow } from '@/lib/projects';
 
@@ -47,7 +47,7 @@ export async function quoteRegistration(args: {
   if (!project || !getProjectConfig(reg.event_id)?.paymentEnabled) return { ok: false, status: 400, error: 'Payments are not available for this event' };
 
   const now = new Date();
-  const formData = reg.form_data ?? {};
+  const formData = fromStoredFormData(reg.event_id, reg.form_data);
   let base: BaseFee;
   try {
     base = project.getBaseFee(formData, now);

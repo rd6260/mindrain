@@ -1,8 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { ClipboardCheck, CreditCard, ListChecks, SquarePen, Video, Info, type LucideIcon } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
 import { FUNCTION_FOLLOWS_FORM } from '@/config/projects';
 
 type Status = 'pending' | 'in_progress' | 'approved' | 'rejected';
@@ -56,29 +54,14 @@ function buildMessage(statuses: Status[], stages: Stage[]): string {
   return 'Your application is on track. We will update you here as it moves forward.';
 }
 
-export default function FunctionFollowsFormProgress({ registrationId }: { registrationId: string }) {
+/** `progress` is `registrations_v3.form_data.progress` (stage -> status). */
+export default function FunctionFollowsFormProgress({ progress }: { progress?: Record<string, string> | null }) {
   const stages = FUNCTION_FOLLOWS_FORM.progressStages as readonly Stage[] as Stage[];
-  const [statuses, setStatuses] = useState<Record<string, Status> | null>(null);
-  const [failed, setFailed] = useState(false);
+  const valid: Status[] = ['pending', 'in_progress', 'approved', 'rejected'];
+  const statuses: Record<string, Status> = Object.fromEntries(
+    stages.map(s => [s, valid.includes(progress?.[s] as Status) ? (progress![s] as Status) : 'pending'])
+  );
 
-  useEffect(() => {
-    const supabase = createClient();
-    supabase
-      .from('registration_progress_v3')
-      .select('stage, status')
-      .eq('registration_id', registrationId)
-      .then(({ data, error }) => {
-        if (error) { console.error('Failed to load progress:', error.code, error.message, error.hint); setFailed(true); return; }
-        setStatuses(Object.fromEntries((data ?? []).map(r => [r.stage, r.status as Status])));
-      });
-  }, [registrationId]);
-
-  if (failed) return null;
-  if (!statuses) {
-    return <div className="mt-4 h-28 rounded-lg animate-pulse" style={{ backgroundColor: '#F8F7F2' }} />;
-  }
-
-  // A missing row counts as pending.
   const list: Status[] = stages.map(s => statuses[s] ?? 'pending');
   const rejectedAt = list.indexOf('rejected');
 

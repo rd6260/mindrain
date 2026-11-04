@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getProject } from '@/lib/projects';
-import { getProjectConfig } from '@/config/projects';
+import { getProjectConfig, toStoredFormData } from '@/config/projects';
 
 export async function POST(req: NextRequest) {
   try {
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
 
     const { data: existingReg } = await supabase
       .from('registrations_v3')
-      .select('id, paid, team_id')
+      .select('id, paid, team_id, form_data')
       .eq('registration_by', user.id)
       .eq('event_id', event_id)
       .maybeSingle();
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
       const { data: updatedReg, error: updateError } = await supabase
         .from('registrations_v3')
         .update({
-          form_data,
+          form_data: toStoredFormData(event_id, form_data, existingReg.form_data),
           team_id: project.buildTeamId({ codeName: event.code_name, formData: form_data, sequence }),
         })
         .eq('id', existingReg.id)
@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
           registration_by: user.id,
           event_id,
           team_id: teamId,
-          form_data,
+          form_data: toStoredFormData(event_id, form_data),
           paid: false,
           referral_used: referralId,
         })

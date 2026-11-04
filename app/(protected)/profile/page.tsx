@@ -883,7 +883,7 @@ const ProfilePage = () => {
                           )}
 
                           {registration.event_id === FUNCTION_FOLLOWS_FORM.eventId && (
-                            <FunctionFollowsFormProgress registrationId={registration.id} />
+                            <FunctionFollowsFormProgress progress={fd.progress as Record<string, string> | undefined} />
                           )}
                         </div>
                       );

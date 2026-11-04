@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getProject } from '@/lib/projects';
+import { fromStoredFormData } from '@/config/projects';
 import { sendInvoiceEmail } from '@/lib/payments/invoice';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
@@ -57,7 +58,7 @@ export async function POST(req: NextRequest) {
       to: user.email,
       eventTitle,
       teamId: registration.team_id,
-      formData: registration.form_data,
+      formData: fromStoredFormData(registration.event_id, registration.form_data),
       hiddenKeys: project?.invoiceHiddenKeys,
       amountMinor: payment.amount,
       currency: payment.currency,

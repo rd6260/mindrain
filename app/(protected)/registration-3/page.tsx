@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense, createElement } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { getProjectConfig } from '@/config/projects';
+import { getProjectConfig, fromStoredFormData } from '@/config/projects';
 import { isOnboardingComplete } from '@/utils/onboarding';
 import { getRegistrationForm, hasRegistrationForm } from '@/app/components/registration/registry';
 
@@ -84,7 +84,7 @@ function RegistrationContent() {
       if (reg?.paid) {
         setShowAlreadyPaid(true);
       } else if (reg) {
-        setInitialData(reg.form_data || {});
+        setInitialData(fromStoredFormData(eventId, reg.form_data));
         setIsEditMode(true);
       }
     }

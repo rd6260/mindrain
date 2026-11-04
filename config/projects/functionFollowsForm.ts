@@ -13,6 +13,13 @@ export const FUNCTION_FOLLOWS_FORM = {
   paymentEnabled: false,
   /** Private bucket for form uploads. Files live at `<uid>/<slug>/...` (RLS is per-uid top-level folder). */
   formUploadBucket: 'form_data',
-  /** Ordered progress stages. Must match `event_progress_stages` rows in the DB. */
+  /** Ordered progress stages (keys of `form_data.progress`). */
   progressStages: ['application', 'shortlisting', 'interview', 'final_selection', 'fee_payment'],
-} as const satisfies ProjectBaseConfig & { formUploadBucket: string; progressStages: readonly string[] };
+  initialProgress: {
+    application: 'approved', // shown as "Submitted"
+    shortlisting: 'in_progress',
+    interview: 'pending',
+    final_selection: 'pending',
+    fee_payment: 'pending',
+  },
+} as const satisfies ProjectBaseConfig & { formUploadBucket: string };
