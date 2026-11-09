@@ -23,7 +23,7 @@ export const FUNCTION_FOLLOWS_FORM = {
       {
         name: 'Function Follows Form',
         description: 'Complete Brief',
-        url: 'https://cdn.jsdelivr.net/gh/rd6260/mindrain@main/public/brief/function-follows-form/Function-Follows-Form-29.10.2026.pdf',
+        url: 'https://cdn.jsdelivr.net/gh/rd6260/mindrain@main/public/brief/function-follows-form/Function Follows Form 06.11.2026.pdf',
       },
     ],
   },
