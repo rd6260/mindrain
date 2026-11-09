@@ -9,6 +9,7 @@ import BriefModal from '@/app/components/BriefModal';
 import { useEffect, useState } from 'react';
 import localFont from 'next/font/local';
 import { FUNCTION_FOLLOWS_FORM } from '@/config/projects';
+import { getCdnUrl } from '@/utils/cdn'
 import {
   MapPin,
   Clock,
@@ -115,7 +116,7 @@ function MobileHero() {
     <section className="relative h-dvh flex flex-col items-start justify-start pt-24 px-6 md:hidden">
       <div className="absolute inset-0 z-0">
         <Image
-          src="/workshops/function-follows-form/function-follows-form-hero-landscape.png"
+          src="/workshops/function-follows-form/function-follows-form-hero-portrait-v2.png"
           alt="UNDER CONSTRUCTION"
           fill
           className="object-cover object-center"
@@ -131,10 +132,10 @@ function MobileHero() {
             <span className="text-5xl leading-none -mt-3">Form</span>
           </span>
           <span className="block text-lg font-medium tracking-wide mt-4">
-            A Kindergarten Design Challenge<br/>2026-27
+            Think beyond the box. <br/> Design with intent. <br/>2026-27
           </span>
-          <span className="block text-lg font-medium tracking-wide mt-2">
-            ARCHITECTURE<br/>COMPETITION <span className="text-sm font-light italic"># Edition 07</span>
+          <span className="block text-lg font-medium tracking-wide mt-4">
+            ARCHITECTURE<br/>DESIGN WORKSHOP <span className="text-sm font-light italic"># Edition 02</span>
           </span>
         </h1>
       </div>
