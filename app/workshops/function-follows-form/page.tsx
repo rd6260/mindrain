@@ -51,7 +51,7 @@ const DESIGNED_FOR = [
 const WORKSHOP_OVERVIEW = [
   { label: 'Duration', icon: Clock, values: ['3 Days Online', '6 Days Offline'] },
   { label: 'Location', icon: MapPin, values: ['Hyderabad, India'] },
-  { label: 'Capacity', icon: Users, values: ['15 Participants'] },
+  { label: 'Capacity', icon: Users, values: ['20 Participants'] },
 ];
 
 const WORKSHOP_SCHEDULE = [
@@ -64,7 +64,7 @@ const WORKSHOP_SCHEDULE = [
   },
   {
     mode: 'Offline',
-    dates: '17–22 December 2026',
+    dates: '18–23 December 2026',
     description: '6 Days of On-site Workshop',
     badgeBg: 'rgba(34, 197, 94, 0.12)',
     badgeColor: '#22A55A',

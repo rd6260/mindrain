@@ -15,8 +15,8 @@ import GuestJury from '../components/GuestJuryComponent';
 import { createClient } from '@/lib/supabase/client';
 import { isOnboardingComplete } from '@/utils/onboarding';
 import { getCdnUrl } from '@/utils/cdn'
-import { ARCHITECTURE_OF_PLAY } from '@/config/projects';
-import { Trophy, Medal, Images } from 'lucide-react';
+import { ARCHITECTURE_OF_PLAY, FUNCTION_FOLLOWS_FORM } from '@/config/projects';
+import { Trophy, Medal, Images, Building2, Utensils, PencilRuler, Gift, Award } from 'lucide-react';
 
 
 const FEARLogo = localFont({
@@ -307,18 +307,24 @@ export default function HomePage() {
             subtitle="An Immersive Architectural Design Workshop"
             imageSrc= {getCdnUrl("public/workshops/function-follows-form/function-follows-form-ratio-3-4.png")}
             imageAlt="FFF"
-            prizeLabel={<span className="font-bold text-sm">Limited to 15 Participants</span>}
+            prizeLabel={<span className="font-bold text-sm">Limited to 20 Participants</span>}
             details={[
-              { label: "Date", value: "17-22 December 2026" },
               { label: "Mode", value: "3 Day Online + 6 Days Offline" },
               { label: "Location", value: "Hydrabad, India" },
+            ]}
+            highlights={[
+              { icon: <Building2 strokeWidth={1.6} />, text: "Stay" },
+              { icon: <Utensils strokeWidth={1.6} />, text: "Meals" },
+              { icon: <PencilRuler strokeWidth={1.6} />, text: "Materials" },
+              { icon: <Gift strokeWidth={1.6} />, text: "Goodies" },
+              { icon: <Award strokeWidth={1.6} />, text: "Certificate" },
             ]}
             deadlineLabel="Registration Ends on"
             deadlineValue="10 December 2026"
             findOutMoreHref="/workshops/function-follows-form"
             briefModalTitle="Download Brief"
-            briefModalSubtitle="The Architecture of Play — select files to download"
-            eventId=""
+            briefModalSubtitle="Function Follows Form — select files to download"
+            eventId={FUNCTION_FOLLOWS_FORM.eventId}
           />
 
           <div className="h-6" />
