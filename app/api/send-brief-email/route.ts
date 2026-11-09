@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCompetitionBriefFiles, getCompetitionMeta } from '@/data/competitionBriefFiles';
+import { getBrief } from '@/config/projects';
 import { createClient } from '@/lib/supabase/server';
 
 
@@ -16,8 +16,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing eventId' }, { status: 400 });
     }
 
-    const briefFiles = getCompetitionBriefFiles(eventId);
-    const meta = getCompetitionMeta(eventId);
+    const brief = getBrief(eventId);
+    const briefFiles = brief?.files;
+    const meta = brief?.meta;
 
     if (!briefFiles || briefFiles.length === 0) {
       return NextResponse.json({ error: 'No brief files found for this competition' }, { status: 404 });

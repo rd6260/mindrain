@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Changa } from 'next/font/google';
 import { createClient } from '@/lib/supabase/client';
-import { getCompetition } from '@/data/competitionBriefFiles';
+import { getBrief } from '@/config/projects';
 import { colors } from '@/utils/colors';
 
 const changa = Changa({ subsets: ['latin'], weight: ['500'] });
@@ -207,8 +207,8 @@ function UserView({
   subtitle?: string;
   onClose: () => void;
 }) {
-  const competition = getCompetition(eventId);
-  const files = competition?.briefFiles ?? [];
+  const brief = getBrief(eventId);
+  const files = brief?.files ?? [];
 
   const downloadAll = () => {
     files.forEach((file, i) => setTimeout(() => downloadFile(file.url), i * 300));
@@ -325,8 +325,8 @@ function LoadingSkeleton({ onClose }: { onClose: () => void }) {
 export default function BriefModal({ isOpen, onClose, eventId }: BriefModalProps) {
   const [authState, setAuthState] = useState<AuthState>('loading');
 
-  const competition = getCompetition(eventId);
-  const title = competition?.meta.title ?? 'Download Brief';
+  const brief = getBrief(eventId);
+  const title = brief?.meta.title ?? 'Download Brief';
   const subtitle = `${title} — select files to download`;
 
   useEffect(() => {

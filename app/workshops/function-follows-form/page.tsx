@@ -9,7 +9,6 @@ import BriefModal from '@/app/components/BriefModal';
 import { useEffect, useState } from 'react';
 import localFont from 'next/font/local';
 import { FUNCTION_FOLLOWS_FORM } from '@/config/projects';
-import { getCompetitionMeta } from '@/data/competitionBriefFiles';
 import {
   MapPin,
   Clock,
@@ -37,7 +36,7 @@ const AptosDisplay = localFont({
 // ─── Static Data ──────────────────────────────────────────────────────────────
 
 const REGISTRATION_EVENT_ID = FUNCTION_FOLLOWS_FORM.eventId;
-const meta = getCompetitionMeta(REGISTRATION_EVENT_ID)!;
+const meta = FUNCTION_FOLLOWS_FORM.brief.meta;
 const REGISTRATION_URL = FUNCTION_FOLLOWS_FORM.registrationPath;
 
 const INTRODUCTION_TEXT =

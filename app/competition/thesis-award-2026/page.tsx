@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 import Navigation from '@/app/components/Navigation';
 import { createClient } from '@/lib/supabase/client';
 import localFont from 'next/font/local';
-import { getCompetitionMeta } from '@/data/competitionBriefFiles';
+import { THESIS_AWARD } from '@/config/projects';
 
 // ─── Font ─────────────────────────────────────────────────────────────────────
 
@@ -21,8 +21,8 @@ const IBMPlexSansCondensedFont = localFont({
 
 // ─── Static Data ──────────────────────────────────────────────────────────────
 
-const REGISTRATION_EVENT_ID = 'c4a201ae-8bfe-48bc-a526-4ac1288dd937';
-const meta = getCompetitionMeta(REGISTRATION_EVENT_ID)!;
+const REGISTRATION_EVENT_ID = THESIS_AWARD.eventId;
+const meta = THESIS_AWARD.brief.meta;
 const REGISTRATION_URL = `/registration-form-2?event_id=${REGISTRATION_EVENT_ID}`;
 
 /** Competition closes after 27 September 2026 23:59 IST — block all registration & payment. */

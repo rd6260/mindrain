@@ -1,3 +1,29 @@
+export interface BriefFile {
+  name: string;
+  description: string;
+  url: string;
+}
+
+export interface BriefMeta {
+  title: string;
+  subtitle: string;
+  category: string;
+  edition: string;
+  registrationUrl: string;
+}
+
+export interface BriefConfig {
+  meta: BriefMeta;
+  files: BriefFile[];
+}
+
+/** Minimal shape for events that only need brief data (no v3 registration/payment pipeline). */
+export interface BriefOnlyConfig {
+  eventId: string;
+  slug: string;
+  brief: BriefConfig;
+}
+
 export interface ProjectBaseConfig {
   /** `events.id` in the database. The single place this id is defined. */
   eventId: string;
@@ -15,6 +41,8 @@ export interface ProjectBaseConfig {
    * Projects with progress tracking store `form_data` as `{ form, progress }`
    * instead of a flat object. `progress` maps stage -> status.
    */
+  /** Brief downloads + marketing metadata shown on the event page and in the brief modal/email. */
+  brief?: BriefConfig;
   progressStages?: readonly string[];
   initialProgress?: Readonly<Record<string, string>>;
 }

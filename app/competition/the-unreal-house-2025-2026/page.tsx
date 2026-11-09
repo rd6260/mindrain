@@ -9,7 +9,7 @@ import BriefModal from '@/app/components/BriefModal';
 import DownloadBriefModal from '@/app/components/DownloadModal';
 import { useState } from 'react';
 import localFont from 'next/font/local';
-import { getCompetitionMeta } from '@/data/competitionBriefFiles';
+import { THE_UNREAL_HOUSE } from '@/config/projects';
 import { ImportantDate } from '@/types';
 import { isRegistrationOpen } from '@/utils/registration';
 
@@ -19,8 +19,8 @@ const TechnorFont = localFont({ src: '../../fonts/Technor-Variable.woff2' });
 
 // ─── Static Data ──────────────────────────────────────────────────────────────
 
-const REGISTRATION_EVENT_ID = '3f123e78-60d6-494d-b307-18c5b4c8ab7f';
-const meta = getCompetitionMeta(REGISTRATION_EVENT_ID)!;
+const REGISTRATION_EVENT_ID = THE_UNREAL_HOUSE.eventId;
+const meta = THE_UNREAL_HOUSE.brief.meta;
 const REGISTRATION_URL = `/registration?event_id=${REGISTRATION_EVENT_ID}`;
 
 const PRESS_KIT_FILES = [
