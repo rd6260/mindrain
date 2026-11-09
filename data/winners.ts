@@ -1560,3 +1560,155 @@ export const previousWinnersMRTA2: PastWinners = {
     }
   ]
 };
+
+export const previousWinnersPhotography2016: PastWinners = {
+  "name": "PHOTOGRAPHY COMPETITION 2016",
+  "year": "2016",
+  "categories": [
+    {
+      "category": "Winners",
+      "winners": [
+        {
+          "position": "Winner",
+          "institute": "",
+          "description": "Stand Alone, Stand Tall - A bare tree standing tall on the sandy shore against ocean waves and clouds.",
+          "entry": {
+            "big": "/past-winners/entry/photography-2016/winner-01.jpg",
+            "small": "/past-winners/entry/photography-2016/winner-01.jpg"
+          },
+          "members": [
+            {
+              "name": "Roshan K",
+              "pfp": ""
+            }
+          ]
+        },
+        {
+          "position": "Winner",
+          "institute": "",
+          "description": "Mirror don't lie, They just show a part of truth - An ornate carved oval mirror reflecting tree branches and the sky.",
+          "entry": {
+            "big": "/past-winners/entry/photography-2016/winner-02.jpg",
+            "small": "/past-winners/entry/photography-2016/winner-02.jpg"
+          },
+          "members": [
+            {
+              "name": "Harshit Parashan",
+              "pfp": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "Honorable Mentions",
+      "winners": [
+        {
+          "position": "Honorable Mention",
+          "institute": "",
+          "description": "A rugged rock formation and cliff face jutting out into crashing ocean waves under an overcast sky.",
+          "entry": {
+            "big": "/past-winners/entry/photography-2016/honorable-mention-01.jpg",
+            "small": "/past-winners/entry/photography-2016/honorable-mention-01.jpg"
+          },
+          "members": [
+            {
+              "name": "Rachit Kaushik",
+              "pfp": ""
+            }
+          ]
+        },
+        {
+          "position": "Honorable Mention",
+          "institute": "",
+          "description": "In midst of heavy traffic noise, huge concrete blocks, busy people rushing for metro, I sight him sitting still on a thread with a droplet of water in his mouth everything comes to a halt; like a freeze frame. Only him and me! him being the frame and me being the camera. I took my phone out still admiring him.",
+          "entry": {
+            "big": "/past-winners/entry/photography-2016/honorable-mention-02.jpg",
+            "small": "/past-winners/entry/photography-2016/honorable-mention-02.jpg"
+          },
+          "members": [
+            {
+              "name": "Kishor Kumar",
+              "pfp": ""
+            }
+          ]
+        },
+        {
+          "position": "Honorable Mention",
+          "institute": "",
+          "description": "Happy Times - Two rural men in traditional attire sharing a joyful, candid laugh in the bright sunlight.",
+          "entry": {
+            "big": "/past-winners/entry/photography-2016/honorable-mention-03.jpg",
+            "small": "/past-winners/entry/photography-2016/honorable-mention-03.jpg"
+          },
+          "members": [
+            {
+              "name": "Suvadipta Behera",
+              "pfp": ""
+            }
+          ]
+        },
+        {
+          "position": "Honorable Mention",
+          "institute": "",
+          "description": "I saw him he was tamed, he barked, I stood still, I moved close, he barked again, then I took my camera out, he stopped, stood still, posing like a trained shot. 'The perfect one wisely Done' - A loyal dog resting calmly beside a rustic wall.",
+          "entry": {
+            "big": "/past-winners/entry/photography-2016/honorable-mention-04.jpg",
+            "small": "/past-winners/entry/photography-2016/honorable-mention-04.jpg"
+          },
+          "members": [
+            {
+              "name": "Siddharth Gupta",
+              "pfp": ""
+            }
+          ]
+        },
+        {
+          "position": "Honorable Mention",
+          "institute": "",
+          "description": "A silhouette of a figure with an outstretched hand against a radiant golden sunset.",
+          "entry": {
+            "big": "/past-winners/entry/photography-2016/honorable-mention-05.jpg",
+            "small": "/past-winners/entry/photography-2016/honorable-mention-05.jpg"
+          },
+          "members": [
+            {
+              "name": "Shubham Khandelia",
+              "pfp": ""
+            }
+          ]
+        },
+        {
+          "position": "Honorable Mention",
+          "institute": "",
+          "description": "How easily we fit into a stereotype we never intended to. The glimpses of the lives we live are just as extraordinary as everybody else's - A dynamic street capture of people in motion wearing traditional white attire.",
+          "entry": {
+            "big": "/past-winners/entry/photography-2016/honorable-mention-06.jpg",
+            "small": "/past-winners/entry/photography-2016/honorable-mention-06.jpg"
+          },
+          "members": [
+            {
+              "name": "Manaswini Rajesh",
+              "pfp": ""
+            }
+          ]
+        },
+        {
+          "position": "Honorable Mention",
+          "institute": "",
+          "description": "'Hope is being able to see that there is light despite all of the darkness.' ~ Desmond Tutu - An ornate floral stone medallion on a rustic wall with wildflowers blooming at the base.",
+          "entry": {
+            "big": "/past-winners/entry/photography-2016/honorable-mention-07.jpg",
+            "small": "/past-winners/entry/photography-2016/honorable-mention-07.jpg"
+          },
+          "members": [
+            {
+              "name": "Ira Kataria",
+              "pfp": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+};

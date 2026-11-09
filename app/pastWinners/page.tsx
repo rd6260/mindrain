@@ -5,10 +5,10 @@ import Navigation from '@/app/components/Navigation';
 import Footer from '@/app/components/Footer';
 import WinnerCard from '@/app/components/WinnerCard';
 import { colors } from '@/utils/colors';
-import { previousWinners2026, previousWinners2019, previousWinners2018, previousWinners2017, previousWinnersMRTA2 } from '@/data/winners';
+import { previousWinners2026, previousWinners2019, previousWinners2018, previousWinners2017, previousWinnersMRTA2, previousWinnersPhotography2016 } from '@/data/winners';
 
 export default function PastWinnersPage() {
-  const allData = [previousWinnersMRTA2, previousWinners2026, previousWinners2019, previousWinners2018, previousWinners2017];
+  const allData = [previousWinnersMRTA2, previousWinners2026, previousWinners2019, previousWinners2018, previousWinners2017, previousWinnersPhotography2016];
 
   // Deduplicated ordered list of years for tabs
   const years = Array.from(new LinkedSet(allData.map((d) => d.year)));
