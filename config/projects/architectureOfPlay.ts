@@ -32,12 +32,12 @@ export const ARCHITECTURE_OF_PLAY = {
       {
         name: 'Complete Brief',
         description: 'Full competition brief document',
-        url: 'https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/architecture_of_play/The%20Architecture%20of%20Play%20(Complete%20brief).pdf',
+        url: 'https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/architecture_of_play/Compitetion%20Brief.pdf',
       },
       {
         name: 'Printable Brief',
         description: 'Print-ready version of the brief',
-        url: 'https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/architecture_of_play/The%20Architecture%20of%20Play%20(Printable%20brief).pdf',
+        url: 'https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/architecture_of_play/Printable%20brief.pdf',
       },
     ],
   },
