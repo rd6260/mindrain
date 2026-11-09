@@ -226,10 +226,6 @@ function BriefEditor({ event }: { event: EventRow }) {
 export default function EventEditorPage() {
   const supabase = createClient();
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [passwordInput, setPasswordInput] = useState('');
-  const [passwordError, setPasswordError] = useState(false);
-
   const [events, setEvents] = useState<EventRow[]>([]);
   const [selectedEventId, setSelectedEventId] = useState('');
   const [action, setAction] = useState<Action>(null);
@@ -244,47 +240,12 @@ export default function EventEditorPage() {
     setEvents((data as EventRow[]) ?? []);
   };
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (passwordInput === 'mangoman') {
-      setIsAuthenticated(true);
-      fetchEvents();
-    } else {
-      setPasswordError(true);
-      setTimeout(() => setPasswordError(false), 3000);
-    }
-  };
+  useEffect(() => {
+    fetchEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const selectedEvent = events.find(e => e.id === selectedEventId) ?? null;
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-[#EDEBDF] flex items-center justify-center p-4">
-        <form onSubmit={handleLogin} className="bg-[#F8F7F2] p-8 rounded-2xl border border-[#D0CEC2] w-full max-w-md shadow-lg">
-          <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold text-[#1A1A1A]">Admin Access</h1>
-            <p className="text-[#6B6B6B] text-sm mt-1">Enter password to manage events</p>
-          </div>
-          <div className="space-y-4">
-            <div>
-              <input
-                type="password"
-                value={passwordInput}
-                onChange={e => setPasswordInput(e.target.value)}
-                placeholder="Password"
-                className={`w-full px-4 py-3 bg-white border rounded-xl outline-none transition-colors ${passwordError ? 'border-[#C85D3E]' : 'border-[#D0CEC2] focus:border-[#2C5F5F] focus:ring-2 focus:ring-[#2C5F5F]/10'}`}
-                autoFocus
-              />
-              {passwordError && <p className="text-[#C85D3E] text-xs mt-1.5 font-medium pl-1">Incorrect password</p>}
-            </div>
-            <button type="submit" className="w-full py-3 bg-[#2C5F5F] text-white rounded-xl font-bold hover:bg-[#1A4D4D] transition-colors">
-              Access
-            </button>
-          </div>
-        </form>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#EDEBDF] p-4 md:p-8">

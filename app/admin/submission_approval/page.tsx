@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
 type Registration = {
@@ -16,11 +16,6 @@ type Registration = {
 };
 
 export default function SubmissionApprovalPage() {
-  // ── Auth ──────────────────────────────────────────────────────────────
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [passwordInput, setPasswordInput] = useState('');
-  const [passwordError, setPasswordError] = useState(false);
-
   // ── Data ──────────────────────────────────────────────────────────────
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(false);
@@ -35,18 +30,6 @@ export default function SubmissionApprovalPage() {
   const supabase = createClient();
 
   // ── Handlers ──────────────────────────────────────────────────────────
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (passwordInput === 'mangoman') {
-      setIsAuthenticated(true);
-      setPasswordError(false);
-      fetchRegistrations();
-    } else {
-      setPasswordError(true);
-      setTimeout(() => setPasswordError(false), 3000);
-    }
-  };
-
   const fetchRegistrations = async () => {
     setLoading(true);
     setError(null);
@@ -99,49 +82,10 @@ export default function SubmissionApprovalPage() {
   const submittedCount = registrations.filter((r) => r.has_submitted).length;
   const notSubmittedCount = registrations.filter((r) => !r.has_submitted).length;
 
-  // ── Password gate ─────────────────────────────────────────────────────
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-[#EDEBDF] flex items-center justify-center p-4">
-        <form
-          onSubmit={handleLogin}
-          className="bg-[#F8F7F2] p-8 rounded-2xl border border-[#D0CEC2] w-full max-w-md shadow-lg"
-        >
-          <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold text-[#1A1A1A]">Admin Access</h1>
-            <p className="text-[#6B6B6B] text-sm mt-1">Enter password to manage submissions</p>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <input
-                type="password"
-                value={passwordInput}
-                onChange={(e) => setPasswordInput(e.target.value)}
-                placeholder="Password"
-                className={`w-full px-4 py-3 bg-white border rounded-xl outline-none transition-colors
-                  ${passwordError
-                    ? 'border-[#C85D3E] ring-2 ring-[#C85D3E]/20'
-                    : 'border-[#D0CEC2] focus:border-[#2C5F5F] focus:ring-2 focus:ring-[#2C5F5F]/10'
-                  }`}
-                autoFocus
-              />
-              {passwordError && (
-                <p className="text-[#C85D3E] text-xs mt-1.5 font-medium pl-1">Incorrect password</p>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-3 bg-[#2C5F5F] text-white rounded-xl font-bold hover:bg-[#1A4D4D] transition-colors"
-            >
-              Access Data
-            </button>
-          </div>
-        </form>
-      </div>
-    );
-  }
+  useEffect(() => {
+    fetchRegistrations();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── Main UI ───────────────────────────────────────────────────────────
   return (
