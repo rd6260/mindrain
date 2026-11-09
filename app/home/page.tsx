@@ -315,7 +315,7 @@ export default function HomePage() {
             ]}
             deadlineLabel="Registration Ends on"
             deadlineValue="10 December 2026"
-            findOutMoreHref="/competition/the-architecture-of-play"
+            findOutMoreHref="/workshops/function-follows-form"
             briefModalTitle="Download Brief"
             briefModalSubtitle="The Architecture of Play — select files to download"
             eventId=""
