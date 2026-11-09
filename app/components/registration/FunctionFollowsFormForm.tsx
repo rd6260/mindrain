@@ -3,24 +3,9 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { FUNCTION_FOLLOWS_FORM } from '@/config/projects';
-import { FFF_ANSWER_MAX_LENGTH, FFF_QUESTION_KEYS } from '@/lib/projects/functionFollowsForm';
+import { FFF_ANSWER_MAX_LENGTH, FFF_QUESTION_KEYS, FFF_QUESTIONS as QUESTIONS } from '@/lib/projects/functionFollowsForm';
 import { FloatingInput } from './ui';
 import type { RegistrationFormProps } from './types';
-
-const QUESTIONS: Record<(typeof FFF_QUESTION_KEYS)[number], string> = {
-  excitement:
-    'What excites you most about the possibility of being part of this workshop? What would you like to learn, experience, or discover during these nine days?',
-  motivation:
-    'Why do you want to be a part of Function Follows Form? What do you hope to experience here that you might not encounter in your regular architectural education?',
-  strength:
-    'What do you believe is your strongest quality as an architectural designer? How does it reflect in the way you observe, imagine, or approach design problems?',
-  challenge:
-    'Every designer has areas they wish to explore and improve. What do you find most challenging about architectural design, and what would you like to become better at?',
-  first_driver:
-    'When approaching a new design problem, what usually drives your first thought — function, form, concept, context, or something entirely different? Tell us why.',
-  openness:
-    'Architecture often requires questioning your own ideas, stepping outside familiar approaches, and starting over. How open are you to challenging your existing design beliefs and exploring possibilities you may not have considered before?',
-};
 
 const MAX_LOR_BYTES = 5 * 1024 * 1024;
 

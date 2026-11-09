@@ -10,6 +10,21 @@ export const FFF_QUESTION_KEYS = [
   'openness',
 ] as const;
 
+export const FFF_QUESTIONS: Record<(typeof FFF_QUESTION_KEYS)[number], string> = {
+  excitement:
+    'What excites you most about the possibility of being part of this workshop? What would you like to learn, experience, or discover during these nine days?',
+  motivation:
+    'Why do you want to be a part of Function Follows Form? What do you hope to experience here that you might not encounter in your regular architectural education?',
+  strength:
+    'What do you believe is your strongest quality as an architectural designer? How does it reflect in the way you observe, imagine, or approach design problems?',
+  challenge:
+    'Every designer has areas they wish to explore and improve. What do you find most challenging about architectural design, and what would you like to become better at?',
+  first_driver:
+    'When approaching a new design problem, what usually drives your first thought — function, form, concept, context, or something entirely different? Tell us why.',
+  openness:
+    'Architecture often requires questioning your own ideas, stepping outside familiar approaches, and starting over. How open are you to challenging your existing design beliefs and exploring possibilities you may not have considered before?',
+};
+
 export const FFF_ANSWER_MAX_LENGTH = 2000;
 
 export const functionFollowsForm: ProjectConfig = {

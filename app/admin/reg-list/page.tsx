@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { FUNCTION_FOLLOWS_FORM, fromStoredFormData } from '@/config/projects';
+import { FFF_QUESTION_KEYS, FFF_QUESTIONS } from '@/lib/projects/functionFollowsForm';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -46,6 +48,12 @@ type UnifiedRegistration = {
   event_title: string;
   // v2-specific fields
   document?: string;
+  // Function Follows Form (v3, essay-based application instead of members)
+  application?: {
+    answers: Record<string, string>;
+    lorPath: string | null;
+    stored: Record<string, any>; // raw form_data ({ form, progress })
+  };
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -255,8 +263,9 @@ export default function AdminRegistrationList() {
       if (v3Data) {
         for (const reg of v3Data as any[]) {
           const eventInfo = reg.events as Event | null;
-          const fd = reg.form_data || {};
+          const fd = fromStoredFormData(reg.event_id, reg.form_data);
           const fdMembers = fd.members || [];
+          const isFFF = reg.event_id === FUNCTION_FOLLOWS_FORM.eventId;
 
           allRegs.push({
             id: reg.id,
@@ -279,6 +288,13 @@ export default function AdminRegistrationList() {
             })),
             source: 'v3',
             event_title: eventInfo?.title || 'Unknown Event',
+            application: isFFF
+              ? {
+                  answers: Object.fromEntries(FFF_QUESTION_KEYS.map(k => [k, fd[k] || ''])),
+                  lorPath: fd.lor_path || null,
+                  stored: reg.form_data || {},
+                }
+              : undefined,
           });
         }
       }
@@ -320,7 +336,7 @@ export default function AdminRegistrationList() {
   // ─── Delete ───────────────────────────────────────────────────────────────
 
   const confirmDelete = async () => {
-    if (!registrationToDelete) return;
+    if (!registrationToDelete || registrationToDelete.application) return;
     const reg = registrationToDelete;
     setIsDeleting(true);
     setError(null);
@@ -419,6 +435,45 @@ export default function AdminRegistrationList() {
     } finally {
       setIsDeleting(false);
     }
+  };
+
+  // ─── Function Follows Form: open the (private) Letter of Recommendation ───
+
+  const openLor = async (path: string) => {
+    const { data, error: signError } = await supabase.storage
+      .from(FUNCTION_FOLLOWS_FORM.formUploadBucket)
+      .createSignedUrl(path, 60);
+    if (signError || !data?.signedUrl) {
+      setError(signError?.message || 'Could not open Letter of Recommendation');
+      window.scrollTo(0, 0);
+      return;
+    }
+    window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  // ─── Function Follows Form: set stage status (form_data.progress) ───────────
+
+  const [savingStage, setSavingStage] = useState<string | null>(null);
+
+  const setStageStatus = async (reg: UnifiedRegistration, stage: string, status: string) => {
+    if (!reg.application) return;
+    const stored = reg.application.stored;
+    const nextStored = { ...stored, progress: { ...(stored.progress || {}), [stage]: status } };
+    setSavingStage(`${reg.id}:${stage}`);
+    setError(null);
+    const { error: updateError } = await supabase
+      .from('registrations_v3')
+      .update({ form_data: nextStored })
+      .eq('id', reg.id);
+    setSavingStage(null);
+    if (updateError) {
+      setError(updateError.message);
+      window.scrollTo(0, 0);
+      return;
+    }
+    setRegistrations(prev =>
+      prev.map(r => (r.id === reg.id && r.application ? { ...r, application: { ...r.application, stored: nextStored } } : r))
+    );
   };
 
   // ─── Event change handler ─────────────────────────────────────────────────
@@ -637,7 +692,7 @@ export default function AdminRegistrationList() {
 
                   <div className="flex flex-col items-end gap-2">
                     <div className="flex flex-wrap items-center justify-end gap-2">
-                      {!reg.paid && (
+                      {!reg.paid && !reg.application && (
                         <button
                           onClick={() => setRegistrationToDelete(reg)}
                           className="px-3 py-1 bg-white border border-[#C85D3E] text-[#C85D3E] rounded-full text-xs font-bold hover:bg-[#C85D3E] hover:text-white transition-colors"
@@ -693,7 +748,63 @@ export default function AdminRegistrationList() {
                   </div>
                 )}
 
+                {/* Function Follows Form application */}
+                {reg.application && (
+                  <div className="p-5">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-xs font-bold uppercase tracking-widest text-[#2C5F5F]">Application</h3>
+                      {reg.application.lorPath ? (
+                        <button
+                          onClick={() => openLor(reg.application!.lorPath!)}
+                          className="px-2 py-1 bg-[#2C5F5F]/10 text-[#2C5F5F] hover:bg-[#2C5F5F] hover:text-white rounded text-xs font-bold transition-colors"
+                        >
+                          View LOR
+                        </button>
+                      ) : (
+                        <span className="text-xs text-[#8B8B8B] italic">No LOR uploaded</span>
+                      )}
+                    </div>
+                    {/* Status per stage */}
+                    <div className="mb-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+                      {FUNCTION_FOLLOWS_FORM.progressStages.map(stage => {
+                        const current = reg.application!.stored.progress?.[stage] || 'pending';
+                        return (
+                          <label key={stage} className="bg-white rounded-xl border border-[#E5E3D7] p-2.5 text-xs">
+                            <span className="block font-semibold text-[#1A1A1A] mb-1 capitalize">{stage.replace('_', ' ')}</span>
+                            <select
+                              value={current}
+                              disabled={savingStage === `${reg.id}:${stage}`}
+                              onChange={(e) => setStageStatus(reg, stage, e.target.value)}
+                              className="w-full px-2 py-1.5 bg-[#F8F7F2] border border-[#D0CEC2] rounded-lg text-xs font-medium outline-none focus:border-[#2C5F5F] disabled:opacity-50"
+                            >
+                              <option value="pending">Pending</option>
+                              <option value="in_progress">In progress</option>
+                              <option value="approved">Approved</option>
+                              <option value="rejected">Rejected</option>
+                            </select>
+                          </label>
+                        );
+                      })}
+                    </div>
+
+                    <div className="space-y-2">
+                      {FFF_QUESTION_KEYS.map((key, i) => (
+                        <details key={key} className="bg-white rounded-xl border border-[#E5E3D7] text-sm">
+                          <summary className="cursor-pointer px-3 py-2.5 font-semibold text-[#1A1A1A]">
+                            <span className="font-mono text-[#2C5F5F] mr-2">{String(i + 1).padStart(2, '0')}.</span>
+                            {FFF_QUESTIONS[key]}
+                          </summary>
+                          <p className="px-3 pb-3 text-[#4B4B4B] whitespace-pre-wrap leading-relaxed">
+                            {reg.application!.answers[key] || <span className="italic text-[#8B8B8B]">No answer</span>}
+                          </p>
+                        </details>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* Members List */}
+                {!reg.application && (
                 <div className="p-5">
                   <h3 className="text-xs font-bold uppercase tracking-widest text-[#2C5F5F] mb-3">
                     {reg.source === 'v2' ? 'Participant' : `Members (${reg.members?.length || 0})`}
@@ -748,6 +859,7 @@ export default function AdminRegistrationList() {
                     <div className="text-sm text-[#8B8B8B] italic">No members added yet</div>
                   )}
                 </div>
+                )}
               </div>
             ))}
 
