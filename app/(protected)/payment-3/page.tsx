@@ -16,6 +16,7 @@ interface Quote {
   summary: { label: string; value: string }[];
   discountPercent?: number;
   applied?: { title: string; message: string };
+  order?: { unit: string; quantity: number; purchased: number; maxTotal: number };
 }
 
 const money = (minor: number) => (minor / 100).toLocaleString();
@@ -49,6 +50,8 @@ function PaymentContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const registrationId = searchParams.get('registration_id');
+  // `?add=1` = buy more units (e.g. images) for an already-paid registration, priced as its own order.
+  const addMode = searchParams.get('add') === '1';
 
   const [quote, setQuote] = useState<Quote | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -56,6 +59,7 @@ function PaymentContent() {
   const [error, setError] = useState<string | null>(null);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [alreadyPaid, setAlreadyPaid] = useState(false);
+  const [quantity, setQuantity] = useState(1);
 
   // Coupon state — `quote` is always what the server says will be charged
   const [couponCode, setCouponCode] = useState('');
@@ -68,11 +72,11 @@ function PaymentContent() {
 
   const supabase = createClient();
 
-  const fetchQuote = async (code?: string): Promise<{ quote: Quote } | { error: string }> => {
+  const fetchQuote = async (code?: string, qty: number = quantity): Promise<{ quote: Quote } | { error: string }> => {
     const res = await fetch('/api/v3/quote', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ registration_id: registrationId, ...(code && { code }) }),
+      body: JSON.stringify({ registration_id: registrationId, ...(code && { code }), ...(addMode && { quantity: qty }) }),
     });
     const data = await res.json();
     return res.ok ? { quote: data.quote as Quote } : { error: (data.error as string) || 'Failed to calculate fee' };
@@ -134,7 +138,7 @@ function PaymentContent() {
           .from('registrations_v3').select('paid, registration_by').eq('id', registrationId).maybeSingle();
         if (!reg) { setError('Registration not found'); setIsLoading(false); return; }
         if (reg.registration_by !== user.id) { setError('Unauthorized access'); setIsLoading(false); return; }
-        if (reg.paid) { setAlreadyPaid(true); setIsLoading(false); return; }
+        if (reg.paid && !addMode) { setAlreadyPaid(true); setIsLoading(false); return; }
 
         const result = await fetchQuote();
         if ('error' in result) setError(result.error);
@@ -148,6 +152,14 @@ function PaymentContent() {
     load();
   }, [registrationId]);
 
+  const changeQuantity = async (n: number) => {
+    setQuantity(n);
+    setError(null);
+    const result = await fetchQuote(appliedCode ?? undefined, n);
+    if ('quote' in result) setQuote(result.quote);
+    else setError(result.error);
+  };
+
   const createOrder = async () => {
     if (!quote) return;
     setIsProcessing(true);
@@ -157,7 +169,7 @@ function PaymentContent() {
       const res = await fetch('/api/v3/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ registration_id: registrationId, ...(appliedCode && { code: appliedCode }) }),
+        body: JSON.stringify({ registration_id: registrationId, ...(appliedCode && { code: appliedCode }), ...(addMode && { quantity }) }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to create order');
@@ -298,8 +310,10 @@ function PaymentContent() {
               Final Step
             </span>
           </div>
-          <h1 className="text-3xl font-bold text-[#1A1A1A] tracking-tight">Complete Payment</h1>
-          <p className="text-[#6B6B6B] mt-1 text-sm">Review your details and confirm your spot</p>
+          <h1 className="text-3xl font-bold text-[#1A1A1A] tracking-tight">{addMode ? 'Add More Images' : 'Complete Payment'}</h1>
+          <p className="text-[#6B6B6B] mt-1 text-sm">
+            {addMode ? 'Choose how many images to add. This purchase is priced on its own size.' : 'Review your details and confirm your spot'}
+          </p>
         </div>
 
         {/* Inline error toast */}
@@ -321,6 +335,34 @@ function PaymentContent() {
                   {quote.badge ?? quote.eventTitle}
                 </span>
               </div>
+
+              {/* Add-more picker */}
+              {addMode && quote.order && (
+                <div>
+                  <SectionHeading>Images to Add</SectionHeading>
+                  <p className="text-sm text-[#4B4B4B] mb-3">
+                    You currently have <strong>{quote.order.purchased}</strong> of {quote.order.maxTotal} images.
+                    You can add up to <strong>{quote.order.maxTotal - quote.order.purchased}</strong> more.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {Array.from({ length: quote.order.maxTotal - quote.order.purchased }, (_, i) => i + 1).map(n => (
+                      <button
+                        key={n}
+                        type="button"
+                        onClick={() => changeQuantity(n)}
+                        disabled={isProcessing}
+                        className={`w-11 py-2.5 rounded-xl text-sm font-semibold border transition-all ${
+                          quantity === n
+                            ? 'bg-[#2C5F5F] text-white border-[#2C5F5F] shadow-md shadow-[#2C5F5F]/20'
+                            : 'bg-white text-[#6B6B6B] border-[#D0CEC2] hover:border-[#2C5F5F] hover:text-[#2C5F5F]'
+                        }`}
+                      >
+                        {n}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Summary card */}
               <div className="bg-white rounded-xl border border-[#E5E3D7] px-5 py-1">
@@ -353,7 +395,9 @@ function PaymentContent() {
                   <span className="text-white text-xs font-bold">i</span>
                 </div>
                 <p className="text-sm text-[#4B4B4B] leading-relaxed">
-                  {quote.badge && <>You&apos;re registering under the <strong className="text-[#2C5F5F]">{quote.badge}</strong> period. </>}
+                  {quote.order
+                    ? <>This order has <strong className="text-[#2C5F5F]">{quote.order.quantity} {quote.order.unit}{quote.order.quantity === 1 ? '' : 's'}</strong> and is priced on its own size ({quote.badge}), regardless of what you bought before. </>
+                    : quote.badge && <>You&apos;re registering under the <strong className="text-[#2C5F5F]">{quote.badge}</strong> period. </>}
                   The registration fee is <strong>non-refundable</strong> once payment is complete.
                 </p>
               </div>

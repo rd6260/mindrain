@@ -3,15 +3,14 @@
 import Image from 'next/image';
 import { colors } from '@/utils/colors';
 import Footer from '@/app/components/Footer';
-import Timeline from '@/app/components/Timeline';
 import Navigation from '@/app/components/Navigation';
 import BriefModal from '@/app/components/BriefModal';
 import DownloadBriefModal from '@/app/components/DownloadModal';
 import { useState } from 'react';
+import { Trophy, ListOrdered, Medal } from 'lucide-react';
 import localFont from 'next/font/local';
-import { MR_LENS_TROPHY } from '@/config/projects';
-import { ImportantDate } from '@/types';
-import { isRegistrationOpen } from '@/utils/registration';
+import { MR_LENS_TROPHY, type LensFeeTable } from '@/config/projects';
+import { lensIsOpen, lensSlabFor, lensOrderTotal } from '@/lib/projects/lensTrophy';
 
 // ─── Font ─────────────────────────────────────────────────────────────────────
 
@@ -20,97 +19,30 @@ const TechnorFont = localFont({ src: '../../fonts/Technor-Variable.woff2' });
 // ─── Static Data ──────────────────────────────────────────────────────────────
 
 const REGISTRATION_EVENT_ID = MR_LENS_TROPHY.eventId;
-const REGISTRATION_URL = `/registration?event_id=${REGISTRATION_EVENT_ID}`;
+const REGISTRATION_URL = MR_LENS_TROPHY.registrationPath;
 
-const PRESS_KIT_FILES = [
-  {
-    name: 'A4 A3 Poster',
-    description: 'A4 and A3 size Campaign Posters',
-    url: 'https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/A4_A3%20campaign%20poster.png',
-  },
-  {
-    name: 'Instagram Post',
-    description: 'Instagram Post sized posters',
-    url: 'https://pdtlcmfanqfascgivywf.supabase.co/storage/v1/object/public/competition_brief/the_unreal_house/instagram%20post%20campaign.png',
-  },
-];
+// Dates and fees live in config/projects/lensTrophy.ts. Change them there, not here.
+const { dates, fees } = MR_LENS_TROPHY;
 
-const IMPORTANT_DATES: ImportantDate[] = [
-  { label: 'Competition Starts', date: '19 February 2026' },
-  { label: 'Early Bird Registration Starts', date: '19 February 2026' },
-  { label: 'Early Bird Registration Ends', date: '22 March 2026' },
-  { label: 'Advance Registration Starts', date: '23 March 2026' },
-  { label: 'Final Submission Starts', date: '1 April 2026' },
-  { label: 'Advance Registration Ends', date: '31 May 2026' },
-  { label: 'Late Registration Starts', date: '1 June 2026' },
-  { label: 'Late Registration Ends (Extended)', date: '25 July 2026' },
-  { label: 'Final Submission Ends (Extended)', date: '30 July 2026' },
-  { label: 'Announcement of Result', date: '1 September 2026' },
-];
+/** '2027-01-18T23:59:59+05:30' → '18 January 2027' (always shown in IST). */
+const formatDate = (iso: string) =>
+  new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric', timeZone: 'Asia/Kolkata' });
 
-const PRIZES = [
-  { label: '1st Prize', amount: '₹11,000', emoji: '🥇' },
-  { label: '2nd Prize', amount: '₹8,000', emoji: '🥈' },
-  { label: '3rd Prize', amount: '₹6,000', emoji: '🥉' },
-];
 
 // ─── Registration Fees Data ───────────────────────────────────────────────────
 
-type Tier = 'Early Bird Registration' | 'Regular Registration' | 'Last Minute Registration';
-type FeeKey = 'india_monetary' | 'india_no_monetary' | 'international';
-type EntryType = 'solo' | 'group';
+type Origin = 'india' | 'international';
 
-const FEES: Record<Tier, Record<FeeKey, Record<EntryType, string>>> = {
-  'Early Bird Registration': {
-    india_monetary: { solo: '₹549', group: '₹999' },
-    india_no_monetary: { solo: '₹275', group: '₹559' },
-    international: { solo: '$35', group: '$79' },
-  },
-  'Regular Registration': {
-    india_monetary: { solo: '₹699', group: '₹1,499' },
-    india_no_monetary: { solo: '₹275', group: '₹559' },
-    international: { solo: '$45', group: '$99' },
-  },
-  'Last Minute Registration': {
-    india_monetary: { solo: '₹999', group: '₹1,999' },
-    india_no_monetary: { solo: '₹375', group: '₹819' },
-    international: { solo: '$69', group: '$149' },
-  },
+const PRICING: Record<Origin, LensFeeTable> = { india: fees.india, international: fees.international };
+const MAX_IMAGES = fees.maxImages;
+
+const formatMoney = (symbol: string, amount: number) => {
+  const rounded = Math.round(amount * 100) / 100;
+  return `${symbol}${Number.isInteger(rounded) ? rounded : rounded.toFixed(2)}`;
 };
 
-const TIER_META: Record<Tier, { shortLabel: string; color: string; bg: string; border: string; dot: string; endsOn: string }> = {
-  'Early Bird Registration': {
-    shortLabel: 'Early Bird',
-    color: 'text-[#2D5F4F]',
-    bg: 'bg-[#2D5F4F]/8',
-    border: 'border-[#2D5F4F]/20',
-    dot: 'bg-[#2D5F4F]',
-    endsOn: '22 March 2026',
-  },
-  'Regular Registration': {
-    shortLabel: 'Regular',
-    color: 'text-[#1A1A1A]',
-    bg: 'bg-[#F8F7F2]',
-    border: 'border-[#D0CEC2]',
-    dot: 'bg-[#6B6B6B]',
-    endsOn: '31 May 2026',
-  },
-  'Last Minute Registration': {
-    shortLabel: 'Last Minute',
-    color: 'text-[#D97757]',
-    bg: 'bg-[#D97757]/8',
-    border: 'border-[#D97757]/20',
-    dot: 'bg-[#D97757]',
-    endsOn: '25 July 2026',
-  },
-};
-
-function getCurrentTier(): Tier {
-  const today = new Date();
-  if (today <= new Date('2026-03-23')) return 'Early Bird Registration';
-  if (today <= new Date('2026-05-31')) return 'Regular Registration';
-  return 'Last Minute Registration';
-}
+const slabFor = (origin: Origin, images: number) => lensSlabFor(origin, images)!;
+const totalFor = (origin: Origin, images: number) => lensOrderTotal(origin, images);
 
 // ─── Small Shared Components ──────────────────────────────────────────────────
 
@@ -167,9 +99,9 @@ function RegistrationClosedPopup({ onClose }: { onClose: () => void }) {
         </div>
 
         <h2 className="text-2xl font-bold mb-2" style={{ color: '#1A1A1A' }}>Registrations Closed</h2>
-        <p className="text-xs font-medium mb-3" style={{ color: '#D97757' }}>Registration closed on 30 July 2026</p>
+        <p className="text-xs font-medium mb-3" style={{ color: '#D97757' }}>Registration closed on {formatDate(dates.registrationEnds)}</p>
         <p className="text-base leading-relaxed mb-6" style={{ color: '#6B6B6B' }}>
-          Registration for <strong style={{ color: '#1A1A1A' }}>The Unreal House</strong> is now closed.
+          Registration for <strong style={{ color: '#1A1A1A' }}>The Mindrain Lens Trophy</strong> is now closed.
           <br />
           If you still wish to participate, reach out to us at:
         </p>
@@ -224,10 +156,10 @@ function ToggleButton({ active, onClick, children }: {
 // ─── Sections ─────────────────────────────────────────────────────────────────
 
 const HERO_DATES = [
-  { label: 'Registration opens', date: '03 November 2026' },
-  { label: 'Registration ends', date: '18 January 2027' },
-  { label: 'Submission ends', date: '25 January 2027' },
-  { label: 'Results announcement', date: '10 March 2027' },
+  { label: 'Registration opens', date: formatDate(dates.registrationOpens) },
+  { label: 'Registration ends', date: formatDate(dates.registrationEnds) },
+  { label: 'Submission ends', date: formatDate(dates.submissionEnds) },
+  { label: 'Results announcement', date: formatDate(dates.resultsAnnouncement) },
 ];
 
 function Hero({ onBriefClick, onRegisterClick }: { onBriefClick: () => void; onRegisterClick: () => void }) {
@@ -308,182 +240,189 @@ function Hero({ onBriefClick, onRegisterClick }: { onBriefClick: () => void; onR
   );
 }
 
-function PrizePool() {
-  const categories = [
-    'Category 1 (1st & 2nd Year)',
-    'Category 2 (3rd, 4th & 5th Year)',
-  ];
 
+const CATEGORIES = ['Category 1', 'Category 2'];
+
+// Podium order is 2nd · 1st · 3rd so the winner stands in the middle.
+const PODIUM = [
+  { rank: '2nd', height: 'h-24', tone: 'bg-[#2C5F5F]/70', trophy: '#9AA0A6', size: 24 },
+  { rank: '1st', height: 'h-32', tone: 'bg-[#2C5F5F]', trophy: '#C9A227', size: 28 },
+  { rank: '3rd', height: 'h-20', tone: 'bg-[#2C5F5F]/45', trophy: '#B07A4A', size: 22 },
+];
+
+function Podium() {
   return (
-    <section className="py-28 px-4 sm:px-6 lg:px-8 relative">
-      <div className="max-w-6xl mx-auto">
-        <h2 className="text-3xl md:text-5xl font-bold mb-16 text-center animate-fade-in-up">Prize Pool</h2>
+    <div className="flex items-end justify-center gap-3 sm:gap-4 pt-6">
+      {PODIUM.map(({ rank, height, tone, trophy, size }) => (
+        <div key={rank} className="flex flex-col items-center w-20 sm:w-24">
+          <Trophy size={size} strokeWidth={1.6} className="mb-2" style={{ color: trophy }} />
+          <div
+            className={`${height} ${tone} w-full rounded-t-xl flex items-start justify-center pt-3 text-white font-extrabold text-lg shadow-md`}
+          >
+            {rank}
+          </div>
+        </div>
+      ))}
+      <div className="absolute inset-x-6 bottom-6 h-px bg-[#D0CEC2]" aria-hidden />
+    </div>
+  );
+}
 
-        <div className="grid md:grid-cols-2 gap-10">
-          {categories.map((category) => (
+function Recognition() {
+  return (
+    <section id="recognition" className="relative py-20 md:py-28 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Heading */}
+        <div className="text-center mb-14 animate-fade-in-up">
+          <div className="inline-flex items-center gap-3 mb-4">
+            <span className="h-px w-10 bg-[#2C5F5F]/40" />
+            <span className="text-xs font-bold uppercase tracking-[0.3em] text-[#2C5F5F]">Recognition</span>
+            <span className="h-px w-10 bg-[#2C5F5F]/40" />
+          </div>
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight" style={{ color: colors.textPrimary }}>
+            Winners &amp; Recognition
+          </h2>
+          <p className="mt-4 text-lg md:text-xl max-w-2xl mx-auto" style={{ color: colors.textSecondary }}>
+            Two categories. Dozens of frames celebrated. Yours could be among them.
+          </p>
+        </div>
+
+        {/* Category podiums */}
+        <div className="grid gap-6 md:grid-cols-2">
+          {CATEGORIES.map((name, idx) => (
             <div
-              key={category}
-              className="rounded-lg p-10 shadow-xl hover-lift animate-fade-in-up border-2"
-              style={{ backgroundColor: colors.white, borderColor: colors.borderLight }}
+              key={name}
+              className="relative overflow-hidden rounded-3xl border p-8 md:p-10 shadow-sm animate-fade-in-up"
+              style={{ backgroundColor: colors.cardBackground, borderColor: colors.borderLight, animationDelay: `${idx * 120}ms` }}
             >
-              <h3 className="text-xl font-bold mb-8 pb-4 border-b-2">{category}</h3>
-              <div className="space-y-6">
-                {PRIZES.map((prize) => (
-                  <div key={prize.label} className="flex justify-between items-center p-4 rounded-xl transition-all">
-                    <span className="text-xl font-medium flex items-center gap-3" style={{ color: colors.textSecondary }}>
-                      <span className="text-2xl">{prize.emoji}</span>
-                      {prize.label}
-                    </span>
-                    <span className="text-2xl font-black" style={{ color: colors.textPrimary }}>
-                      {prize.amount}
-                    </span>
-                  </div>
-                ))}
+              <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-[#2C5F5F]/5" aria-hidden />
+              <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#2C5F5F] mb-2">{name}</p>
+              <div className="flex items-baseline gap-3">
+                <span className="text-6xl md:text-7xl font-extrabold leading-none" style={{ color: colors.textPrimary }}>3</span>
+                <span className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Winners</span>
+              </div>
+              <div className="relative mt-4 pb-6">
+                <Podium />
               </div>
             </div>
           ))}
         </div>
 
-        <p className="mt-8 text-sm">
-          <sup>*</sup>Monetary Awards will be given to Group A Participants only. Read the full brief and
-          <sup>*</sup>T&C documents carefully for more information.
-        </p>
+        {/* Top 15 + Honorable mentions */}
+        <div
+          className="relative overflow-hidden mt-6 rounded-3xl text-white shadow-xl animate-fade-in-up"
+          style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})`, animationDelay: '240ms' }}
+        >
+          <div className="absolute -bottom-24 -left-16 w-72 h-72 rounded-full bg-white/5" aria-hidden />
+          <div className="absolute -top-20 right-1/3 w-56 h-56 rounded-full bg-white/5" aria-hidden />
+
+          <div className="relative grid md:grid-cols-2 md:divide-x divide-white/15">
+            <div className="p-8 md:p-12">
+              <ListOrdered size={28} strokeWidth={1.6} className="mb-5 text-white/70" />
+              <div className="flex items-baseline gap-3">
+                <span className="text-6xl md:text-7xl font-extrabold leading-none">15</span>
+                <span className="text-2xl font-bold">Top Winners List</span>
+              </div>
+              <p className="mt-3 text-white/70 text-base">Excluding the top 3 winners.</p>
+            </div>
+
+            <div className="p-8 md:p-12 border-t md:border-t-0 border-white/15">
+              <Medal size={28} strokeWidth={1.6} className="mb-5 text-white/70" />
+              <div className="flex items-baseline gap-3">
+                <span className="text-6xl md:text-7xl font-extrabold leading-none">20+</span>
+                <span className="text-2xl font-bold">Honorable Mentions</span>
+              </div>
+              <p className="mt-3 text-white/70 text-base">Recognising outstanding work beyond the podium.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
 }
 
-function StudentDiscounts() {
+
+function FeeScheme({ origin, images }: { origin: Origin; images: number }) {
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        <h2 className="text-4xl md:text-5xl font-bold text-center mb-12" style={{ color: colors.textPrimary }}>
-          Student Discounts
-        </h2>
-
-        <div className="rounded-lg p-8 md:p-12" style={{ backgroundColor: colors.white }}>
-          {[
-            <>Participate and avail discount <span className="font-bold">Flat 35%</span></>,
-            'The Mind Rain Competition Team welcomes participation from universities, colleges, and design schools across the world.',
-            <>Students can avail exclusive discounts through group registration offers (valid for <span className="font-bold">30 or more</span> participants registering from the same institution).</>,
-            'This is a great opportunity for faculty and mentors to encourage students to think creatively and explore imaginative architecture beyond textbooks.',
-          ].map((text, i) => (
-            <p key={i} className="text-lg mb-6 leading-relaxed" style={{ color: colors.textSecondary }}>{text}</p>
-          ))}
-
-          <div className="rounded-xl p-6 mb-6" style={{ backgroundColor: colors.cardBackground }}>
-            <h3 className="text-xl font-semibold mb-4" style={{ color: colors.textPrimary }}>
-              To apply for student discounts:
-            </h3>
-            <ul className="space-y-2 list-disc list-inside">
-              {[
-                'Email us from your official university e-mail ID',
-                'Include your university name, your role, and number of participants',
-                'Only recognized university representatives (professors/staff) are eligible to request discounted access on behalf of students',
-              ].map((item) => (
-                <li key={item} style={{ color: colors.textSecondary }}>{item}</li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="text-center">
-            <a
-              href="mailto:support@mindrain.org"
-              className="inline-block px-8 py-3 rounded-lg text-white font-medium transition-all hover:opacity-90"
-              style={{ backgroundColor: colors.accent }}
-              data-testid="discount-email-link"
-            >
-              Contact for Group Discounts
-            </a>
-          </div>
-        </div>
+    <div className="rounded-lg overflow-hidden text-white" style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})` }}>
+      <div className="grid md:grid-cols-2 md:divide-x divide-white/15 divide-y md:divide-y-0">
+        {(Object.keys(PRICING) as Origin[]).map(key => {
+          const { title, symbol, slabs } = PRICING[key];
+          const activeSlab = key === origin ? slabFor(origin, images) : null;
+          return (
+            <div key={key} className="px-6 py-6 text-center">
+              <h3 className="text-sm font-bold uppercase tracking-widest underline underline-offset-4 mb-5">{title}</h3>
+              <ul className="space-y-3">
+                {slabs.map(slab => (
+                  <li
+                    key={slab.label}
+                    className={`rounded-xl px-4 py-3 transition-colors ${slab === activeSlab ? 'bg-white/15' : ''}`}
+                  >
+                    <p className="text-xs font-semibold uppercase tracking-widest text-white/80">{slab.label}</p>
+                    <p className="text-2xl font-bold my-1">
+                      {slab.total != null
+                        ? <>{formatMoney(symbol, slab.total)} <span className="text-base">TOTAL</span></>
+                        : <>{formatMoney(symbol, slab.perImage as number)} <span className="text-base font-semibold">/ image</span></>}
+                    </p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-white/70">{slab.note}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
       </div>
-    </section >
+    </div>
   );
 }
 
-function RegistrationFees({ onRegisterClick }: { onRegisterClick: () => void }) {
-  const [origin, setOrigin] = useState<'india' | 'international'>('india');
-  const [monetary, setMonetary] = useState<'yes' | 'no'>('yes');
-  const [teamType, setTeamType] = useState<EntryType>('solo');
-
-  const activeTier = getCurrentTier();
-  const { shortLabel, color, bg, border, dot, endsOn } = TIER_META[activeTier];
-
-  const feeKey: FeeKey =
-    origin === 'international' ? 'international'
-      : monetary === 'yes' ? 'india_monetary'
-        : 'india_no_monetary';
-
-  const amount = FEES[activeTier][feeKey][teamType];
-
-  const originLabel =
-    origin === 'india'
-      ? monetary === 'yes' ? 'Monetary track' : 'Non-monetary track'
-      : 'International';
+function FeeCalculator({
+  origin, setOrigin, images, setImages, onRegisterClick,
+}: {
+  origin: Origin;
+  setOrigin: (o: Origin) => void;
+  images: number;
+  setImages: (n: number) => void;
+  onRegisterClick: () => void;
+}) {
+  const { symbol } = PRICING[origin];
+  const slab = slabFor(origin, images);
+  const total = totalFor(origin, images);
 
   return (
     <div className="rounded-lg p-6 space-y-7" style={{ backgroundColor: colors.white }}>
-
-      {/* Application Type */}
       <div>
-        <SectionHeading>Application Type</SectionHeading>
+        <SectionHeading>Participant Type</SectionHeading>
         <div className="flex gap-2">
-          <ToggleButton active={origin === 'india'} onClick={() => setOrigin('india')}>Indian Application</ToggleButton>
-          <ToggleButton active={origin === 'international'} onClick={() => setOrigin('international')}>International</ToggleButton>
+          <ToggleButton active={origin === 'india'} onClick={() => setOrigin('india')}>Indian Participant</ToggleButton>
+          <ToggleButton active={origin === 'international'} onClick={() => setOrigin('international')}>International Participant</ToggleButton>
         </div>
       </div>
 
-      {/* Award Preference — India only */}
-      {origin === 'india' && (
-        <div>
-          <SectionHeading>Award Preference</SectionHeading>
-          <div className="flex gap-2">
-            <ToggleButton active={monetary === 'yes'} onClick={() => setMonetary('yes')}>
-              <span className="block text-xs font-bold">Group A</span>
-              <span className="block text-[10px] opacity-70 mt-0.5">Monetary Award</span>
-            </ToggleButton>
-            <ToggleButton active={monetary === 'no'} onClick={() => setMonetary('no')}>
-              <span className="block text-xs font-bold">Group B</span>
-              <span className="block text-[10px] opacity-70 mt-0.5">No Monetary Award</span>
-            </ToggleButton>
-          </div>
-        </div>
-      )}
-
-      {/* Entry Type */}
       <div>
-        <SectionHeading>Entry Type</SectionHeading>
-        <div className="flex gap-2">
-          <ToggleButton active={teamType === 'solo'} onClick={() => setTeamType('solo')}>
-            <span className="block text-xs font-bold">Solo</span>
-            <span className="block text-[10px] opacity-70 mt-0.5">1 member</span>
-          </ToggleButton>
-          <ToggleButton active={teamType === 'group'} onClick={() => setTeamType('group')}>
-            <span className="block text-xs font-bold">Group</span>
-            <span className="block text-[10px] opacity-70 mt-0.5">up to 3 members</span>
-          </ToggleButton>
+        <SectionHeading>Number of Images</SectionHeading>
+        <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
+          {Array.from({ length: MAX_IMAGES }, (_, k) => k + 1).map(n => (
+            <ToggleButton key={n} active={images === n} onClick={() => setImages(n)}>{n}</ToggleButton>
+          ))}
         </div>
       </div>
 
       <div className="border-t border-[#E5E3D7]" />
 
-      {/* Current Fee */}
       <div>
-        <SectionHeading>Registration Fees</SectionHeading>
-        <div className={`flex items-center justify-between px-4 py-3.5 rounded-xl border ${bg} ${border}`}>
-          <div className="flex items-center gap-3">
-            <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dot}`} />
-            <span className="text-sm text-[#6B6B6B] font-medium">{activeTier}</span>
+        <SectionHeading>Your Total</SectionHeading>
+        <div className="flex items-end justify-between gap-4 px-5 py-5 rounded-xl border border-[#D0CEC2] bg-[#F8F7F2]">
+          <div>
+            <p className="text-sm font-semibold text-[#1A1A1A]">
+              {images} {images === 1 ? 'image' : 'images'}
+              {slab.total == null && <span className="font-normal text-[#6B6B6B]"> × {formatMoney(symbol, slab.perImage as number)}</span>}
+            </p>
+            <p className="text-xs uppercase tracking-wide text-[#6B6B6B] mt-1">{slab.note}</p>
           </div>
-          <span className={`text-base font-bold tabular-nums ${color}`}>{amount}</span>
+          <p className="text-4xl font-extrabold tabular-nums leading-none text-[#2C5F5F]">{formatMoney(symbol, total)}</p>
         </div>
-
-        <p className="text-[10px] text-[#8B8B8B] mt-3 text-center">
-          {shortLabel} pricing · ends{' '}
-          <span className="font-semibold text-[#D97757]">{endsOn}</span>
-          {' '}· {teamType} · {originLabel}
-        </p>
+        <p className="text-[11px] text-[#8B8B8B] mt-3 text-right italic">*Includes fees and taxes.</p>
       </div>
 
       <div className="flex items-center justify-center">
@@ -495,14 +434,25 @@ function RegistrationFees({ onRegisterClick }: { onRegisterClick: () => void }) 
   );
 }
 
+function RegistrationFees({ onRegisterClick }: { onRegisterClick: () => void }) {
+  const [origin, setOrigin] = useState<Origin>('india');
+  const [images, setImages] = useState(1);
+
+  return (
+    <div className="space-y-6">
+      <FeeScheme origin={origin} images={images} />
+      <FeeCalculator origin={origin} setOrigin={setOrigin} images={images} setImages={setImages} onRegisterClick={onRegisterClick} />
+    </div>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function CompetitionPage() {
   const [isBriefOpen, setIsBriefOpen] = useState(false);
-  const [isPressOpen, setIsPressOpen] = useState(false);
   const [isRegClosedOpen, setIsRegClosedOpen] = useState(false);
 
-  const registrationOpen = isRegistrationOpen();
+  const registrationOpen = lensIsOpen(new Date());
   const handleRegisterClick = () => {
     if (registrationOpen) {
       window.location.href = REGISTRATION_URL;
@@ -525,17 +475,7 @@ export default function CompetitionPage() {
         />
 
         <Hero onBriefClick={() => setIsBriefOpen(true)} onRegisterClick={handleRegisterClick} />
-
-        <PrizePool />
-
-        <section id="timeline" className="py-20 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-4xl md:text-5xl font-bold text-center mb-16" style={{ color: colors.textPrimary }}>
-              Important Dates
-            </h2>
-            <Timeline dates={IMPORTANT_DATES} />
-          </div>
-        </section>
+        <Recognition />
 
         <section id="register" className="py-20 px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
@@ -546,7 +486,6 @@ export default function CompetitionPage() {
           </div>
         </section>
 
-        <StudentDiscounts />
         <Footer />
       </div>
 
@@ -556,13 +495,6 @@ export default function CompetitionPage() {
         eventId={REGISTRATION_EVENT_ID}
       />
 
-      <DownloadBriefModal
-        isOpen={isPressOpen}
-        onClose={() => setIsPressOpen(false)}
-        title="Download Press Kit"
-        subtitle="The Unreal House — select files to download"
-        files={PRESS_KIT_FILES}
-      />
     </>
   );
 }

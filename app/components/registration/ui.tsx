@@ -1,17 +1,17 @@
 // Shared building blocks for per-project registration forms.
 
 export function FloatingInput({
-  label, type = 'text', value, onChange, disabled, accept, placeholder,
+  label, type = 'text', value, onChange, disabled, accept, placeholder, multiple,
 }: {
   label: string; type?: string; value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  disabled?: boolean; accept?: string; placeholder?: string;
+  disabled?: boolean; accept?: string; placeholder?: string; multiple?: boolean;
 }) {
   return (
     <label className="relative block w-full group">
       <input
         type={type} value={value} onChange={onChange} disabled={disabled}
-        accept={accept} placeholder={placeholder ?? ' '}
+        accept={accept} multiple={multiple} placeholder={placeholder ?? ' '}
         className="
           peer w-full px-4 pt-6 pb-2 text-[#1A1A1A] bg-[#F8F7F2]
           border border-[#D0CEC2] rounded-xl outline-none text-sm font-medium

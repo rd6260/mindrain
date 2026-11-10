@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { quoteRegistration } from '@/lib/payments/quote';
+import { mutateFormData, readOrders } from '@/lib/projects/orders';
 import Razorpay from 'razorpay';
 
 export async function POST(req: NextRequest) {
@@ -12,7 +13,7 @@ export async function POST(req: NextRequest) {
     }
 
     // The amount is never taken from the client — it is recomputed here.
-    const { registration_id, code } = await req.json();
+    const { registration_id, code, quantity } = await req.json();
     if (!registration_id) {
       return NextResponse.json({ error: 'Missing registration_id' }, { status: 400 });
     }
@@ -22,6 +23,7 @@ export async function POST(req: NextRequest) {
       userId: user.id,
       registrationId: registration_id,
       code,
+      quantity,
     });
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: result.status });
@@ -68,6 +70,27 @@ export async function POST(req: NextRequest) {
     if (paymentError || !payment) {
       console.error('Payment insert error:', paymentError);
       return NextResponse.json({ error: 'Failed to create payment record' }, { status: 500 });
+    }
+
+    // Multi-order projects: remember this order's size server-side so verify-payment can credit it.
+    if (quote.order) {
+      const saved = await mutateFormData(supabase, registration_id, stored => ({
+        ...stored,
+        orders: [
+          ...readOrders(stored),
+          {
+            payment_id: payment.payment_id,
+            quantity: quote.order!.quantity,
+            status: 'pending',
+            created_at: new Date().toISOString(),
+          },
+        ],
+      }));
+      if (!saved.ok) {
+        console.error('Failed to record pending order:', saved.error);
+        await supabase.from('payments_v3').update({ status: 'failed' }).eq('payment_id', payment.payment_id);
+        return NextResponse.json({ error: 'Failed to create order' }, { status: 500 });
+      }
     }
 
     if (referralId) {

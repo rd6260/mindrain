@@ -1,7 +1,10 @@
 'use client';
 
-import { getProjectConfig, FUNCTION_FOLLOWS_FORM } from '@/config/projects';
+import { getProjectConfig, FUNCTION_FOLLOWS_FORM, MR_LENS_TROPHY } from '@/config/projects';
+import { lensIsOpen } from '@/lib/projects/lensTrophy';
+import { capturedQuantity } from '@/lib/projects/orders';
 import FunctionFollowsFormProgress from '@/app/components/progress/FunctionFollowsFormProgress';
+import FunctionFollowsFormLor from '@/app/components/progress/FunctionFollowsFormLor';
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
@@ -882,9 +885,58 @@ const ProfilePage = () => {
                             </div>
                           )}
 
+                          {registration.event_id === MR_LENS_TROPHY.eventId && registration.paid && (() => {
+                            const bought = capturedQuantity(registration.form_data);
+                            const max = MR_LENS_TROPHY.fees.maxImages;
+                            const canAdd = bought < max && lensIsOpen(new Date());
+                            return (
+                              <div className="mt-4 rounded-lg border p-4" style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E3D7' }}>
+                                <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#2C5F5F' }}>Your Images</p>
+                                <p className="text-sm mt-2" style={{ color: '#1A1A1A' }}>
+                                  <span className="text-2xl font-extrabold">{bought}</span> of {max} images purchased
+                                </p>
+                                {canAdd ? (
+                                  <>
+                                    <p className="text-xs mt-1 mb-3" style={{ color: '#6B6B6B' }}>
+                                      Need more? You can add up to {max - bought} more. Each purchase is priced on its own size.
+                                    </p>
+                                    <a
+                                      href={`/payment-3?registration_id=${registration.id}&add=1`}
+                                      className="inline-block px-4 py-2 rounded-lg text-xs font-bold text-white"
+                                      style={{ backgroundColor: '#2C5F5F' }}
+                                    >
+                                      Add more images →
+                                    </a>
+                                  </>
+                                ) : (
+                                  <p className="text-xs mt-1" style={{ color: '#6B6B6B' }}>
+                                    {bought >= max ? 'You have reached the maximum number of images.' : 'Registration has closed, so no more images can be added.'}
+                                  </p>
+                                )}
+                              </div>
+                            );
+                          })()}
+
                           {registration.event_id === FUNCTION_FOLLOWS_FORM.eventId && (
                             <FunctionFollowsFormProgress progress={fd.progress as Record<string, string> | undefined} />
                           )}
+
+                          {registration.event_id === FUNCTION_FOLLOWS_FORM.eventId &&
+                            (fd.progress as Record<string, string> | undefined)?.interview === 'approved' && (
+                              <FunctionFollowsFormLor
+                                registrationId={registration.id}
+                                hasLor={!!(fd.form as Record<string, unknown> | undefined)?.lor_path}
+                                onUploaded={(lorPath) =>
+                                  setRegistrations3(prev =>
+                                    prev.map(r =>
+                                      r.id === registration.id
+                                        ? { ...r, form_data: { ...r.form_data, form: { ...((r.form_data.form as object) ?? {}), lor_path: lorPath } } }
+                                        : r
+                                    )
+                                  )
+                                }
+                              />
+                            )}
                         </div>
                       );
                     })}

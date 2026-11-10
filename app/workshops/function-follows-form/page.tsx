@@ -404,8 +404,9 @@ function InterestedInApplying({
           </p>
           <p className="text-lg leading-relaxed mb-6" style={{ color: colors.textSecondary }}>
             Applicants are required to complete the application form, answer the design reflection
-            questions, and submit a LOR (Letter of Recommendation) from an Architectural Design
-            faculty member who has taught them.
+            questions, and may submit a LOR (Letter of Recommendation) from an Architectural Design
+            faculty member who has taught them. The LOR becomes mandatory for applicants who are selected
+            after the interview round.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <button

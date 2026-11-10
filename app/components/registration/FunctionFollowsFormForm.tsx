@@ -3,11 +3,17 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { FUNCTION_FOLLOWS_FORM } from '@/config/projects';
-import { FFF_ANSWER_MAX_LENGTH, FFF_QUESTION_KEYS, FFF_QUESTIONS as QUESTIONS } from '@/lib/projects/functionFollowsForm';
+import {
+  FFF_ANSWER_MAX_LENGTH, FFF_QUESTION_KEYS, FFF_QUESTIONS as QUESTIONS, fffLorPath,
+  FFF_DOCUMENT_MAX_BYTES, FFF_DOCUMENT_MAX_COUNT, FFF_DOCUMENT_TYPES, fffDocumentsFolder, type FffDocument,
+} from '@/lib/projects/functionFollowsForm';
 import { FloatingInput } from './ui';
 import type { RegistrationFormProps } from './types';
 
 const MAX_LOR_BYTES = 5 * 1024 * 1024;
+
+const safeFileName = (name: string) => name.replace(/[^a-zA-Z0-9._-]+/g, '_');
+const formatSize = (bytes: number) => (bytes >= 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(2)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`);
 
 export default function FunctionFollowsFormForm({ initialData, onSubmit }: RegistrationFormProps) {
   const supabase = createClient();
@@ -21,8 +27,13 @@ export default function FunctionFollowsFormForm({ initialData, onSubmit }: Regis
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const canSubmit =
-    FFF_QUESTION_KEYS.every(k => answers[k].trim()) && (!!lorFile || !!existingLorPath);
+  // Documents & undertakings: already-saved ones, plus newly picked files uploaded on submit.
+  const [savedDocs, setSavedDocs] = useState<FffDocument[]>(Array.isArray(fd.documents) ? fd.documents : []);
+  const [newDocs, setNewDocs] = useState<File[]>([]);
+  const [docError, setDocError] = useState<string | null>(null);
+
+  // The LOR is optional here; it is required later if the applicant is approved at the interview stage.
+  const canSubmit = FFF_QUESTION_KEYS.every(k => answers[k].trim());
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
@@ -37,6 +48,27 @@ export default function FunctionFollowsFormForm({ initialData, onSubmit }: Regis
     setLorFile(file);
   };
 
+  const handleDocs = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const picked = Array.from(e.target.files ?? []);
+    e.target.value = '';
+    setDocError(null);
+    const accepted: File[] = [];
+    for (const f of picked) {
+      if (!(FFF_DOCUMENT_TYPES as readonly string[]).includes(f.type)) {
+        setDocError(`"${f.name}" must be a PDF or an image (JPG, PNG, WebP)`); continue;
+      }
+      if (f.size > FFF_DOCUMENT_MAX_BYTES) {
+        setDocError(`"${f.name}" is larger than 1MB`); continue;
+      }
+      accepted.push(f);
+    }
+    if (savedDocs.length + newDocs.length + accepted.length > FFF_DOCUMENT_MAX_COUNT) {
+      setDocError(`You can attach at most ${FFF_DOCUMENT_MAX_COUNT} documents`);
+      return;
+    }
+    setNewDocs(prev => [...prev, ...accepted]);
+  };
+
   const handleSubmit = async () => {
     if (!canSubmit) { setError('Please complete all required fields'); return; }
     setIsLoading(true);
@@ -49,7 +81,7 @@ export default function FunctionFollowsFormForm({ initialData, onSubmit }: Regis
       if (lorFile) {
         // Layout: <event>/<uid>/<file>. Bucket RLS checks the 2nd folder equals the user's id.
         // Fixed filename + upsert: re-submitting replaces the file instead of leaving orphans.
-        const path = `${FUNCTION_FOLLOWS_FORM.slug}/${user.id}/letter_of_recommendation.pdf`;
+        const path = fffLorPath(user.id);
         const { error: uploadError } = await supabase.storage
           .from(FUNCTION_FOLLOWS_FORM.formUploadBucket)
           .upload(path, lorFile, { upsert: true, contentType: 'application/pdf' });
@@ -57,10 +89,37 @@ export default function FunctionFollowsFormForm({ initialData, onSubmit }: Regis
         lorPath = path;
       }
 
-      await onSubmit({
-        ...Object.fromEntries(FFF_QUESTION_KEYS.map(k => [k, answers[k].trim()])),
-        lor_path: lorPath,
-      });
+      // Upload newly picked documents; keep the ones that were already saved.
+      const uploaded: FffDocument[] = [];
+      try {
+        for (const f of newDocs) {
+          const path = `${fffDocumentsFolder(user.id)}/${Date.now()}-${uploaded.length}-${safeFileName(f.name)}`;
+          const { error: docUpErr } = await supabase.storage
+            .from(FUNCTION_FOLLOWS_FORM.formUploadBucket)
+            .upload(path, f, { contentType: f.type });
+          if (docUpErr) throw docUpErr;
+          uploaded.push({ name: f.name, path, size: f.size, type: f.type });
+        }
+
+        await onSubmit({
+          ...Object.fromEntries(FFF_QUESTION_KEYS.map(k => [k, answers[k].trim()])),
+          lor_path: lorPath,
+          documents: [...savedDocs, ...uploaded],
+        });
+      } catch (err) {
+        // Don't leave orphaned uploads behind when the save failed.
+        if (uploaded.length) {
+          await supabase.storage.from(FUNCTION_FOLLOWS_FORM.formUploadBucket).remove(uploaded.map(d => d.path));
+        }
+        throw err;
+      }
+
+      // Saved: delete files the applicant removed from their application.
+      const kept = new Set(savedDocs.map(d => d.path));
+      const removed = (Array.isArray(fd.documents) ? (fd.documents as FffDocument[]) : []).filter(d => !kept.has(d.path));
+      if (removed.length) {
+        await supabase.storage.from(FUNCTION_FOLLOWS_FORM.formUploadBucket).remove(removed.map(d => d.path));
+      }
     } catch (err) {
       console.error('Registration error:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -113,10 +172,11 @@ export default function FunctionFollowsFormForm({ initialData, onSubmit }: Regis
         <div>
           <p className="text-sm font-semibold text-[#1A1A1A] mb-2">
             <span className="font-mono text-[#2C5F5F] mr-2">07.</span>
-            Letter of Recommendation <span className="text-[#C85D3E]">(Mandatory)</span>
+            Letter of Recommendation <span className="text-[#6B6B6B]">(Optional)</span>
           </p>
           <p className="text-sm text-[#4B4B4B] leading-relaxed mb-3">
             Upload a Letter of Recommendation (LOR) from an Architectural Design faculty member who has taught you in a previous or current semester.
+            You can skip this for now, but it becomes mandatory if you are selected after the interview round. You will be able to upload it from your profile page.
           </p>
           <div className="text-xs text-[#6B6B6B] leading-relaxed mb-4 p-4 bg-white rounded-xl border border-[#E5E3D7]">
             <p className="font-bold uppercase tracking-wider mb-1.5">Submission requirements</p>
@@ -130,6 +190,54 @@ export default function FunctionFollowsFormForm({ initialData, onSubmit }: Regis
           {existingLorPath && !lorFile && (
             <p className="text-xs text-[#2D5F4F] mt-2 font-medium">✓ Letter of Recommendation uploaded — choose a file above to replace it</p>
           )}
+        </div>
+
+        <div className="border-t border-[#E5E3D7]" />
+
+        <div>
+          <p className="text-sm font-semibold text-[#1A1A1A] mb-2">
+            <span className="font-mono text-[#2C5F5F] mr-2">08.</span>
+            Documents and Undertakings <span className="text-[#6B6B6B]">(Optional)</span>
+          </p>
+          <p className="text-sm text-[#4B4B4B] leading-relaxed mb-3">
+            Attach any supporting documents or signed undertakings. You can add multiple files. Each file must be a PDF or an image
+            (JPG, PNG, WebP) under 1MB, up to {FFF_DOCUMENT_MAX_COUNT} files in total.
+          </p>
+
+          {(savedDocs.length > 0 || newDocs.length > 0) && (
+            <ul className="mb-3 space-y-2">
+              {savedDocs.map(d => (
+                <li key={d.path} className="flex items-center justify-between gap-3 px-3 py-2 bg-white rounded-xl border border-[#E5E3D7] text-sm">
+                  <span className="truncate text-[#1A1A1A]">
+                    <span className="text-[#2D5F4F] mr-1">✓</span>{d.name}
+                    <span className="text-xs text-[#8B8B8B] ml-2">{formatSize(d.size)}</span>
+                  </span>
+                  <button type="button" disabled={isLoading}
+                    onClick={() => setSavedDocs(prev => prev.filter(x => x.path !== d.path))}
+                    className="text-xs font-semibold text-[#C85D3E] hover:underline shrink-0 disabled:opacity-50">
+                    Remove
+                  </button>
+                </li>
+              ))}
+              {newDocs.map((f, i) => (
+                <li key={`${f.name}-${i}`} className="flex items-center justify-between gap-3 px-3 py-2 bg-white rounded-xl border border-dashed border-[#2C5F5F]/40 text-sm">
+                  <span className="truncate text-[#1A1A1A]">
+                    {f.name}
+                    <span className="text-xs text-[#8B8B8B] ml-2">{formatSize(f.size)} · uploads on submit</span>
+                  </span>
+                  <button type="button" disabled={isLoading}
+                    onClick={() => setNewDocs(prev => prev.filter((_, idx) => idx !== i))}
+                    className="text-xs font-semibold text-[#C85D3E] hover:underline shrink-0 disabled:opacity-50">
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <FloatingInput label="Add documents (PDF or image, max 1MB each)" type="file" multiple
+            accept="application/pdf,image/jpeg,image/png,image/webp" onChange={handleDocs} disabled={isLoading} />
+          {docError && <p className="text-xs text-[#C85D3E] mt-2 font-medium">{docError}</p>}
         </div>
 
         <div className="border-t border-[#E5E3D7]" />
@@ -150,7 +258,7 @@ export default function FunctionFollowsFormForm({ initialData, onSubmit }: Regis
             }
           </button>
           {!canSubmit && !isLoading && (
-            <p className="text-xs text-[#8B8B8B] text-center mt-2">Answer all questions and upload your LOR to continue</p>
+            <p className="text-xs text-[#8B8B8B] text-center mt-2">Answer all questions to continue</p>
           )}
         </div>
       </div>

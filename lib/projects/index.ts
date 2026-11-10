@@ -1,5 +1,6 @@
 import { architectureOfPlay } from './architectureOfPlay';
 import { functionFollowsForm } from './functionFollowsForm';
+import { lensTrophy } from './lensTrophy';
 import type { ProjectConfig } from './types';
 
 /**
@@ -10,6 +11,7 @@ import type { ProjectConfig } from './types';
 const PROJECTS: Record<string, ProjectConfig> = {
   [architectureOfPlay.eventId]: architectureOfPlay,
   [functionFollowsForm.eventId]: functionFollowsForm,
+  [lensTrophy.eventId]: lensTrophy,
 };
 
 export function getProject(eventId: string): ProjectConfig | undefined {

@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { FUNCTION_FOLLOWS_FORM, fromStoredFormData } from '@/config/projects';
+import { FUNCTION_FOLLOWS_FORM, MR_LENS_TROPHY, fromStoredFormData } from '@/config/projects';
+import { capturedQuantity } from '@/lib/projects/orders';
 import { FFF_QUESTION_KEYS, FFF_QUESTIONS } from '@/lib/projects/functionFollowsForm';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -48,10 +49,21 @@ type UnifiedRegistration = {
   event_title: string;
   // v2-specific fields
   document?: string;
+  // The MR Lens Trophy (v3): a single participant who buys images in one or more orders
+  lens?: {
+    name: string;
+    email: string;
+    whatsapp: string;
+    instagram: string;
+    country: string;
+    firstOrderImages: number;
+    purchased: number; // images paid for (sum of captured orders)
+  };
   // Function Follows Form (v3, essay-based application instead of members)
   application?: {
     answers: Record<string, string>;
     lorPath: string | null;
+    documents: { name: string; path: string; size: number; type: string }[];
     stored: Record<string, any>; // raw form_data ({ form, progress })
   };
 };
@@ -266,6 +278,7 @@ export default function AdminRegistrationList() {
           const fd = fromStoredFormData(reg.event_id, reg.form_data);
           const fdMembers = fd.members || [];
           const isFFF = reg.event_id === FUNCTION_FOLLOWS_FORM.eventId;
+          const isLens = reg.event_id === MR_LENS_TROPHY.eventId;
 
           allRegs.push({
             id: reg.id,
@@ -288,10 +301,22 @@ export default function AdminRegistrationList() {
             })),
             source: 'v3',
             event_title: eventInfo?.title || 'Unknown Event',
+            lens: isLens
+              ? {
+                  name: fd.name || '',
+                  email: fd.email || '',
+                  whatsapp: fd.whatsapp || '',
+                  instagram: fd.instagram || '',
+                  country: fd.country || '',
+                  firstOrderImages: Number(fd.images) || 0,
+                  purchased: capturedQuantity(reg.form_data),
+                }
+              : undefined,
             application: isFFF
               ? {
                   answers: Object.fromEntries(FFF_QUESTION_KEYS.map(k => [k, fd[k] || ''])),
                   lorPath: fd.lor_path || null,
+                  documents: Array.isArray(fd.documents) ? fd.documents : [],
                   stored: reg.form_data || {},
                 }
               : undefined,
@@ -439,12 +464,12 @@ export default function AdminRegistrationList() {
 
   // ─── Function Follows Form: open the (private) Letter of Recommendation ───
 
-  const openLor = async (path: string) => {
+  const openPrivateFile = async (path: string) => {
     const { data, error: signError } = await supabase.storage
       .from(FUNCTION_FOLLOWS_FORM.formUploadBucket)
       .createSignedUrl(path, 60);
     if (signError || !data?.signedUrl) {
-      setError(signError?.message || 'Could not open Letter of Recommendation');
+      setError(signError?.message || 'Could not open file');
       window.scrollTo(0, 0);
       return;
     }
@@ -748,6 +773,26 @@ export default function AdminRegistrationList() {
                   </div>
                 )}
 
+                {/* Lens Trophy participant */}
+                {reg.lens && (
+                  <div className="p-5">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-xs font-bold uppercase tracking-widest text-[#2C5F5F]">Participant</h3>
+                      <span className="px-2.5 py-1 bg-[#2C5F5F]/10 text-[#2C5F5F] rounded-full text-xs font-bold">
+                        {reg.lens.purchased} images paid
+                        {reg.lens.purchased === 0 && ` (selected ${reg.lens.firstOrderImages})`}
+                      </span>
+                    </div>
+                    <div className="bg-white p-3 rounded-xl border border-[#E5E3D7] text-sm grid gap-1 sm:grid-cols-2">
+                      <div><span className="text-[#8B8B8B]">Name: </span>{reg.lens.name}</div>
+                      <div className="truncate" title={reg.lens.email}><span className="text-[#8B8B8B]">Email: </span>{reg.lens.email}</div>
+                      <div><span className="text-[#8B8B8B]">WhatsApp: </span>{reg.lens.whatsapp}</div>
+                      <div><span className="text-[#8B8B8B]">Instagram: </span>{reg.lens.instagram ? `@${reg.lens.instagram}` : '—'}</div>
+                      <div><span className="text-[#8B8B8B]">Country: </span>{reg.lens.country}</div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Function Follows Form application */}
                 {reg.application && (
                   <div className="p-5">
@@ -755,7 +800,7 @@ export default function AdminRegistrationList() {
                       <h3 className="text-xs font-bold uppercase tracking-widest text-[#2C5F5F]">Application</h3>
                       {reg.application.lorPath ? (
                         <button
-                          onClick={() => openLor(reg.application!.lorPath!)}
+                          onClick={() => openPrivateFile(reg.application!.lorPath!)}
                           className="px-2 py-1 bg-[#2C5F5F]/10 text-[#2C5F5F] hover:bg-[#2C5F5F] hover:text-white rounded text-xs font-bold transition-colors"
                         >
                           View LOR
@@ -787,6 +832,26 @@ export default function AdminRegistrationList() {
                       })}
                     </div>
 
+                    {reg.application.documents.length > 0 && (
+                      <div className="mb-4">
+                        <p className="text-xs font-bold uppercase tracking-widest text-[#2C5F5F] mb-2">
+                          Documents &amp; Undertakings ({reg.application.documents.length})
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {reg.application.documents.map(d => (
+                            <button
+                              key={d.path}
+                              onClick={() => openPrivateFile(d.path)}
+                              title={d.name}
+                              className="max-w-[16rem] truncate px-2.5 py-1.5 bg-white border border-[#E5E3D7] hover:border-[#2C5F5F] rounded-lg text-xs font-medium text-[#1A1A1A] transition-colors"
+                            >
+                              {d.name}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     <div className="space-y-2">
                       {FFF_QUESTION_KEYS.map((key, i) => (
                         <details key={key} className="bg-white rounded-xl border border-[#E5E3D7] text-sm">
@@ -804,7 +869,7 @@ export default function AdminRegistrationList() {
                 )}
 
                 {/* Members List */}
-                {!reg.application && (
+                {!reg.application && !reg.lens && (
                 <div className="p-5">
                   <h3 className="text-xs font-bold uppercase tracking-widest text-[#2C5F5F] mb-3">
                     {reg.source === 'v2' ? 'Participant' : `Members (${reg.members?.length || 0})`}

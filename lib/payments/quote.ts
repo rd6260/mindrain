@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { getProjectConfig, fromStoredFormData } from '@/config/projects';
 import { getProject } from '@/lib/projects';
 import type { BaseFee, SummaryRow } from '@/lib/projects';
+import { capturedQuantity } from '@/lib/projects/orders';
 
 export interface Quote {
   amountMinor: number;
@@ -14,6 +15,8 @@ export interface Quote {
   discountPercent?: number;
   /** Present when a coupon / referral was applied. */
   applied?: { title: string; message: string };
+  /** Present for projects where units are bought in several orders (e.g. photo entries). */
+  order?: { unit: string; quantity: number; purchased: number; maxTotal: number };
 }
 
 export type QuoteResult =
@@ -30,6 +33,8 @@ export async function quoteRegistration(args: {
   userId: string;
   registrationId: string;
   code?: string | null;
+  /** Size of the order. Required to add units to an already-paid registration. */
+  quantity?: number | null;
 }): Promise<QuoteResult> {
   const { supabase, userId, registrationId } = args;
 
@@ -41,16 +46,46 @@ export async function quoteRegistration(args: {
 
   if (!reg) return { ok: false, status: 404, error: 'Registration not found' };
   if (reg.registration_by !== userId) return { ok: false, status: 403, error: 'Unauthorized' };
-  if (reg.paid) return { ok: false, status: 400, error: 'Registration already paid' };
 
   const project = getProject(reg.event_id);
   if (!project || !getProjectConfig(reg.event_id)?.paymentEnabled) return { ok: false, status: 400, error: 'Payments are not available for this event' };
 
+  // A paid registration can only be charged again for projects that sell units in multiple orders.
+  if (reg.paid && !project.orders) return { ok: false, status: 400, error: 'Registration already paid' };
+
   const now = new Date();
+  if (project.isOpen && !project.isOpen(now)) {
+    return { ok: false, status: 400, error: 'Registration is closed for this event' };
+  }
+
   const formData = fromStoredFormData(reg.event_id, reg.form_data);
+
+  // Multi-order projects: this order's size decides its price, not the participant's running total.
+  let quantity: number | undefined;
+  let order: Quote['order'];
+  if (project.orders) {
+    const purchased = capturedQuantity(reg.form_data);
+
+    quantity = reg.paid ? Number(args.quantity) : project.orders.initialQuantity(formData);
+    if (!Number.isInteger(quantity) || quantity < 1) {
+      return { ok: false, status: 400, error: `Choose how many ${project.orders.unit}s to add` };
+    }
+    if (purchased + quantity > project.orders.maxTotal) {
+      const remaining = Math.max(0, project.orders.maxTotal - purchased);
+      return {
+        ok: false,
+        status: 400,
+        error: remaining === 0
+          ? `You already have the maximum of ${project.orders.maxTotal} ${project.orders.unit}s.`
+          : `You can add at most ${remaining} more ${project.orders.unit}${remaining === 1 ? '' : 's'} (limit ${project.orders.maxTotal}).`,
+      };
+    }
+    order = { unit: project.orders.unit, quantity, purchased, maxTotal: project.orders.maxTotal };
+  }
+
   let base: BaseFee;
   try {
-    base = project.getBaseFee(formData, now);
+    base = project.getBaseFee(formData, now, quantity);
   } catch (e) {
     console.error('Pricing unavailable for event', reg.event_id, e);
     return { ok: false, status: 400, error: 'Payments are not open for this event yet' };
@@ -93,10 +128,11 @@ export async function quoteRegistration(args: {
       currency: fee.currency,
       badge: fee.badge,
       description: fee.description,
-      summary: project.getSummary(formData, fee),
+      summary: project.getSummary(formData, fee, quantity),
       eventTitle,
       discountPercent,
       applied,
+      order,
     },
   };
 }

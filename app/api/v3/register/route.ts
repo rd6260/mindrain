@@ -21,9 +21,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Registration is not open for this event' }, { status: 400 });
     }
 
+    if (project.isOpen && !project.isOpen(new Date())) {
+      return NextResponse.json({ error: 'Registration is closed for this event' }, { status: 400 });
+    }
+
     const paymentRequired = !!getProjectConfig(event_id)?.paymentEnabled;
 
-    const validationError = project.validateFormData(form_data);
+    const validationError = project.validateFormData(form_data, { userId: user.id });
     if (validationError) {
       return NextResponse.json({ error: validationError }, { status: 400 });
     }

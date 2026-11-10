@@ -46,17 +46,35 @@ export interface ProjectConfig {
   eventId: string;
   title: string;
 
-  /** Return an error message, or null when `form_data` is valid. */
-  validateFormData(formData: FormData): string | null;
+  /** Return an error message, or null when `form_data` is valid. `ctx.userId` is the submitting user (when known). */
+  validateFormData(formData: FormData, ctx?: { userId: string }): string | null;
 
   /** Team id for the registration. `sequence` is a random 0–9999 number. */
   buildTeamId(args: { codeName: string; formData: FormData; sequence: number }): string;
 
-  /** Price for this registration at `now`. Must be computed server-side only. */
-  getBaseFee(formData: FormData, now: Date): BaseFee;
+  /**
+   * Price for this registration at `now`. Must be computed server-side only.
+   * `quantity` is the size of the order being paid for (projects with `orders`).
+   */
+  getBaseFee(formData: FormData, now: Date, quantity?: number): BaseFee;
 
   /** Rows shown in the payment summary. */
-  getSummary(formData: FormData, fee: BaseFee): SummaryRow[];
+  getSummary(formData: FormData, fee: BaseFee, quantity?: number): SummaryRow[];
+
+  /** Return false while registration/payment is closed. Omit for projects that are always open. */
+  isOpen?(now: Date): boolean;
+
+  /**
+   * Projects where a participant buys units (e.g. photo entries) in several separate orders.
+   * Each order is a `payments_v3` row with a `quantity`; the price of an order depends only on
+   * its own quantity. The first order's quantity comes from the registration form.
+   */
+  orders?: {
+    unit: string;
+    /** Max units one participant may buy across all orders. */
+    maxTotal: number;
+    initialQuantity(formData: FormData): number;
+  };
 
   /** Project specific coupons, keyed by UPPERCASE code. Unmatched codes fall back to referral codes. */
   coupons?: Record<string, (ctx: CouponContext) => Promise<CouponResult>>;

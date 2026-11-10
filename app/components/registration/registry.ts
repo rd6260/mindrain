@@ -1,7 +1,8 @@
 import type { ComponentType } from 'react';
 import ArchitectureOfPlayForm from './ArchitectureOfPlayForm';
 import FunctionFollowsFormForm from './FunctionFollowsFormForm';
-import { ARCHITECTURE_OF_PLAY, FUNCTION_FOLLOWS_FORM } from '@/config/projects';
+import LensTrophyForm from './LensTrophyForm';
+import { ARCHITECTURE_OF_PLAY, FUNCTION_FOLLOWS_FORM, MR_LENS_TROPHY } from '@/config/projects';
 import type { RegistrationFormProps } from './types';
 
 /**
@@ -11,6 +12,7 @@ import type { RegistrationFormProps } from './types';
 const REGISTRATION_FORMS: Record<string, ComponentType<RegistrationFormProps>> = {
   [ARCHITECTURE_OF_PLAY.eventId]: ArchitectureOfPlayForm,
   [FUNCTION_FOLLOWS_FORM.eventId]: FunctionFollowsFormForm,
+  [MR_LENS_TROPHY.eventId]: LensTrophyForm,
 };
 
 export function getRegistrationForm(eventId: string) {

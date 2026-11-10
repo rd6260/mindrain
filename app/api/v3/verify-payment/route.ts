@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getProject } from '@/lib/projects';
 import { fromStoredFormData } from '@/config/projects';
+import { mutateFormData, readOrders } from '@/lib/projects/orders';
 import { sendInvoiceEmail } from '@/lib/payments/invoice';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
@@ -58,7 +59,12 @@ export async function POST(req: NextRequest) {
       to: user.email,
       eventTitle,
       teamId: registration.team_id,
-      formData: fromStoredFormData(registration.event_id, registration.form_data),
+      // For multi-order projects the receipt should show this order's size, not the first order's.
+      formData: (() => {
+        const fd = fromStoredFormData(registration.event_id, registration.form_data);
+        const order = readOrders(registration.form_data).find(o => o.payment_id === payment_id);
+        return order && project?.orders ? { ...fd, images: order.quantity } : fd;
+      })(),
       hiddenKeys: project?.invoiceHiddenKeys,
       amountMinor: payment.amount,
       currency: payment.currency,
@@ -92,6 +98,18 @@ export async function POST(req: NextRequest) {
       rzpPayment = await razorpay.payments.fetch(razorpay_payment_id);
     } catch (e) {
       console.error('Failed to fetch Razorpay payment details:', e);
+    }
+
+    // Multi-order projects: credit this order. Idempotent, so a retried verification is safe.
+    if (project?.orders) {
+      const credited = await mutateFormData(supabase, registration_id, stored => ({
+        ...stored,
+        orders: readOrders(stored).map(o => (o.payment_id === payment_id ? { ...o, status: 'captured' as const } : o)),
+      }));
+      if (!credited.ok) {
+        console.error('Failed to credit order:', credited.error);
+        return NextResponse.json({ message: 'Failed to record your order. Please contact support.', isOk: false }, { status: 500 });
+      }
     }
 
     const { error: updatePaymentError } = await supabase
