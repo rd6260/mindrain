@@ -11,6 +11,7 @@ import { Trophy, ListOrdered, Medal } from 'lucide-react';
 import localFont from 'next/font/local';
 import { MR_LENS_TROPHY, type LensFeeTable } from '@/config/projects';
 import { lensIsOpen, lensSlabFor, lensOrderTotal } from '@/lib/projects/lensTrophy';
+import { getCdnUrl } from '@/utils/cdn'
 
 // ─── Font ─────────────────────────────────────────────────────────────────────
 
@@ -227,7 +228,7 @@ function Hero({ onBriefClick, onRegisterClick }: { onBriefClick: () => void; onR
         {/* Image */}
         <div className="relative w-full max-w-md mx-auto lg:max-w-none lg:ml-auto lg:w-[min(100%,460px)] aspect-[3/4] rounded-xl overflow-hidden shadow-2xl">
           <Image
-            src="/competitions/the-mr-lens-trophy-26/the-mr-lens-trophy-ratio-3-4.webp"
+            src={getCdnUrl("public/competitions/the-mr-lens-trophy-26/the-mr-lens-trophy-ratio-3-4.webp")}
             alt="Photograph by Fredrik Axling: a man walking through a diagonal band of light on an orange wall"
             fill
             sizes="(min-width: 1024px) 460px, 90vw"
