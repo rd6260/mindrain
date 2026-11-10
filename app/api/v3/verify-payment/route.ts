@@ -63,7 +63,9 @@ export async function POST(req: NextRequest) {
       formData: (() => {
         const fd = fromStoredFormData(registration.event_id, registration.form_data);
         const order = readOrders(registration.form_data).find(o => o.payment_id === payment_id);
-        return order && project?.orders ? { ...fd, images: order.quantity } : fd;
+        return order && project?.orders
+          ? { ...fd, images: order.quantity, ...(order.breakdown && { categories: order.breakdown }) }
+          : fd;
       })(),
       hiddenKeys: project?.invoiceHiddenKeys,
       amountMinor: payment.amount,

@@ -59,7 +59,10 @@ export interface ProjectConfig {
   getBaseFee(formData: FormData, now: Date, quantity?: number): BaseFee;
 
   /** Rows shown in the payment summary. */
-  getSummary(formData: FormData, fee: BaseFee, quantity?: number): SummaryRow[];
+  getSummary(formData: FormData, fee: BaseFee, quantity?: number, breakdown?: Record<string, number>,
+    /** How many more units this participant can still buy (cap minus owned), for projects with `orders`. */
+    remaining?: number,
+  ): SummaryRow[];
 
   /** Return false while registration/payment is closed. Omit for projects that are always open. */
   isOpen?(now: Date): boolean;
@@ -74,6 +77,17 @@ export interface ProjectConfig {
     /** Max units one participant may buy across all orders. */
     maxTotal: number;
     initialQuantity(formData: FormData): number;
+    /**
+     * Optional split of an order into groups (e.g. photography categories). The price is still decided
+     * by the order's total quantity; the split is only recorded.
+     */
+    breakdown?: {
+      groups: { key: string; label: string }[];
+      /** The split chosen in the registration form (first order). */
+      initial(formData: FormData): Record<string, number>;
+      /** Validate a split sent for an add-on order. `undefined` input = the default (smallest) order. */
+      parse(input: unknown): Record<string, number> | null;
+    };
   };
 
   /** Project specific coupons, keyed by UPPERCASE code. Unmatched codes fall back to referral codes. */

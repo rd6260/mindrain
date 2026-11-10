@@ -3,12 +3,11 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { MR_LENS_TROPHY } from '@/config/projects';
-import { lensOriginOf, lensOrderTotal, lensSlabFor } from '@/lib/projects/lensTrophy';
+import { lensOriginOf, lensOrderTotal, lensSlabFor, lensUpsell } from '@/lib/projects/lensTrophy';
 import { FloatingInput, SectionHeading, ToggleBtn } from './ui';
 import type { RegistrationFormProps } from './types';
 
-const { fees } = MR_LENS_TROPHY;
-const IMAGE_COUNTS = Array.from({ length: fees.maxImages }, (_, i) => i + 1);
+const { fees, categories } = MR_LENS_TROPHY;
 
 const formatMoney = (symbol: string, amount: number) => {
   const rounded = Math.round(amount * 100) / 100;
@@ -27,7 +26,13 @@ export default function LensTrophyForm({ initialData, onSubmit }: RegistrationFo
     !fd.country || fd.country === 'India' ? 'India' : 'Other'
   );
   const [country, setCountry] = useState<string>(fd.country || 'India');
-  const [images, setImages] = useState<number>(fd.images || 1);
+  // How many images per photography category (this first order).
+  const [counts, setCounts] = useState<Record<string, number>>(
+    Object.fromEntries(categories.map((c, i) => [c.key, fd.categories?.[c.key] ?? (i === 0 ? 1 : 0)]))
+  );
+  const images = Object.values(counts).reduce((a, b) => a + b, 0);
+  const setCount = (key: string, delta: number) =>
+    setCounts(prev => ({ ...prev, [key]: Math.max(0, prev[key] + delta) }));
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,11 +52,12 @@ export default function LensTrophyForm({ initialData, onSubmit }: RegistrationFo
 
   const origin = lensOriginOf(country);
   const table = fees[origin];
-  const slab = lensSlabFor(origin, images);
-  const orderTotal = lensOrderTotal(origin, images);
+  const slab = images >= 1 ? lensSlabFor(origin, images) : undefined;
+  const orderTotal = images >= 1 ? lensOrderTotal(origin, images) : 0;
+  const upsell = lensUpsell(origin, images, fees.maxImages);
 
   const canSubmit =
-    name.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) && whatsapp.trim() && country.trim() && images >= 1;
+    name.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) && whatsapp.trim() && country.trim() && images >= 1 && images <= fees.maxImages;
 
   const handleSubmit = async () => {
     if (!canSubmit) { setError('Please complete all required fields'); return; }
@@ -64,7 +70,7 @@ export default function LensTrophyForm({ initialData, onSubmit }: RegistrationFo
         whatsapp: whatsapp.trim(),
         instagram: instagram.replace(/^@/, '').trim() || null,
         country: country.trim(),
-        images,
+        categories: counts,
       });
     } catch (err) {
       console.error('Registration error:', err);
@@ -125,25 +131,41 @@ export default function LensTrophyForm({ initialData, onSubmit }: RegistrationFo
         <div>
           <SectionHeading>Images to Register Now</SectionHeading>
           <p className="text-sm text-[#4B4B4B] leading-relaxed mb-3">
-            You don&apos;t upload any images yet. You are only paying for the number of entries you want. You can buy more
-            later (up to {fees.maxImages} in total). Each purchase is priced on its own size, so adding 2 images later is
-            charged at the 1–4 images rate, whatever you bought before.
+            Choose how many images you want in each category.
           </p>
-          <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
-            {IMAGE_COUNTS.map(n => (
-              <ToggleBtn key={n} active={images === n} onClick={() => setImages(n)} disabled={isLoading}>{n}</ToggleBtn>
+          <div className="space-y-3">
+            {categories.map(c => (
+              <div key={c.key} className="flex items-center justify-between gap-4 px-4 py-3 rounded-xl border border-[#D0CEC2] bg-white">
+                <div>
+                  <p className="text-sm font-semibold text-[#1A1A1A]">{c.label}</p>
+                  <p className="text-xs text-[#6B6B6B]">Images in this category</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button type="button" onClick={() => setCount(c.key, -1)}
+                    disabled={isLoading || counts[c.key] <= 0} aria-label={`Remove one ${c.label} image`}
+                    className="w-9 h-9 rounded-full border border-[#D0CEC2] text-lg font-bold text-[#2C5F5F] hover:border-[#2C5F5F] disabled:opacity-30 disabled:cursor-not-allowed transition-colors">−</button>
+                  <span className="w-6 text-center text-lg font-bold tabular-nums text-[#1A1A1A]">{counts[c.key]}</span>
+                  <button type="button" onClick={() => setCount(c.key, 1)}
+                    disabled={isLoading || images >= fees.maxImages} aria-label={`Add one ${c.label} image`}
+                    className="w-9 h-9 rounded-full bg-[#2C5F5F] text-lg font-bold text-white hover:bg-[#1A4D4D] disabled:opacity-30 disabled:cursor-not-allowed transition-colors">+</button>
+                </div>
+              </div>
             ))}
+            <p className="text-xs text-[#6B6B6B] text-right">
+              {images} of {fees.maxImages} images selected
+            </p>
           </div>
 
           <div className="mt-4 flex items-end justify-between gap-4 px-5 py-4 rounded-xl border border-[#D0CEC2] bg-white">
             <div>
               <p className="text-sm font-semibold text-[#1A1A1A]">
-                {images} {images === 1 ? 'image' : 'images'}
-                {slab?.total == null && slab && (
+                {images} {images === 1 ? 'image' : 'images'} in total
+                {slab && slab.total == null && (
                   <span className="font-normal text-[#6B6B6B]"> × {formatMoney(table.symbol, slab.perImage as number)}</span>
                 )}
               </p>
-              <p className="text-xs uppercase tracking-wide text-[#6B6B6B] mt-1">{slab?.label} · {slab?.note}</p>
+              <p className="text-xs uppercase tracking-wide text-[#6B6B6B] mt-1">{slab ? slab.label : 'Add at least one image'}</p>
+              {upsell && <p className="text-xs font-semibold text-[#2C5F5F] mt-1">{upsell}</p>}
             </div>
             <p className="text-3xl font-extrabold tabular-nums leading-none text-[#2C5F5F]">
               {formatMoney(table.symbol, orderTotal)}

@@ -1,8 +1,8 @@
 'use client';
 
 import { getProjectConfig, FUNCTION_FOLLOWS_FORM, MR_LENS_TROPHY } from '@/config/projects';
-import { lensIsOpen } from '@/lib/projects/lensTrophy';
-import { capturedQuantity } from '@/lib/projects/orders';
+import { lensIsOpen, lensPhotoIds } from '@/lib/projects/lensTrophy';
+import { capturedQuantity, capturedBreakdown } from '@/lib/projects/orders';
 import FunctionFollowsFormProgress from '@/app/components/progress/FunctionFollowsFormProgress';
 import FunctionFollowsFormLor from '@/app/components/progress/FunctionFollowsFormLor';
 import { useState, useEffect } from 'react';
@@ -887,6 +887,7 @@ const ProfilePage = () => {
 
                           {registration.event_id === MR_LENS_TROPHY.eventId && registration.paid && (() => {
                             const bought = capturedQuantity(registration.form_data);
+                            const byCategory = capturedBreakdown(registration.form_data);
                             const max = MR_LENS_TROPHY.fees.maxImages;
                             const canAdd = bought < max && lensIsOpen(new Date());
                             return (
@@ -895,6 +896,11 @@ const ProfilePage = () => {
                                 <p className="text-sm mt-2" style={{ color: '#1A1A1A' }}>
                                   <span className="text-2xl font-extrabold">{bought}</span> of {max} images purchased
                                 </p>
+                                <ul className="mt-2 mb-1 text-xs space-y-0.5" style={{ color: '#6B6B6B' }}>
+                                  {MR_LENS_TROPHY.categories.map(c => (
+                                    <li key={c.key}>{c.label}: <strong style={{ color: '#1A1A1A' }}>{byCategory[c.key] ?? 0}</strong></li>
+                                  ))}
+                                </ul>
                                 {canAdd ? (
                                   <>
                                     <p className="text-xs mt-1 mb-3" style={{ color: '#6B6B6B' }}>
@@ -912,6 +918,36 @@ const ProfilePage = () => {
                                   <p className="text-xs mt-1" style={{ color: '#6B6B6B' }}>
                                     {bought >= max ? 'You have reached the maximum number of images.' : 'Registration has closed, so no more images can be added.'}
                                   </p>
+                                )}
+
+                                {bought > 0 && (
+                                  <div className="mt-4 pt-4 border-t" style={{ borderColor: '#E5E3D7' }}>
+                                    <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#2C5F5F' }}>
+                                      Your Photography IDs
+                                    </p>
+                                    <div className="space-y-3">
+                                      {lensPhotoIds(registration.team_id, byCategory).map(group => (
+                                        <div key={group.key}>
+                                          <p className="text-xs font-semibold mb-1.5" style={{ color: '#6B6B6B' }}>{group.label}</p>
+                                          {group.ids.length > 0 ? (
+                                            <div className="flex flex-wrap gap-2">
+                                              {group.ids.map(id => (
+                                                <span
+                                                  key={id}
+                                                  className="px-2.5 py-1 rounded-md text-xs font-mono font-semibold"
+                                                  style={{ backgroundColor: '#F8F7F2', color: '#1A1A1A', border: '1px solid #E5E3D7' }}
+                                                >
+                                                  {id}
+                                                </span>
+                                              ))}
+                                            </div>
+                                          ) : (
+                                            <p className="text-xs italic" style={{ color: '#8B8B8B' }}>No images in this category yet</p>
+                                          )}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
                                 )}
                               </div>
                             );

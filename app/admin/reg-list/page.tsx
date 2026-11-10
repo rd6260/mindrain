@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { FUNCTION_FOLLOWS_FORM, MR_LENS_TROPHY, fromStoredFormData } from '@/config/projects';
-import { capturedQuantity } from '@/lib/projects/orders';
+import { capturedQuantity, capturedBreakdown } from '@/lib/projects/orders';
 import { FFF_QUESTION_KEYS, FFF_QUESTIONS } from '@/lib/projects/functionFollowsForm';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -58,6 +58,7 @@ type UnifiedRegistration = {
     country: string;
     firstOrderImages: number;
     purchased: number; // images paid for (sum of captured orders)
+    byCategory: Record<string, number>; // paid images per photography category
   };
   // Function Follows Form (v3, essay-based application instead of members)
   application?: {
@@ -308,8 +309,9 @@ export default function AdminRegistrationList() {
                   whatsapp: fd.whatsapp || '',
                   instagram: fd.instagram || '',
                   country: fd.country || '',
-                  firstOrderImages: Number(fd.images) || 0,
+                  firstOrderImages: Object.values((fd.categories ?? {}) as Record<string, number>).reduce((a, b) => a + (Number(b) || 0), 0),
                   purchased: capturedQuantity(reg.form_data),
+                  byCategory: capturedBreakdown(reg.form_data),
                 }
               : undefined,
             application: isFFF
@@ -789,6 +791,10 @@ export default function AdminRegistrationList() {
                       <div><span className="text-[#8B8B8B]">WhatsApp: </span>{reg.lens.whatsapp}</div>
                       <div><span className="text-[#8B8B8B]">Instagram: </span>{reg.lens.instagram ? `@${reg.lens.instagram}` : '—'}</div>
                       <div><span className="text-[#8B8B8B]">Country: </span>{reg.lens.country}</div>
+                      <div className="sm:col-span-2">
+                        <span className="text-[#8B8B8B]">Paid images: </span>
+                        {MR_LENS_TROPHY.categories.map(c => `${c.label} ${reg.lens!.byCategory[c.key] ?? 0}`).join(' · ')}
+                      </div>
                     </div>
                   </div>
                 )}

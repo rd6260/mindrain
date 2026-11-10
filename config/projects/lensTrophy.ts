@@ -11,7 +11,8 @@ export interface LensFeeSlab {
   perImage?: number;
   /** Flat price for the whole order instead of a per-image price (special package). */
   total?: number;
-  note: string;
+  /** Advertised discount (%) of this slab compared with the first slab. Shown in the "add N more" hints. */
+  discountPercent?: number;
 }
 
 export interface LensFeeTable {
@@ -47,6 +48,16 @@ export const MR_LENS_TROPHY = {
     },
   },
 
+  /**
+   * Photography categories. A participant chooses how many images they want in EACH category.
+   * The `key`s are stored in registration data, so don't rename them once registrations exist.
+   * The `code` is the category number used in photography ids: <mind id>-<code>-<n>.
+   */
+  categories: [
+    { key: 'open', code: 1, label: 'Open Photography (Category 1)' },
+    { key: 'architecture', code: 2, label: 'Architecture Photography (Category 2)' },
+  ],
+
   /** ISO 8601 with offset, so comparisons are exact regardless of the viewer's timezone. */
   dates: {
     registrationOpens: '2026-11-11T00:00:00+05:30',
@@ -67,9 +78,9 @@ export const MR_LENS_TROPHY = {
       symbol: '₹',
       title: 'Indian Participants',
       slabs: [
-        { from: 1, to: 4, label: '1–4 Images', perImage: 99, note: 'No discount' },
-        { from: 5, to: 9, label: '5–9 Images', perImage: 84, note: '15% off' },
-        { from: 10, to: 10, label: '10 Images', total: 799, note: 'Special package' },
+        { from: 1, to: 4, label: '1–4 Images', perImage: 99 },
+        { from: 5, to: 9, label: '5–9 Images', perImage: 84, discountPercent: 15 },
+        { from: 10, to: 10, label: '10 Images', total: 799 },
       ],
     },
     international: {
@@ -77,13 +88,14 @@ export const MR_LENS_TROPHY = {
       symbol: '$',
       title: 'International Participants',
       slabs: [
-        { from: 1, to: 4, label: '1–4 Images', perImage: 3, note: 'No discount' },
-        { from: 5, to: 9, label: '5–9 Images', perImage: 2.6, note: '15% off' },
-        { from: 10, to: 10, label: '10 Images', total: 23, note: 'Special package' },
+        { from: 1, to: 4, label: '1–4 Images', perImage: 3 },
+        { from: 5, to: 9, label: '5–9 Images', perImage: 2.6, discountPercent: 15 },
+        { from: 10, to: 10, label: '10 Images', total: 23 },
       ],
     },
   },
 } as const satisfies ProjectBaseConfig & {
+  categories: readonly { key: string; code: number; label: string }[];
   dates: Record<string, string>;
   fees: { maxImages: number; india: LensFeeTable; international: LensFeeTable };
 };

@@ -12,6 +12,8 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 export interface StoredOrder {
   payment_id: string;
   quantity: number;
+  /** Split of `quantity` by group (e.g. photography category), when the project uses one. */
+  breakdown?: Record<string, number>;
   status: 'pending' | 'captured';
   created_at: string;
 }
@@ -24,6 +26,16 @@ export const capturedQuantity = (stored: Record<string, any> | null | undefined)
   readOrders(stored)
     .filter(o => o.status === 'captured')
     .reduce((sum, o) => sum + (Number(o.quantity) || 0), 0);
+
+/** Units paid for, per group (e.g. per photography category). */
+export const capturedBreakdown = (stored: Record<string, any> | null | undefined): Record<string, number> => {
+  const totals: Record<string, number> = {};
+  for (const o of readOrders(stored)) {
+    if (o.status !== 'captured') continue;
+    for (const [k, v] of Object.entries(o.breakdown ?? {})) totals[k] = (totals[k] ?? 0) + (Number(v) || 0);
+  }
+  return totals;
+};
 
 /**
  * Read-modify-write on a registration's `form_data` that cannot silently overwrite a concurrent change:

@@ -16,7 +16,14 @@ export interface Quote {
   /** Present when a coupon / referral was applied. */
   applied?: { title: string; message: string };
   /** Present for projects where units are bought in several orders (e.g. photo entries). */
-  order?: { unit: string; quantity: number; purchased: number; maxTotal: number };
+  order?: {
+    unit: string;
+    quantity: number;
+    purchased: number;
+    maxTotal: number;
+    /** Split of this order by group (e.g. photography category). */
+    groups?: { key: string; label: string; count: number }[];
+  };
 }
 
 export type QuoteResult =
@@ -35,6 +42,8 @@ export async function quoteRegistration(args: {
   code?: string | null;
   /** Size of the order. Required to add units to an already-paid registration. */
   quantity?: number | null;
+  /** Split of the order by group, for projects with `orders.breakdown`. Overrides `quantity`. */
+  breakdown?: unknown;
 }): Promise<QuoteResult> {
   const { supabase, userId, registrationId } = args;
 
@@ -62,11 +71,25 @@ export async function quoteRegistration(args: {
 
   // Multi-order projects: this order's size decides its price, not the participant's running total.
   let quantity: number | undefined;
+  let breakdown: Record<string, number> | undefined;
   let order: Quote['order'];
   if (project.orders) {
     const purchased = capturedQuantity(reg.form_data);
 
-    quantity = reg.paid ? Number(args.quantity) : project.orders.initialQuantity(formData);
+    const split = project.orders.breakdown;
+    if (reg.paid) {
+      if (split) {
+        const parsed = split.parse(args.breakdown);
+        if (!parsed) return { ok: false, status: 400, error: 'Invalid selection' };
+        breakdown = parsed;
+        quantity = Object.values(parsed).reduce((a, b) => a + b, 0);
+      } else {
+        quantity = Number(args.quantity);
+      }
+    } else {
+      quantity = project.orders.initialQuantity(formData);
+      breakdown = split?.initial(formData);
+    }
     if (!Number.isInteger(quantity) || quantity < 1) {
       return { ok: false, status: 400, error: `Choose how many ${project.orders.unit}s to add` };
     }
@@ -80,7 +103,13 @@ export async function quoteRegistration(args: {
           : `You can add at most ${remaining} more ${project.orders.unit}${remaining === 1 ? '' : 's'} (limit ${project.orders.maxTotal}).`,
       };
     }
-    order = { unit: project.orders.unit, quantity, purchased, maxTotal: project.orders.maxTotal };
+    order = {
+      unit: project.orders.unit,
+      quantity,
+      purchased,
+      maxTotal: project.orders.maxTotal,
+      groups: split?.groups.map(g => ({ ...g, count: breakdown?.[g.key] ?? 0 })),
+    };
   }
 
   let base: BaseFee;
@@ -128,7 +157,7 @@ export async function quoteRegistration(args: {
       currency: fee.currency,
       badge: fee.badge,
       description: fee.description,
-      summary: project.getSummary(formData, fee, quantity),
+      summary: project.getSummary(formData, fee, quantity, breakdown, order ? order.maxTotal - order.purchased : undefined),
       eventTitle,
       discountPercent,
       applied,

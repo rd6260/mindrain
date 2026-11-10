@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     }
 
     // The amount is never taken from the client — it is recomputed here.
-    const { registration_id, code, quantity } = await req.json();
+    const { registration_id, code, quantity, breakdown } = await req.json();
     if (!registration_id) {
       return NextResponse.json({ error: 'Missing registration_id' }, { status: 400 });
     }
@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
       registrationId: registration_id,
       code,
       quantity,
+      breakdown,
     });
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: result.status });
@@ -81,6 +82,9 @@ export async function POST(req: NextRequest) {
           {
             payment_id: payment.payment_id,
             quantity: quote.order!.quantity,
+            breakdown: quote.order!.groups
+              ? Object.fromEntries(quote.order!.groups.map(g => [g.key, g.count]))
+              : undefined,
             status: 'pending',
             created_at: new Date().toISOString(),
           },

@@ -10,7 +10,7 @@ import { useState } from 'react';
 import { Trophy, ListOrdered, Medal } from 'lucide-react';
 import localFont from 'next/font/local';
 import { MR_LENS_TROPHY, type LensFeeTable } from '@/config/projects';
-import { lensIsOpen, lensSlabFor, lensOrderTotal } from '@/lib/projects/lensTrophy';
+import { lensIsOpen, lensSlabFor, lensOrderTotal, lensUpsell, lensSlabCaption } from '@/lib/projects/lensTrophy';
 import { getCdnUrl } from '@/utils/cdn'
 
 // ─── Font ─────────────────────────────────────────────────────────────────────
@@ -365,7 +365,9 @@ function FeeScheme({ origin, images }: { origin: Origin; images: number }) {
                         ? <>{formatMoney(symbol, slab.total)} <span className="text-base">TOTAL</span></>
                         : <>{formatMoney(symbol, slab.perImage as number)} <span className="text-base font-semibold">/ image</span></>}
                     </p>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-white/70">{slab.note}</p>
+                    {lensSlabCaption(slab) && (
+                      <p className="text-xs font-semibold uppercase tracking-wide text-white/70">{lensSlabCaption(slab)}</p>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -419,7 +421,7 @@ function FeeCalculator({
               {images} {images === 1 ? 'image' : 'images'}
               {slab.total == null && <span className="font-normal text-[#6B6B6B]"> × {formatMoney(symbol, slab.perImage as number)}</span>}
             </p>
-            <p className="text-xs uppercase tracking-wide text-[#6B6B6B] mt-1">{slab.note}</p>
+            <p className="text-xs font-semibold text-[#2C5F5F] mt-1">{lensUpsell(origin, images, MAX_IMAGES)}</p>
           </div>
           <p className="text-4xl font-extrabold tabular-nums leading-none text-[#2C5F5F]">{formatMoney(symbol, total)}</p>
         </div>

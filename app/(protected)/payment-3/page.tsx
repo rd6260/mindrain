@@ -16,7 +16,10 @@ interface Quote {
   summary: { label: string; value: string }[];
   discountPercent?: number;
   applied?: { title: string; message: string };
-  order?: { unit: string; quantity: number; purchased: number; maxTotal: number };
+  order?: {
+    unit: string; quantity: number; purchased: number; maxTotal: number;
+    groups?: { key: string; label: string; count: number }[];
+  };
 }
 
 const money = (minor: number) => (minor / 100).toLocaleString();
@@ -60,6 +63,8 @@ function PaymentContent() {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [alreadyPaid, setAlreadyPaid] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  // Add-more orders that are split into groups (e.g. photography categories): group key -> count
+  const [breakdown, setBreakdown] = useState<Record<string, number> | null>(null);
 
   // Coupon state — `quote` is always what the server says will be charged
   const [couponCode, setCouponCode] = useState('');
@@ -72,11 +77,15 @@ function PaymentContent() {
 
   const supabase = createClient();
 
-  const fetchQuote = async (code?: string, qty: number = quantity): Promise<{ quote: Quote } | { error: string }> => {
+  const fetchQuote = async (
+    code?: string,
+    qty: number = quantity,
+    split: Record<string, number> | null = breakdown,
+  ): Promise<{ quote: Quote } | { error: string }> => {
     const res = await fetch('/api/v3/quote', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ registration_id: registrationId, ...(code && { code }), ...(addMode && { quantity: qty }) }),
+      body: JSON.stringify({ registration_id: registrationId, ...(code && { code }), ...(addMode && (split ? { breakdown: split } : { quantity: qty })) }),
     });
     const data = await res.json();
     return res.ok ? { quote: data.quote as Quote } : { error: (data.error as string) || 'Failed to calculate fee' };
@@ -142,7 +151,12 @@ function PaymentContent() {
 
         const result = await fetchQuote();
         if ('error' in result) setError(result.error);
-        else setQuote(result.quote);
+        else {
+          setQuote(result.quote);
+          if (result.quote.order?.groups) {
+            setBreakdown(Object.fromEntries(result.quote.order.groups.map(g => [g.key, g.count])));
+          }
+        }
       } catch (err) {
         console.error('Error loading registration:', err);
         setError('Failed to load registration details');
@@ -160,6 +174,18 @@ function PaymentContent() {
     else setError(result.error);
   };
 
+  const changeGroup = async (key: string, delta: number) => {
+    if (!breakdown || !quote?.order) return;
+    const next = { ...breakdown, [key]: Math.max(0, (breakdown[key] ?? 0) + delta) };
+    const total = Object.values(next).reduce((a, b) => a + b, 0);
+    if (total < 1 || total > quote.order.maxTotal - quote.order.purchased) return;
+    setBreakdown(next);
+    setError(null);
+    const result = await fetchQuote(appliedCode ?? undefined, total, next);
+    if ('quote' in result) setQuote(result.quote);
+    else setError(result.error);
+  };
+
   const createOrder = async () => {
     if (!quote) return;
     setIsProcessing(true);
@@ -169,7 +195,7 @@ function PaymentContent() {
       const res = await fetch('/api/v3/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ registration_id: registrationId, ...(appliedCode && { code: appliedCode }), ...(addMode && { quantity }) }),
+        body: JSON.stringify({ registration_id: registrationId, ...(appliedCode && { code: appliedCode }), ...(addMode && (breakdown ? { breakdown } : { quantity })) }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to create order');
@@ -344,23 +370,54 @@ function PaymentContent() {
                     You currently have <strong>{quote.order.purchased}</strong> of {quote.order.maxTotal} images.
                     You can add up to <strong>{quote.order.maxTotal - quote.order.purchased}</strong> more.
                   </p>
-                  <div className="flex flex-wrap gap-2">
-                    {Array.from({ length: quote.order.maxTotal - quote.order.purchased }, (_, i) => i + 1).map(n => (
-                      <button
-                        key={n}
-                        type="button"
-                        onClick={() => changeQuantity(n)}
-                        disabled={isProcessing}
-                        className={`w-11 py-2.5 rounded-xl text-sm font-semibold border transition-all ${
-                          quantity === n
-                            ? 'bg-[#2C5F5F] text-white border-[#2C5F5F] shadow-md shadow-[#2C5F5F]/20'
-                            : 'bg-white text-[#6B6B6B] border-[#D0CEC2] hover:border-[#2C5F5F] hover:text-[#2C5F5F]'
-                        }`}
-                      >
-                        {n}
-                      </button>
-                    ))}
-                  </div>
+                  {quote.order.groups && breakdown ? (
+                    <div className="space-y-2">
+                      {quote.order.groups.map(g => {
+                        const total = Object.values(breakdown).reduce((a, b) => a + b, 0);
+                        const remaining = quote.order!.maxTotal - quote.order!.purchased;
+                        return (
+                          <div key={g.key} className="flex items-center justify-between gap-4 px-4 py-3 rounded-xl border border-[#D0CEC2] bg-white">
+                            <p className="text-sm font-semibold text-[#1A1A1A]">{g.label}</p>
+                            <div className="flex items-center gap-3">
+                              <button
+                                type="button"
+                                onClick={() => changeGroup(g.key, -1)}
+                                disabled={isProcessing || (breakdown[g.key] ?? 0) <= 0 || total <= 1}
+                                aria-label={`Remove one ${g.label} image`}
+                                className="w-9 h-9 rounded-full border border-[#D0CEC2] text-lg font-bold text-[#2C5F5F] hover:border-[#2C5F5F] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                              >−</button>
+                              <span className="w-6 text-center text-lg font-bold tabular-nums text-[#1A1A1A]">{breakdown[g.key] ?? 0}</span>
+                              <button
+                                type="button"
+                                onClick={() => changeGroup(g.key, 1)}
+                                disabled={isProcessing || total >= remaining}
+                                aria-label={`Add one ${g.label} image`}
+                                className="w-9 h-9 rounded-full bg-[#2C5F5F] text-lg font-bold text-white hover:bg-[#1A4D4D] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                              >+</button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {Array.from({ length: quote.order.maxTotal - quote.order.purchased }, (_, i) => i + 1).map(n => (
+                        <button
+                          key={n}
+                          type="button"
+                          onClick={() => changeQuantity(n)}
+                          disabled={isProcessing}
+                          className={`w-11 py-2.5 rounded-xl text-sm font-semibold border transition-all ${
+                            quantity === n
+                              ? 'bg-[#2C5F5F] text-white border-[#2C5F5F] shadow-md shadow-[#2C5F5F]/20'
+                              : 'bg-white text-[#6B6B6B] border-[#D0CEC2] hover:border-[#2C5F5F] hover:text-[#2C5F5F]'
+                          }`}
+                        >
+                          {n}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
