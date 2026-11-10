@@ -14,7 +14,8 @@ export interface BriefMeta {
 
 export interface BriefConfig {
   meta: BriefMeta;
-  files: BriefFile[];
+  /** Hard-coded files. Omit to load them from the `event_briefs` table (see lib/briefs.ts). */
+  files?: BriefFile[];
 }
 
 /** Minimal shape for events that only need brief data (no v3 registration/payment pipeline). */

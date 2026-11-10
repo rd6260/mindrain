@@ -9,7 +9,7 @@ import BriefModal from '@/app/components/BriefModal';
 import DownloadBriefModal from '@/app/components/DownloadModal';
 import { useState } from 'react';
 import localFont from 'next/font/local';
-import { THE_UNREAL_HOUSE } from '@/config/projects';
+import { MR_LENS_TROPHY } from '@/config/projects';
 import { ImportantDate } from '@/types';
 import { isRegistrationOpen } from '@/utils/registration';
 
@@ -19,8 +19,7 @@ const TechnorFont = localFont({ src: '../../fonts/Technor-Variable.woff2' });
 
 // ─── Static Data ──────────────────────────────────────────────────────────────
 
-const REGISTRATION_EVENT_ID = THE_UNREAL_HOUSE.eventId;
-const meta = THE_UNREAL_HOUSE.brief.meta;
+const REGISTRATION_EVENT_ID = MR_LENS_TROPHY.eventId;
 const REGISTRATION_URL = `/registration?event_id=${REGISTRATION_EVENT_ID}`;
 
 const PRESS_KIT_FILES = [
@@ -224,105 +223,85 @@ function ToggleButton({ active, onClick, children }: {
 
 // ─── Sections ─────────────────────────────────────────────────────────────────
 
-function MobileHero({ onBriefClick, onPressClick, onRegisterClick }: { onBriefClick: () => void; onPressClick: () => void; onRegisterClick: () => void }) {
+const HERO_DATES = [
+  { label: 'Registration opens', date: '03 November 2026' },
+  { label: 'Registration ends', date: '18 January 2027' },
+  { label: 'Submission ends', date: '25 January 2027' },
+  { label: 'Results announcement', date: '10 March 2027' },
+];
+
+function Hero({ onBriefClick, onRegisterClick }: { onBriefClick: () => void; onRegisterClick: () => void }) {
   return (
-    <section className="relative h-dvh flex flex-col items-center justify-end pb-16 px-6 md:hidden">
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/the-unreal-house/TUH-cover.jpg"
-          alt="The Unreal House"
-          fill
-          className="object-cover object-center"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-      </div>
-
-      <div className="relative z-10 w-full text-center text-white animate-fade-in">
-        <span className="block text-sm font-medium tracking-[0.2em] uppercase text-gray-300 mb-1">
-          {meta.category}
-        </span>
-        <span className="block text-sm font-light italic text-gray-400 mb-4">{meta.edition}</span>
-        <h1 className={`${TechnorFont.className} text-6xl font-black leading-none mb-3`}>
-          The Unreal<br />House
-        </h1>
-        <p className="text-base font-medium tracking-wide text-gray-300 mb-10">
-          {meta.subtitle}
-        </p>
-
-        <div className="flex flex-col gap-3 w-full max-w-xs mx-auto">
-          <button
-            onClick={onRegisterClick}
-            className="w-full px-6 py-4 rounded-lg text-white font-bold text-base transition-all duration-300 active:scale-95 shadow-xl text-center"
-            style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})` }}
-            data-testid="register-now-button-mobile"
-          >
-            Register Now →
-          </button>
-          <button
-            className="w-full px-6 py-4 rounded-lg text-white font-bold text-base transition-all duration-300 active:scale-95 shadow-xl"
-            style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})` }}
-            onClick={onBriefClick}
-          >
-            Download Brief ↓
-          </button>
-          <button
-            className="w-full px-6 py-4 rounded-lg font-bold text-base border border-white text-white transition-all duration-300 active:scale-95 shadow-xl"
-            style={{ background: 'rgba(255,255,255,0.08)' }}
-            onClick={onPressClick}
-          >
-            Press Kit ↓
-          </button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function DesktopHero({ onBriefClick, onPressClick, onRegisterClick }: { onBriefClick: () => void; onPressClick: () => void; onRegisterClick: () => void }) {
-  return (
-    <section className="relative min-h-screen hidden md:flex items-center justify-start px-4 sm:px-6 lg:px-8">
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/competition-hero.jpg"
-          alt="Imaginative Home Competition"
-          fill
-          className="object-cover opacity-100"
-          priority
-        />
-      </div>
-
-      <div className="relative z-10 ml-24 mt-10 max-w-5xl text-left text-gray-200 animate-fade-in">
-        <h1 className="space-y-4">
-          <span className="block text-2xl md:text-4xl font-medium tracking-wide">{meta.category}</span>
-          <span className="block text-xl md:text-2xl font-light italic">{meta.edition}</span>
-          <span className="font-['Technor-Variable'] block text-6xl md:text-8xl lg:text-9xl font-black my-6 leading-tight">
-            {meta.title}
-          </span>
-          <span className="block text-2xl md:text-4xl font-medium tracking-wide">
-            {meta.subtitle}
-          </span>
-        </h1>
-
-        <div className="flex gap-8">
-          <GradientButton onClick={onRegisterClick} className="mt-16" testId="register-now-button">
-            Register Now →
-          </GradientButton>
-          <GradientButton onClick={onBriefClick} className="mt-16" testId="download-brief-button">
-            Download Brief ↓
-          </GradientButton>
-          <button
-            className="group relative overflow-hidden border border-white mt-16 px-16 py-5 rounded-lg font-bold text-xl shadow-2xl cursor-pointer"
-            onClick={onPressClick}
-          >
-            <span
-              className="absolute inset-0 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]"
-              style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.accentHover})` }}
-            />
-            <span className="relative z-10 uppercase text-white group-hover:text-white transition-colors duration-500">
-              Press Kit ↓
+    <section className="relative min-h-screen px-6 sm:px-10 lg:px-16 pt-28 pb-12 lg:pt-24 flex items-center">
+      <div className="relative z-10 w-full max-w-7xl mx-auto grid gap-10 lg:gap-16 lg:grid-cols-[1.15fr_1fr] items-center animate-fade-in">
+        {/* Text */}
+        <div style={{ color: colors.textPrimary }}>
+          <div className="flex items-center gap-5 mb-8 lg:mb-10">
+            <span className="text-sm sm:text-lg tracking-wide uppercase" style={{ color: colors.textSecondary }}>
+              Photography Competition <span className="mx-1">•</span> 2026–27
             </span>
-          </button>
+            <span className="hidden sm:block h-px w-28 bg-current opacity-30" />
+          </div>
+
+          <h1 className="font-[family-name:var(--font-inter)] font-extrabold uppercase tracking-tight leading-[0.95]">
+            <span className="block text-4xl sm:text-6xl lg:text-6xl xl:text-7xl">The Mindrain</span>
+            <span className="flex flex-wrap items-baseline gap-x-4">
+              <span className="block text-5xl sm:text-7xl lg:text-7xl xl:text-8xl">Lens Trophy</span>
+              <span className="text-lg sm:text-2xl font-normal tracking-normal" style={{ color: colors.textSecondary }}>
+                #EDITION 02
+              </span>
+            </span>
+          </h1>
+
+          <p className="mt-8 text-lg sm:text-2xl uppercase tracking-wide" style={{ color: colors.textSecondary }}>
+            Your world. Your frame. Your story.
+          </p>
+
+          <p className="mt-8 text-sm sm:text-base uppercase tracking-wide">
+            Open Photography <span className="mx-3">/</span> Architecture Photography
+          </p>
+
+          <ul className="mt-8 space-y-3 border-l border-current/30 pl-0 relative">
+            {HERO_DATES.map(item => (
+              <li key={item.label} className="flex items-center gap-4 text-base sm:text-lg -ml-[5px]">
+                <span className="w-2.5 h-2.5 rounded-full shrink-0 bg-current" />
+                <span>
+                  {item.label} <strong className="font-bold">{item.date}</strong>
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-10 flex flex-col sm:flex-row gap-4">
+            <button
+              onClick={onRegisterClick}
+              data-testid="register-now-button"
+              className="px-10 py-4 rounded-lg text-white font-bold text-lg shadow-lg transition-all duration-300 hover:opacity-90 active:scale-95 cursor-pointer"
+              style={{ backgroundColor: colors.accent }}
+            >
+              Register Now →
+            </button>
+            <button
+              onClick={onBriefClick}
+              data-testid="download-brief-button"
+              className="px-10 py-4 rounded-lg font-bold text-lg border-2 transition-all duration-300 hover:bg-black/5 active:scale-95 cursor-pointer"
+              style={{ borderColor: colors.accent, color: colors.accent }}
+            >
+              Download Brief ↓
+            </button>
+          </div>
+        </div>
+
+        {/* Image */}
+        <div className="relative w-full max-w-md mx-auto lg:max-w-none lg:ml-auto lg:w-[min(100%,460px)] aspect-[3/4] rounded-xl overflow-hidden shadow-2xl">
+          <Image
+            src="/competitions/the-mr-lens-trophy-26/the-mr-lens-trophy-ratio-3-4.webp"
+            alt="Photograph by Fredrik Axling: a man walking through a diagonal band of light on an orange wall"
+            fill
+            sizes="(min-width: 1024px) 460px, 90vw"
+            className="object-cover"
+            priority
+          />
         </div>
       </div>
     </section>
@@ -545,8 +524,7 @@ export default function CompetitionPage() {
           style={{ backgroundColor: colors.accent }}
         />
 
-        <MobileHero onBriefClick={() => setIsBriefOpen(true)} onPressClick={() => setIsPressOpen(true)} onRegisterClick={handleRegisterClick} />
-        <DesktopHero onBriefClick={() => setIsBriefOpen(true)} onPressClick={() => setIsPressOpen(true)} onRegisterClick={handleRegisterClick} />
+        <Hero onBriefClick={() => setIsBriefOpen(true)} onRegisterClick={handleRegisterClick} />
 
         <PrizePool />
 

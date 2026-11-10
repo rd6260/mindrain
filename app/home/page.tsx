@@ -15,7 +15,7 @@ import GuestJury from '../components/GuestJuryComponent';
 import { createClient } from '@/lib/supabase/client';
 import { isOnboardingComplete } from '@/utils/onboarding';
 import { getCdnUrl } from '@/utils/cdn'
-import { ARCHITECTURE_OF_PLAY, FUNCTION_FOLLOWS_FORM } from '@/config/projects';
+import { ARCHITECTURE_OF_PLAY, FUNCTION_FOLLOWS_FORM, MR_LENS_TROPHY } from '@/config/projects';
 import { Trophy, Medal, Images, Building2, Utensils, PencilRuler, Gift, Award } from 'lucide-react';
 
 
@@ -347,10 +347,10 @@ export default function HomePage() {
             ]}
             deadlineLabel="Registration closes"
             deadlineValue="18 January 2027"
-            findOutMoreHref="/competition/the-mindrain-lens-trophy"
+            findOutMoreHref="/competition/the-mr-lens-trophy-26"
             briefModalTitle="Download Brief"
             briefModalSubtitle="The Mindrain Lens Trophy — select files to download"
-            eventId="" // TODO: add the real event id so "Download brief" shows
+            eventId={MR_LENS_TROPHY.eventId}
           />
 
           <div className="h-6" />

@@ -4,12 +4,14 @@ export { ARCHITECTURE_OF_PLAY } from './architectureOfPlay';
 export { FUNCTION_FOLLOWS_FORM } from './functionFollowsForm';
 export { THE_UNREAL_HOUSE } from './unrealHouse';
 export { THESIS_AWARD } from './thesisAward';
+export { MR_LENS_TROPHY } from './lensTrophy';
 export type { ProjectBaseConfig, BriefConfig, BriefFile, BriefMeta } from './types';
 
 import { ARCHITECTURE_OF_PLAY } from './architectureOfPlay';
 import { FUNCTION_FOLLOWS_FORM } from './functionFollowsForm';
 import { THE_UNREAL_HOUSE } from './unrealHouse';
 import { THESIS_AWARD } from './thesisAward';
+import { MR_LENS_TROPHY } from './lensTrophy';
 import type { ProjectBaseConfig, BriefConfig } from './types';
 
 const ALL: ProjectBaseConfig[] = [ARCHITECTURE_OF_PLAY, FUNCTION_FOLLOWS_FORM];
@@ -18,7 +20,7 @@ export function getProjectConfig(eventId: string): ProjectBaseConfig | undefined
   return ALL.find(p => p.eventId === eventId);
 }
 
-const BRIEF_SOURCES: { eventId: string; brief?: BriefConfig }[] = [...ALL, THE_UNREAL_HOUSE, THESIS_AWARD];
+const BRIEF_SOURCES: { eventId: string; brief?: BriefConfig }[] = [...ALL, THE_UNREAL_HOUSE, THESIS_AWARD, MR_LENS_TROPHY];
 
 /** Brief files + marketing metadata for any event (v3 projects and legacy events). */
 export function getBrief(eventId: string): BriefConfig | null {

@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { Changa } from 'next/font/google';
 import { createClient } from '@/lib/supabase/client';
-import { getBrief } from '@/config/projects';
+import { getBrief, type BriefFile } from '@/config/projects';
+import { getBriefFiles } from '@/lib/briefs';
 import { colors } from '@/utils/colors';
 
 const changa = Changa({ subsets: ['latin'], weight: ['500'] });
@@ -197,18 +198,16 @@ function GuestView({
 // ─── User View: Direct Downloads ──────────────────────────────────────────────
 
 function UserView({
-  eventId,
+  files,
   title,
   subtitle,
   onClose,
 }: {
-  eventId: string;
+  files: BriefFile[];
   title: string;
   subtitle?: string;
   onClose: () => void;
 }) {
-  const brief = getBrief(eventId);
-  const files = brief?.files ?? [];
 
   const downloadAll = () => {
     files.forEach((file, i) => setTimeout(() => downloadFile(file.url), i * 300));
@@ -328,6 +327,14 @@ export default function BriefModal({ isOpen, onClose, eventId }: BriefModalProps
   const brief = getBrief(eventId);
   const title = brief?.meta.title ?? 'Download Brief';
   const subtitle = `${title} — select files to download`;
+  const [files, setFiles] = useState<BriefFile[] | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancelled = false;
+    getBriefFiles(createClient(), eventId).then(f => { if (!cancelled) setFiles(f); });
+    return () => { cancelled = true; };
+  }, [isOpen, eventId]);
 
   useEffect(() => {
     if (!isOpen) { setAuthState('loading'); return; }
@@ -355,7 +362,7 @@ export default function BriefModal({ isOpen, onClose, eventId }: BriefModalProps
         className="bg-white w-full max-w-md mx-4 rounded-lg shadow-xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        {authState === 'loading' && <LoadingSkeleton onClose={onClose} />}
+        {(authState === 'loading' || (authState === 'user' && files === null)) && <LoadingSkeleton onClose={onClose} />}
         {authState === 'guest' && (
           <GuestView
             eventId={eventId}
@@ -363,9 +370,9 @@ export default function BriefModal({ isOpen, onClose, eventId }: BriefModalProps
             onClose={onClose}
           />
         )}
-        {authState === 'user' && (
+        {authState === 'user' && files !== null && (
           <UserView
-            eventId={eventId}
+            files={files}
             title="Download Brief"
             subtitle={subtitle}
             onClose={onClose}

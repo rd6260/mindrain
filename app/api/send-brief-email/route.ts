@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getBrief } from '@/config/projects';
+import { getBriefFiles } from '@/lib/briefs';
 import { createClient } from '@/lib/supabase/server';
 
 
@@ -17,10 +18,10 @@ export async function POST(req: NextRequest) {
     }
 
     const brief = getBrief(eventId);
-    const briefFiles = brief?.files;
+    const briefFiles = await getBriefFiles(supabase, eventId);
     const meta = brief?.meta;
 
-    if (!briefFiles || briefFiles.length === 0) {
+    if (briefFiles.length === 0) {
       return NextResponse.json({ error: 'No brief files found for this competition' }, { status: 404 });
     }
 
