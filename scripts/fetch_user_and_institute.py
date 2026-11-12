@@ -1,3 +1,10 @@
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "dotenv>=0.9.9",
+#     "supabase>=2.34.1",
+# ]
+# ///
 import os
 from dotenv import load_dotenv
 from supabase import create_client
