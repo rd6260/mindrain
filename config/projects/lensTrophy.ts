@@ -90,7 +90,7 @@ export const MR_LENS_TROPHY = {
       slabs: [
         { from: 1, to: 4, label: '1–4 Images', perImage: 3 },
         { from: 5, to: 9, label: '5–9 Images', perImage: 2.6, discountPercent: 15 },
-        { from: 10, to: 10, label: '10 Images', total: 23 },
+        { from: 10, to: 10, label: '10 Images', total: 24 },
       ],
     },
   },
