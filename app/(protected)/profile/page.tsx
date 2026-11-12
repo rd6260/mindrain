@@ -1,6 +1,6 @@
 'use client';
 
-import { getProjectConfig, FUNCTION_FOLLOWS_FORM, MR_LENS_TROPHY } from '@/config/projects';
+import { getProjectConfig, ARCHITECTURE_OF_PLAY, FUNCTION_FOLLOWS_FORM, MR_LENS_TROPHY } from '@/config/projects';
 import { lensIsOpen, lensPhotoIds } from '@/lib/projects/lensTrophy';
 import { capturedQuantity, capturedBreakdown } from '@/lib/projects/orders';
 import FunctionFollowsFormProgress from '@/app/components/progress/FunctionFollowsFormProgress';
@@ -14,6 +14,9 @@ import { isCertificatesAvailable } from '@/utils/registration';
 import { useRouter } from 'next/navigation';
 
 // ─── Submission Links ─────────────────────────────────────────────────────────
+/** The Architecture of Play: registration and payment are closed; paid participants submit via this form. */
+const AOP_SUBMISSION_LINK = 'https://forms.gle/QtYr7MQ9LBsVeQQC6';
+
 const SUBMISSION_LINKS: Record<string, string> = {
   TUH: 'https://forms.gle/ZcnqVNnbVNazzAW5A',
   MRTA2: 'https://forms.gle/gnjPH2TBZk8P1RYXA',
@@ -331,7 +334,7 @@ const ProfilePage = () => {
   };
 
   // Exclude thesis-award (registrations_2) from the pending-payments check when the competition is closed
-  const needsPayment = (reg: Registration3) => !reg.paid && (getProjectConfig(reg.event_id)?.paymentEnabled ?? true);
+  const needsPayment = (reg: Registration3) => !reg.paid && reg.event_id !== ARCHITECTURE_OF_PLAY.eventId && (getProjectConfig(reg.event_id)?.paymentEnabled ?? true);
   const hasPendingPayments = registrations.some(reg => !reg.paid) || (!THESIS_AWARD_CLOSED && registrations2.some(reg => !reg.paid)) || registrations3.some(needsPayment);
 
   const formatAcademicLevel = (level: string | null) => {
@@ -787,7 +790,25 @@ const ProfilePage = () => {
                               </p>
                             </div>
                             <div className="flex flex-col items-end gap-2">
-                              {payNow ? (
+                              {registration.event_id === ARCHITECTURE_OF_PLAY.eventId ? (
+                                registration.paid ? (
+                                  <a
+                                    href={AOP_SUBMISSION_LINK}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:shadow-md"
+                                    style={{ backgroundColor: '#D97757', color: '#FFFFFF' }}
+                                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#C04B2B')}
+                                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#D97757')}
+                                  >
+                                    Submit Entry →
+                                  </a>
+                                ) : (
+                                  <span className="text-xs font-semibold text-right max-w-[11rem]" style={{ color: '#8B8B8B' }}>
+                                    Registration was not completed, so you did not participate in this edition.
+                                  </span>
+                                )
+                              ) : payNow ? (
                                 <a
                                   href={`/payment-3?registration_id=${registration.id}`}
                                   className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:shadow-md"
