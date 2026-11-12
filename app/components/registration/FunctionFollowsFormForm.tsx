@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { FUNCTION_FOLLOWS_FORM } from '@/config/projects';
 import {
-  FFF_ANSWER_MAX_LENGTH, FFF_QUESTION_KEYS, FFF_QUESTIONS as QUESTIONS, fffLorPath,
+  FFF_ACADEMIC_YEARS, FFF_ANSWER_MAX_LENGTH, FFF_QUESTION_KEYS, FFF_QUESTIONS as QUESTIONS, fffLorPath,
   FFF_DOCUMENT_MAX_BYTES, FFF_DOCUMENT_MAX_COUNT, FFF_DOCUMENT_TYPES, fffDocumentsFolder, type FffDocument,
 } from '@/lib/projects/functionFollowsForm';
 import { FloatingInput } from './ui';
@@ -22,6 +22,11 @@ export default function FunctionFollowsFormForm({ initialData, onSubmit }: Regis
   const [answers, setAnswers] = useState<Record<string, string>>(
     Object.fromEntries(FFF_QUESTION_KEYS.map(k => [k, (fd[k] as string) || '']))
   );
+  const [name, setName] = useState<string>(fd.name || '');
+  const [email, setEmail] = useState<string>(fd.email || '');
+  const [whatsapp, setWhatsapp] = useState<string>(fd.whatsapp || '');
+  const [academicYear, setAcademicYear] = useState<string>(fd.academic_year || '');
+  const [college, setCollege] = useState<string>(fd.college || '');
   const [lorFile, setLorFile] = useState<File | null>(null);
   const existingLorPath: string | null = fd.lor_path || null;
   const [isLoading, setIsLoading] = useState(false);
@@ -32,8 +37,26 @@ export default function FunctionFollowsFormForm({ initialData, onSubmit }: Regis
   const [newDocs, setNewDocs] = useState<File[]>([]);
   const [docError, setDocError] = useState<string | null>(null);
 
+  // Prefill name + email from the user's profile / login, unless a saved application already has them.
+  useEffect(() => {
+    if (fd.name && fd.email) return;
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data: info } = await supabase.from('user_info').select('name').eq('id', user.id).maybeSingle();
+      setName(prev => prev || info?.name || '');
+      setEmail(prev => prev || user.email || '');
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // The LOR is optional here; it is required later if the applicant is approved at the interview stage.
-  const canSubmit = FFF_QUESTION_KEYS.every(k => answers[k].trim());
+  const canSubmit =
+    name.trim() &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) &&
+    /^\+[0-9][0-9\s-]{6,17}$/.test(whatsapp.trim()) &&
+    academicYear && college.trim() &&
+    FFF_QUESTION_KEYS.every(k => answers[k].trim());
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
@@ -102,6 +125,11 @@ export default function FunctionFollowsFormForm({ initialData, onSubmit }: Regis
         }
 
         await onSubmit({
+          name: name.trim(),
+          email: email.trim(),
+          whatsapp: whatsapp.trim(),
+          academic_year: academicYear,
+          college: college.trim(),
           ...Object.fromEntries(FFF_QUESTION_KEYS.map(k => [k, answers[k].trim()])),
           lor_path: lorPath,
           documents: [...savedDocs, ...uploaded],
@@ -148,6 +176,33 @@ export default function FunctionFollowsFormForm({ initialData, onSubmit }: Regis
       )}
 
       <div className="bg-[#F8F7F2] rounded-2xl border border-[#D0CEC2] p-6 space-y-7">
+        <div>
+          <p className="text-sm font-semibold text-[#1A1A1A] mb-3">Your Details</p>
+          <div className="space-y-3">
+            <FloatingInput label="Full name" value={name} onChange={e => setName(e.target.value)} disabled={isLoading} />
+            <div>
+              <FloatingInput label="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} disabled={isLoading} />
+              <p className="text-xs text-[#6B6B6B] mt-1.5">All communication and notifications about your application will be sent to this email.</p>
+            </div>
+            <div>
+              <FloatingInput label="WhatsApp number with country code (e.g. +91 98765 43210)" type="tel" value={whatsapp} onChange={e => setWhatsapp(e.target.value)} disabled={isLoading} />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="relative block w-full">
+                <select value={academicYear} onChange={e => setAcademicYear(e.target.value)} disabled={isLoading}
+                  className="w-full px-4 pt-6 pb-2 text-[#1A1A1A] bg-[#F8F7F2] border border-[#D0CEC2] rounded-xl outline-none text-sm font-medium focus:border-[#2C5F5F] focus:ring-2 focus:ring-[#2C5F5F]/10 disabled:opacity-50">
+                  <option value="" disabled>Select</option>
+                  {FFF_ACADEMIC_YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                </select>
+                <span className="absolute left-4 top-2 text-xs font-semibold text-[#6B6B6B] pointer-events-none">Academic year</span>
+              </label>
+              <FloatingInput label="College name" value={college} onChange={e => setCollege(e.target.value)} disabled={isLoading} />
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t border-[#E5E3D7]" />
+
         {FFF_QUESTION_KEYS.map((key, i) => (
           <div key={key}>
             <label htmlFor={`fff-${key}`} className="block text-sm font-semibold text-[#1A1A1A] leading-relaxed mb-2">
@@ -258,7 +313,7 @@ export default function FunctionFollowsFormForm({ initialData, onSubmit }: Regis
             }
           </button>
           {!canSubmit && !isLoading && (
-            <p className="text-xs text-[#8B8B8B] text-center mt-2">Answer all questions to continue</p>
+            <p className="text-xs text-[#8B8B8B] text-center mt-2">Fill in your details and answer all questions to continue</p>
           )}
         </div>
       </div>

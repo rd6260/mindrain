@@ -43,11 +43,21 @@ export interface FffDocument {
 
 export const FFF_ANSWER_MAX_LENGTH = 2000;
 
+export const FFF_ACADEMIC_YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'] as const;
+
 export const functionFollowsForm: ProjectConfig = {
   eventId: FUNCTION_FOLLOWS_FORM.eventId,
   title: FUNCTION_FOLLOWS_FORM.title,
 
   validateFormData(fd, ctx) {
+    if (typeof fd.name !== 'string' || !fd.name.trim()) return 'Please enter your name';
+    if (typeof fd.email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.email.trim())) return 'Please enter a valid email address';
+    // WhatsApp number with country code, e.g. +91 98765 43210
+    if (typeof fd.whatsapp !== 'string' || !/^\+[0-9][0-9\s-]{6,17}$/.test(fd.whatsapp.trim())) {
+      return 'Please enter your WhatsApp number with country code (e.g. +91 98765 43210)';
+    }
+    if (!(FFF_ACADEMIC_YEARS as readonly string[]).includes(fd.academic_year)) return 'Please select your academic year';
+    if (typeof fd.college !== 'string' || !fd.college.trim() || fd.college.length > 200) return 'Please enter your college name';
     for (const key of FFF_QUESTION_KEYS) {
       const v = fd[key];
       if (typeof v !== 'string' || !v.trim()) return 'Please answer all the questions';

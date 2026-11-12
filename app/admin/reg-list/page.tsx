@@ -62,6 +62,7 @@ type UnifiedRegistration = {
   };
   // Function Follows Form (v3, essay-based application instead of members)
   application?: {
+    details: { name: string; email: string; whatsapp: string; academicYear: string; college: string };
     answers: Record<string, string>;
     lorPath: string | null;
     documents: { name: string; path: string; size: number; type: string }[];
@@ -316,6 +317,13 @@ export default function AdminRegistrationList() {
               : undefined,
             application: isFFF
               ? {
+                  details: {
+                    name: fd.name || '',
+                    email: fd.email || '',
+                    whatsapp: fd.whatsapp || '',
+                    academicYear: fd.academic_year || '',
+                    college: fd.college || '',
+                  },
                   answers: Object.fromEntries(FFF_QUESTION_KEYS.map(k => [k, fd[k] || ''])),
                   lorPath: fd.lor_path || null,
                   documents: Array.isArray(fd.documents) ? fd.documents : [],
@@ -815,6 +823,20 @@ export default function AdminRegistrationList() {
                         <span className="text-xs text-[#8B8B8B] italic">No LOR uploaded</span>
                       )}
                     </div>
+                    <dl className="mb-4 grid gap-x-6 gap-y-1 sm:grid-cols-2 text-sm">
+                      {([
+                        ['Name', reg.application.details.name],
+                        ['Email', reg.application.details.email],
+                        ['WhatsApp', reg.application.details.whatsapp],
+                        ['Academic year', reg.application.details.academicYear],
+                        ['College', reg.application.details.college],
+                      ] as const).map(([k, v]) => (
+                        <div key={k} className="flex gap-2">
+                          <dt className="text-[#6B6B6B]">{k}:</dt>
+                          <dd className="font-medium text-[#1A1A1A] break-all">{v || <span className="italic text-[#8B8B8B]">—</span>}</dd>
+                        </div>
+                      ))}
+                    </dl>
                     {/* Status per stage */}
                     <div className="mb-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
                       {FUNCTION_FOLLOWS_FORM.progressStages.map(stage => {
