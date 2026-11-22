@@ -67,6 +67,7 @@ const navItems: NavItem[] = [
   },
   { label: 'Winners', href: '/pastWinners' },
   { label: 'Earn with Us', href: '/earn' },
+  { label: 'Blog', href: '/blog' },
   { label: 'About us', href: '/about' },
   { label: 'FAQs', href: '/faqs' },
   { label: 'Contact', href: '/contactUs' },
