@@ -41,7 +41,7 @@ export default async function BlogPostPage({ params }: Props) {
     <div className="min-h-screen" style={{ backgroundColor: '#EDEBDF' }}>
       <Navigation />
 
-      <div className="max-w-3xl mx-auto px-4 py-12 space-y-10">
+      <div className="max-w-5xl mx-auto px-4 py-12 space-y-10">
         <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-semibold" style={{ color: '#2C5F5F' }}>
           ← All posts
         </Link>
@@ -70,7 +70,7 @@ export default async function BlogPostPage({ params }: Props) {
         {/* ── Article ── */}
         <article className="rounded-2xl border p-6 md:p-10 space-y-6" style={{ backgroundColor: '#F8F7F2', borderColor: '#D0CEC2' }}>
           {post.topImages.length > 0 && (
-            <div className="grid gap-4 sm:grid-cols-2 items-start">
+            <div className={`grid gap-4 items-start ${post.topImages.length > 1 ? 'sm:grid-cols-2' : ''}`}>
               {post.topImages.map((img) => (
                 <Figure key={img.src} img={img} />
               ))}
@@ -78,13 +78,13 @@ export default async function BlogPostPage({ params }: Props) {
           )}
 
           {post.paragraphs.map((p, i) => (
-            <p key={i} className="leading-relaxed" style={{ color: '#2A2A2A' }}>
+            <p key={i} className="leading-relaxed max-w-3xl mx-auto" style={{ color: '#2A2A2A' }}>
               {/* *text* renders as italics; split puts the emphasised parts at odd indexes */}
               {p.split(/\*(.+?)\*/g).map((part, j) => (j % 2 ? <em key={j}>{part}</em> : part))}
             </p>
           ))}
 
-          <p className="leading-relaxed" style={{ color: '#2A2A2A' }}>
+          <p className="leading-relaxed max-w-3xl mx-auto" style={{ color: '#2A2A2A' }}>
             {post.credit.text}{' '}
             {post.credit.links.map((l, i) => (
               <span key={l.href}>
@@ -97,10 +97,12 @@ export default async function BlogPostPage({ params }: Props) {
           </p>
 
           {post.bottomImages.length > 0 && (
-            <div className="max-w-xs">
-              {post.bottomImages.map((img) => (
-                <Figure key={img.src} img={img} />
-              ))}
+            <div className="max-w-3xl mx-auto">
+              <div className="max-w-xs">
+                {post.bottomImages.map((img) => (
+                  <Figure key={img.src} img={img} />
+                ))}
+              </div>
             </div>
           )}
         </article>
