@@ -58,7 +58,7 @@ export const blogPosts: BlogPost[] = [
     credit: {
       text: 'This blog entry has been written for Mind Rain by Rahul Saini. To know more about him you can visit his website',
       links: [
-        { label: 'www.rahulsain.in', href: 'http://www.rahulsaini.in/' },
+        { label: 'www.rahul-saini.com', href: 'https://www.rahul-saini.com/' },
         { label: 'https://en.wikipedia.org/wiki/Rahul_Saini', href: 'https://en.wikipedia.org/wiki/Rahul_Saini' },
       ],
     },
@@ -108,7 +108,7 @@ export const blogPosts: BlogPost[] = [
     ],
     credit: {
       text: 'This blog entry has been written for Mind Rain by Rahul Saini. To know more about him you can visit his website',
-      links: [{ label: 'www.rahulsain.in', href: 'http://www.rahulsaini.in/' }],
+      links: [{ label: 'www.rahul-saini.com', href: 'https://www.rahul-saini.com/' }],
     },
     bottomImages: [
       { src: '/blog/on-concept-and-design-principles/a1a.jpg', alt: 'a1a', width: 437, height: 558 },
