@@ -45,3 +45,7 @@ next-env.d.ts
 
 # exported data (csv etc.) from scripts
 /exports/
+
+
+# logs
+/logs
