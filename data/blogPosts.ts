@@ -25,7 +25,8 @@ export type BlogPost = {
   bottomImages: BlogImage[];
 };
 
-const MEDIA = '/blog/on-beauty-meaning-and-identification';
+const CDN = 'https://cdn.jsdelivr.net/gh/mindrain-assets/blog-assets@main';
+const MEDIA = `${CDN}/on-beauty-meaning-and-identification`;
 
 export const blogPosts: BlogPost[] = [
   {
@@ -93,7 +94,7 @@ export const blogPosts: BlogPost[] = [
     ],
     topImages: [
       {
-        src: '/blog/on-concept-and-design-principles/principles-of-design.jpg',
+        src: `${CDN}/on-concept-and-design-principles/principles-of-design.jpg`,
         alt: 'Principles-of-Design-Grey-2880px',
         width: 1200,
         height: 750,
@@ -111,7 +112,7 @@ export const blogPosts: BlogPost[] = [
       links: [{ label: 'www.rahul-saini.com', href: 'https://www.rahul-saini.com/' }],
     },
     bottomImages: [
-      { src: '/blog/on-concept-and-design-principles/a1a.jpg', alt: 'a1a', width: 437, height: 558 },
+      { src: `${CDN}/on-concept-and-design-principles/a1a.jpg`, alt: 'a1a', width: 437, height: 558 },
     ],
   },
 ];
