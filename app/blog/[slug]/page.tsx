@@ -25,8 +25,8 @@ function Figure({ img }: { img: BlogImage }) {
       alt={img.alt}
       width={img.width}
       height={img.height}
-      // animated GIFs must not go through the image optimizer
-      unoptimized={img.src.endsWith('.gif')}
+      // served straight from jsDelivr (already a CDN); skips the Vercel optimizer
+      unoptimized
       className="rounded-xl border w-full h-auto"
       style={{ borderColor: '#D0CEC2', backgroundColor: '#F8F7F2' }}
     />
