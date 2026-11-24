@@ -36,6 +36,23 @@ export function fromStoredFormData(eventId: string, stored: Json | null | undefi
   return getProjectConfig(eventId)?.progressStages ? (stored.form ?? {}) : stored;
 }
 
+const stageStatus = (stored: Json | null | undefined, stage: string): string | undefined =>
+  stored?.progress?.[stage];
+
+/** True once the applicant can no longer edit their form (e.g. decided at shortlisting). */
+export function isApplicationLocked(eventId: string, stored: Json | null | undefined): boolean {
+  const stage = getProjectConfig(eventId)?.editLockedAfterStage;
+  if (!stage) return false;
+  const s = stageStatus(stored, stage);
+  return s === 'approved' || s === 'rejected';
+}
+
+/** False while a project's payment is gated behind a selection stage that isn't approved yet. */
+export function isPaymentUnlocked(eventId: string, stored: Json | null | undefined): boolean {
+  const stage = getProjectConfig(eventId)?.paymentAfterStage;
+  return !stage || stageStatus(stored, stage) === 'approved';
+}
+
 /** What actually gets written to `registrations_v3.form_data`. Existing progress is never overwritten. */
 export function toStoredFormData(eventId: string, form: Json, existingStored?: Json | null): Json {
   const cfg = getProjectConfig(eventId);

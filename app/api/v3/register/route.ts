@@ -1,7 +1,8 @@
+import { lookupReferralCode } from '@/lib/referral';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getProject } from '@/lib/projects';
-import { getProjectConfig, toStoredFormData } from '@/config/projects';
+import { getProjectConfig, isApplicationLocked, isPaymentUnlocked, toStoredFormData } from '@/config/projects';
 
 export async function POST(req: NextRequest) {
   try {
@@ -52,6 +53,12 @@ export async function POST(req: NextRequest) {
       if (existingReg.paid) {
         return NextResponse.json({ error: 'Already registered and paid' }, { status: 400 });
       }
+      if (isApplicationLocked(event_id, existingReg.form_data)) {
+        return NextResponse.json(
+          { error: 'Your application has been reviewed and can no longer be edited' },
+          { status: 403 }
+        );
+      }
       // Keep the same sequence, regenerate the rest in case form_data changed.
       const oldSequence = parseInt(existingReg.team_id?.split('-').pop() || '', 10);
       const sequence = Number.isNaN(oldSequence) ? Math.floor(Math.random() * 10000) : oldSequence;
@@ -70,21 +77,20 @@ export async function POST(req: NextRequest) {
         console.error('Update error:', updateError);
         return NextResponse.json({ error: 'Failed to update registration' }, { status: 500 });
       }
-      return NextResponse.json({ registration_id: updatedReg.id, team_id: updatedReg.team_id, payment_required: paymentRequired });
+      return NextResponse.json({
+        registration_id: updatedReg.id,
+        team_id: updatedReg.team_id,
+        payment_required: paymentRequired && isPaymentUnlocked(event_id, existingReg.form_data),
+      });
     }
 
     let referralId: string | null = null;
     if (form_data.referral_code) {
-      const { data: referral } = await supabase
-        .from('referral_account')
-        .select('id')
-        .eq('code', form_data.referral_code)
-        .eq('status', 'active')
-        .maybeSingle();
-      if (!referral) {
-        return NextResponse.json({ error: 'Invalid or inactive referral code' }, { status: 400 });
+      const lookup = await lookupReferralCode(supabase, String(form_data.referral_code), user.id);
+      if (!lookup.ok) {
+        return NextResponse.json({ error: lookup.error }, { status: 400 });
       }
-      referralId = referral.id;
+      referralId = lookup.referralId;
     }
 
     // Retry on team_id collision (unique violation)
@@ -113,7 +119,12 @@ export async function POST(req: NextRequest) {
         console.error('Insert error:', error);
         return NextResponse.json({ error: 'Failed to create registration' }, { status: 500 });
       }
-      return NextResponse.json({ registration_id: data.id, team_id: data.team_id, payment_required: paymentRequired });
+      return NextResponse.json({
+        registration_id: data.id,
+        team_id: data.team_id,
+        // A fresh application can't have passed a selection stage yet.
+        payment_required: paymentRequired && isPaymentUnlocked(event_id, toStoredFormData(event_id, form_data)),
+      });
     }
 
     return NextResponse.json({ error: 'Failed to generate unique team ID after retries' }, { status: 500 });

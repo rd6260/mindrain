@@ -426,10 +426,10 @@ function PaymentContent() {
                 {quote.summary.map((row) => (
                   <SummaryRow key={row.label} label={row.label} value={row.value} highlight />
                 ))}
-                {discounted && quote.discountPercent && (
+                {discounted && quote.amountMinor < quote.originalAmountMinor && (
                   <SummaryRow
                     label="Discount"
-                    value={`${quote.discountPercent}% off (-${currencySymbol}${money(quote.originalAmountMinor - quote.amountMinor)})`}
+                    value={`${quote.discountPercent ? `${quote.discountPercent}% off ` : ''}(-${currencySymbol}${money(quote.originalAmountMinor - quote.amountMinor)})`}
                   />
                 )}
                 {discounted && (

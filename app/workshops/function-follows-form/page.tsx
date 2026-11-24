@@ -402,12 +402,29 @@ function InterestedInApplying({
             Download the complete workshop brief to explore the workshop structure, eligibility,
             schedule, deliverables, accommodation, and registration process.
           </p>
-          <p className="text-lg leading-relaxed mb-6" style={{ color: colors.textSecondary }}>
-            Applicants are required to complete the application form, answer the design reflection
-            questions, and may submit a LOR (Letter of Recommendation) from an Architectural Design
-            faculty member who has taught them. The LOR becomes mandatory for applicants who are selected
-            after the interview round.
+          <p className="text-lg leading-relaxed mb-4" style={{ color: colors.textSecondary }}>
+            Applicants are required to complete the application form and answer the design reflection
+            questions. A LOR (Letter of Recommendation) from an Architectural Design faculty member who
+            has taught them is optional at this stage.
           </p>
+          <ol className="list-decimal pl-6 space-y-2 text-lg leading-relaxed mb-6" style={{ color: colors.textSecondary }}>
+            <li>
+              <strong style={{ color: colors.textPrimary }}>Shortlisting:</strong> your application can be
+              edited until it has been reviewed.
+            </li>
+            <li>
+              <strong style={{ color: colors.textPrimary }}>Interview:</strong> shortlisted applicants are
+              invited to a video interview.
+            </li>
+            <li>
+              <strong style={{ color: colors.textPrimary }}>Final Selection:</strong> applicants who clear the
+              interview must submit their LOR from their profile.
+            </li>
+            <li>
+              <strong style={{ color: colors.textPrimary }}>Fee Payment:</strong> selected applicants pay the
+              workshop fee to confirm their seat.
+            </li>
+          </ol>
           <div className="flex flex-col sm:flex-row gap-4">
             <button
               onClick={onRegisterClick}

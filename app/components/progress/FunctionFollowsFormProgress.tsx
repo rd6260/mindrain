@@ -28,11 +28,11 @@ const STAGES: Record<Stage, {
   },
   final_selection: {
     title: 'Final Selection', icon: ClipboardCheck, approvedLabel: 'Selected',
-    inProgressMessage: 'Your application is in the final selection stage.',
+    inProgressMessage: 'Your application is in the final selection stage. Please upload your Letter of Recommendation below to be considered.',
   },
   fee_payment: {
     title: 'Fee Payment', icon: CreditCard, approvedLabel: 'Paid',
-    inProgressMessage: 'Please complete your fee payment to confirm your participation.',
+    inProgressMessage: 'You have been selected! Please complete your fee payment to confirm your participation.',
   },
 };
 
@@ -49,8 +49,9 @@ function buildMessage(statuses: Status[], stages: Stage[]): string {
     return `Unfortunately, your application was not taken forward at the ${STAGES[stages[rejectedAt]].title.toLowerCase()} stage.`;
   }
   if (statuses.every(s => s === 'approved')) return 'Congratulations! Your participation is confirmed.';
-  const current = statuses.indexOf('in_progress');
-  if (current !== -1) return STAGES[stages[current]].inProgressMessage;
+  // The first stage not yet approved is where the applicant currently is.
+  const current = statuses.findIndex(s => s !== 'approved');
+  if (current > 0 || statuses[current] === 'in_progress') return STAGES[stages[current]].inProgressMessage;
   return 'Your application is on track. We will update you here as it moves forward.';
 }
 

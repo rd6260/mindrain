@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getProject } from '@/lib/projects';
-import { fromStoredFormData } from '@/config/projects';
+import { fromStoredFormData, getProjectConfig } from '@/config/projects';
 import { mutateFormData, readOrders } from '@/lib/projects/orders';
 import { sendInvoiceEmail } from '@/lib/payments/invoice';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
 
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
     // The payment row must belong to this registration and this Razorpay order.
     const { data: payment } = await supabase
       .from('payments_v3')
-      .select('payment_id, registration_id, razorpay_order_id, amount, currency, status')
+      .select('payment_id, registration_id, razorpay_order_id, amount, currency, status, original_amount, referral_id, referral_points')
       .eq('payment_id', payment_id)
       .maybeSingle();
 
@@ -139,6 +140,40 @@ export async function POST(req: NextRequest) {
     if (updateRegError) {
       console.error('Error updating registration:', updateRegError);
       return NextResponse.json({ message: 'Failed to update registration status', isOk: false }, { status: 500 });
+    }
+
+    // Projects with a progress tracker: mark the fee stage as done.
+    const paymentStage = getProjectConfig(registration.event_id)?.paymentStage;
+    if (paymentStage) {
+      const marked = await mutateFormData(supabase, registration_id, stored => ({
+        ...stored,
+        progress: { ...(stored.progress ?? {}), [paymentStage]: 'approved' },
+      }));
+      if (!marked.ok) console.error('Failed to mark fee stage as paid:', marked.error);
+    }
+
+    // Credit the referrer. Unique on payment_id, so a retried verification can't credit twice.
+    if (payment.referral_id) {
+      try {
+        const { error: creditError } = await createAdminClient()
+          .from('referral_earnings')
+          .upsert(
+            {
+              referral_id: payment.referral_id,
+              payment_id,
+              registration_id,
+              event_id: registration.event_id,
+              currency: payment.currency,
+              original_amount: payment.original_amount ?? payment.amount,
+              points: payment.referral_points ?? 0,
+            },
+            { onConflict: 'payment_id', ignoreDuplicates: true },
+          );
+        if (creditError) console.error('Failed to credit referral points:', creditError);
+      } catch (e) {
+        // The participant's payment is fine either way; this only needs fixing on our side.
+        console.error('Failed to credit referral points:', e);
+      }
     }
 
     await sendInvoiceEmail({ ...invoiceBase, method: rzpPayment?.method || undefined, status: 'captured' });

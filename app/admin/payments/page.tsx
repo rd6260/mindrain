@@ -8,7 +8,21 @@ import { createClient } from '@/lib/supabase/client';
 type EventRow = { id: string; title: string };
 
 type Currency = 'INR' | 'USD';
-type Outcome = 'paid' | 'pending' | 'failed' | 'other';
+type Outcome = 'paid' | 'failed' | 'other';
+
+type Preset = 'today' | '7d' | '30d' | '90d' | 'lifetime' | 'custom';
+const PRESETS: { key: Preset; label: string }[] = [
+  { key: 'today', label: 'Today' },
+  { key: '7d', label: 'Last 7 days' },
+  { key: '30d', label: 'Last 30 days' },
+  { key: '90d', label: 'Last 90 days' },
+  { key: 'lifetime', label: 'Lifetime' },
+  { key: 'custom', label: 'Custom' },
+];
+
+// local-date YYYY-MM-DD
+const ymd = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
 // One normalised payment, whichever table it came from. Amounts are in major units (₹ / $).
 type Payment = {
@@ -43,8 +57,8 @@ const money = (n: number, currency: Currency = 'INR') =>
 const outcomeOf = (status: string): Outcome => {
   const s = (status || '').toLowerCase();
   if (s === 'paid' || s === 'captured') return 'paid';
-  if (s === 'created' || s === 'authorized') return 'pending';
-  if (s === 'failed') return 'failed';
+  // a payment that was started but never completed counts as failed
+  if (s === 'created' || s === 'authorized' || s === 'failed') return 'failed';
   return 'other'; // unpaid / refunded / anything else
 };
 
@@ -55,6 +69,8 @@ const methodLabel = (m: string | null | undefined) => {
   if (/bulk|bilk/.test(s)) return 'Bulk / manual';
   return s.toUpperCase();
 };
+
+const pointsFmt = (n: number) => Math.floor(n).toLocaleString('en-IN');
 
 const monthKey = (iso: string) => iso.slice(0, 7);
 
@@ -132,6 +148,9 @@ export default function AdminPaymentsPage() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [referral, setReferral] = useState<Referral | null>(null);
   const [eventFilter, setEventFilter] = useState('all');
+  const [preset, setPreset] = useState<Preset>('30d');
+  const [customFrom, setCustomFrom] = useState('');
+  const [customTo, setCustomTo] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -144,7 +163,7 @@ export default function AdminPaymentsPage() {
           supabase.from('payments_2').select('payment_id, amount, currency, razorpay_fee, tax, method, status, created_at, registrations_2(event_id)'),
           supabase.from('payments_v3').select('payment_id, amount, currency, razorpay_fee, tax, method, status, created_at, registrations_v3(event_id)'),
           supabase.from('referral_account').select('earned_amount, redeemed_amount'),
-          supabase.from('redeem_history').select('amount, is_approved, action_time'),
+          supabase.from('redeem_history').select('amount, is_approved, action_time').eq('legacy', false),
         ]);
         const firstError = [ev, p1, p2, p3, ref, redeems].find(r => r.error)?.error;
         if (firstError) throw firstError;
@@ -216,9 +235,34 @@ export default function AdminPaymentsPage() {
 
   const eventTitle = useMemo(() => new Map(events.map(e => [e.id, e.title])), [events]);
 
+  // inclusive [from, to] range as local dates; null = unbounded
+  const range = useMemo(() => {
+    const today = new Date();
+    const daysAgo = (n: number) => {
+      const d = new Date(today);
+      d.setDate(d.getDate() - n);
+      return ymd(d);
+    };
+    switch (preset) {
+      case 'today': return { from: ymd(today), to: ymd(today) };
+      case '7d': return { from: daysAgo(6), to: ymd(today) };
+      case '30d': return { from: daysAgo(29), to: ymd(today) };
+      case '90d': return { from: daysAgo(89), to: ymd(today) };
+      case 'custom': return { from: customFrom || null, to: customTo || null };
+      default: return { from: null, to: null };
+    }
+  }, [preset, customFrom, customTo]);
+
   const scoped = useMemo(
-    () => (eventFilter === 'all' ? payments : payments.filter(p => p.eventId === eventFilter)),
-    [payments, eventFilter],
+    () =>
+      payments.filter(p => {
+        if (eventFilter !== 'all' && p.eventId !== eventFilter) return false;
+        const day = ymd(new Date(p.createdAt));
+        if (range.from && day < range.from) return false;
+        if (range.to && day > range.to) return false;
+        return true;
+      }),
+    [payments, eventFilter, range],
   );
 
   const recent = useMemo(
@@ -248,6 +292,29 @@ export default function AdminPaymentsPage() {
           </select>
         </div>
 
+        <div className="flex flex-wrap items-center gap-2">
+          {PRESETS.map(pr => (
+            <button
+              key={pr.key}
+              onClick={() => setPreset(pr.key)}
+              className={`px-3.5 py-2 rounded-xl text-sm font-bold border transition-colors ${
+                preset === pr.key
+                  ? 'bg-[#2C5F5F] text-white border-[#2C5F5F]'
+                  : 'bg-[#F8F7F2] text-[#1A1A1A] border-[#D0CEC2] hover:bg-white'
+              }`}
+            >
+              {pr.label}
+            </button>
+          ))}
+          {preset === 'custom' && (
+            <div className="flex items-center gap-2 text-sm text-[#6B6B6B]">
+              <input type="date" value={customFrom} max={customTo || undefined} onChange={e => setCustomFrom(e.target.value)} className="px-3 py-2 bg-white border border-[#D0CEC2] rounded-xl outline-none focus:border-[#2C5F5F]" />
+              to
+              <input type="date" value={customTo} min={customFrom || undefined} onChange={e => setCustomTo(e.target.value)} className="px-3 py-2 bg-white border border-[#D0CEC2] rounded-xl outline-none focus:border-[#2C5F5F]" />
+            </div>
+          )}
+        </div>
+
         {error && <div className="px-4 py-2.5 rounded-xl bg-[#C85D3E]/10 text-[#C85D3E] text-sm font-medium">{error}</div>}
 
         {loading ? (
@@ -255,13 +322,12 @@ export default function AdminPaymentsPage() {
             <div className="w-8 h-8 border-4 border-[#2C5F5F] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : currenciesPresent.length === 0 ? (
-          <div className={`${card} text-center text-[#6B6B6B]`}>No payments for this selection.</div>
+          <div className={`${card} text-center text-[#6B6B6B]`}>No payments for this selection. Try a wider date range.</div>
         ) : (
           <>
             {currenciesPresent.map(c => {
               const rows = scoped.filter(p => p.currency === c);
               const paid = rows.filter(p => p.outcome === 'paid');
-              const pending = rows.filter(p => p.outcome === 'pending');
               const failed = rows.filter(p => p.outcome === 'failed');
               const gross = sum(paid, p => p.gross);
               const fees = sum(paid, p => p.gatewayFee);
@@ -286,8 +352,7 @@ export default function AdminPaymentsPage() {
                         <Stat label="Net after fees" value="—" />
                       </>
                     )}
-                    <Stat label="Pending (not completed)" value={money(sum(pending, p => p.gross), c)} sub={`${pending.length} payments started, not paid`} />
-                    <Stat label="Failed" value={String(failed.length)} sub={money(sum(failed, p => p.gross), c)} />
+                    <Stat label="Failed / not completed" value={String(failed.length)} sub={`${money(sum(failed, p => p.gross), c)} not collected`} />
                   </div>
 
                   <div className="grid gap-4 lg:grid-cols-2">
@@ -352,10 +417,10 @@ export default function AdminPaymentsPage() {
           <div className="space-y-3">
             <h2 className="text-xl font-bold text-[#1A1A1A]">Referral payouts</h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <Stat label="Earned by referrers" value={money(referral.earned)} />
-              <Stat label="Redeemed" value={money(referral.redeemed)} />
-              <Stat label="Owed (balance)" value={money(referral.earned - referral.redeemed)} />
-              <Stat label="Pending redeem requests" value={String(referral.pendingRedeems)} sub={money(referral.pendingAmount)} />
+              <Stat label="Earned by referrers" value={pointsFmt(referral.earned)} sub="MR POINTS" />
+              <Stat label="Redeemed" value={pointsFmt(referral.redeemed)} sub="MR POINTS" />
+              <Stat label="Outstanding balance" value={pointsFmt(referral.earned - referral.redeemed)} sub="MR POINTS" />
+              <Stat label="Pending redeem requests" value={String(referral.pendingRedeems)} sub={`${pointsFmt(referral.pendingAmount)} MR POINTS`} />
             </div>
             <p className="text-xs text-[#8B8B8B]">Referral figures cover all events and aren&apos;t affected by the event filter.</p>
           </div>

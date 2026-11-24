@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: result.status });
     }
-    const { quote, referralId } = result;
+    const { quote, applied } = result;
 
     if (quote.amountMinor < 100) {
       return NextResponse.json({ error: 'Invalid payment amount' }, { status: 400 });
@@ -64,6 +64,12 @@ export async function POST(req: NextRequest) {
         mindrain_fee: quote.amountMinor, // full amount goes to mindrain initially
         tax: 0,
         status: 'created',
+        original_amount: quote.originalAmountMinor,
+        discount_amount: quote.originalAmountMinor - quote.amountMinor,
+        coupon_code: applied?.code ?? null,
+        // Points are fixed now, at the price the payer agreed to, and credited on capture.
+        referral_id: applied?.referralId ?? null,
+        referral_points: applied?.points ?? 0,
       })
       .select('payment_id')
       .single();
@@ -97,8 +103,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (referralId) {
-      await supabase.from('registrations_v3').update({ referral_used: referralId }).eq('id', registration_id);
+    if (applied?.referralId) {
+      await supabase.from('registrations_v3').update({ referral_used: applied.referralId }).eq('id', registration_id);
     }
 
     return NextResponse.json({

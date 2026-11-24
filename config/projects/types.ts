@@ -46,6 +46,12 @@ export interface ProjectBaseConfig {
   brief?: BriefConfig;
   progressStages?: readonly string[];
   initialProgress?: Readonly<Record<string, string>>;
+  /** Once this stage is approved or rejected, the applicant can no longer edit the form. */
+  editLockedAfterStage?: string;
+  /** Payment opens only once this stage is approved. */
+  paymentAfterStage?: string;
+  /** Stage marked `approved` when the payment is captured. */
+  paymentStage?: string;
 }
 
 export const registrationPath = (eventId: string) => `/registration-3?event_id=${eventId}`;

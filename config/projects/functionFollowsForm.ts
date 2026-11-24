@@ -38,4 +38,9 @@ export const FUNCTION_FOLLOWS_FORM = {
     final_selection: 'pending',
     fee_payment: 'pending',
   },
+  /** Decided at shortlisting (approved or rejected) → the application form is frozen. */
+  editLockedAfterStage: 'shortlisting',
+  /** Selected in the final round → fee payment opens. */
+  paymentAfterStage: 'final_selection',
+  paymentStage: 'fee_payment',
 } as const satisfies ProjectBaseConfig & { formUploadBucket: string };

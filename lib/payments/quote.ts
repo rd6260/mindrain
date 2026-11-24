@@ -1,8 +1,9 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { getProjectConfig, fromStoredFormData } from '@/config/projects';
+import { getProjectConfig, fromStoredFormData, isPaymentUnlocked } from '@/config/projects';
 import { getProject } from '@/lib/projects';
 import type { BaseFee, SummaryRow } from '@/lib/projects';
 import { capturedQuantity } from '@/lib/projects/orders';
+import { getReferralSettings, lookupReferralCode, referralDiscountMinor, referralPoints } from '@/lib/referral';
 
 export interface Quote {
   amountMinor: number;
@@ -26,8 +27,18 @@ export interface Quote {
   };
 }
 
+/** Server-only details of an applied code. Never sent to the client. */
+export interface AppliedCode {
+  kind: 'coupon' | 'referral';
+  code: string;
+  /** Referral only */
+  referralId?: string;
+  /** Referral only: MR POINTS the referrer gets once this payment is captured. */
+  points?: number;
+}
+
 export type QuoteResult =
-  | { ok: true; quote: Quote; referralId: string | null }
+  | { ok: true; quote: Quote; applied: AppliedCode | null }
   | { ok: false; status: number; error: string };
 
 /**
@@ -58,6 +69,9 @@ export async function quoteRegistration(args: {
 
   const project = getProject(reg.event_id);
   if (!project || !getProjectConfig(reg.event_id)?.paymentEnabled) return { ok: false, status: 400, error: 'Payments are not available for this event' };
+  if (!isPaymentUnlocked(reg.event_id, reg.form_data)) {
+    return { ok: false, status: 403, error: 'Payment opens once you are selected in the final round' };
+  }
 
   // A paid registration can only be charged again for projects that sell units in multiple orders.
   if (reg.paid && !project.orders) return { ok: false, status: 400, error: 'Registration already paid' };
@@ -122,7 +136,7 @@ export async function quoteRegistration(args: {
   let fee: BaseFee = base;
   let discountPercent: number | undefined;
   let applied: Quote['applied'];
-  let referralId: string | null = null;
+  let appliedCode: AppliedCode | null = null;
 
   const code = args.code?.trim().toUpperCase();
   if (code) {
@@ -133,16 +147,31 @@ export async function quoteRegistration(args: {
       fee = res.fee ?? base;
       discountPercent = res.discountPercent;
       applied = { title: res.title, message: res.message };
+      appliedCode = { kind: 'coupon', code };
     } else {
-      const { data: referral } = await supabase
-        .from('referral_account')
-        .select('id')
-        .eq('code', code)
-        .eq('status', 'active')
-        .maybeSingle();
-      if (!referral) return { ok: false, status: 400, error: 'Invalid coupon or referral code.' };
-      referralId = referral.id;
-      applied = { title: 'Referral Applied!', message: 'Referral code verified successfully.' };
+      // Not a coupon: try it as a referral code. Coupons and referrals don't stack (one code per payment).
+      const lookup = await lookupReferralCode(supabase, code, userId);
+      if (!lookup.ok) return { ok: false, status: 400, error: lookup.error };
+
+      const settings = await getReferralSettings(supabase, reg.event_id);
+      if (!settings.enabled) return { ok: false, status: 400, error: 'Referral codes are not accepted for this event.' };
+
+      const discount = referralDiscountMinor(settings, base.amountMinor, base.currency);
+      fee = { ...base, amountMinor: base.amountMinor - discount };
+      if (settings.d2_type === 'percent' && discount > 0) discountPercent = settings.d2_percent;
+      const symbol = base.currency === 'INR' ? '₹' : '$';
+      applied = {
+        title: 'Referral Applied!',
+        message: discount > 0
+          ? `Referral code verified. You save ${symbol}${(discount / 100).toLocaleString()}.`
+          : 'Referral code verified successfully.',
+      };
+      appliedCode = {
+        kind: 'referral',
+        code,
+        referralId: lookup.referralId,
+        points: referralPoints(settings, base.amountMinor, base.currency),
+      };
     }
   }
 
@@ -150,7 +179,7 @@ export async function quoteRegistration(args: {
 
   return {
     ok: true,
-    referralId,
+    applied: appliedCode,
     quote: {
       amountMinor: fee.amountMinor,
       originalAmountMinor: base.amountMinor,

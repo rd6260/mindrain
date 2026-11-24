@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense, createElement } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { getProjectConfig, fromStoredFormData } from '@/config/projects';
+import { getProjectConfig, fromStoredFormData, isApplicationLocked } from '@/config/projects';
 import { isOnboardingComplete } from '@/utils/onboarding';
 import { getRegistrationForm, hasRegistrationForm } from '@/app/components/registration/registry';
 
@@ -57,6 +57,7 @@ function RegistrationContent() {
   const [initialData, setInitialData] = useState<Record<string, any> | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [showAlreadyPaid, setShowAlreadyPaid] = useState(false);
+  const [showLocked, setShowLocked] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   const supabase = createClient();
@@ -83,6 +84,8 @@ function RegistrationContent() {
 
       if (reg?.paid) {
         setShowAlreadyPaid(true);
+      } else if (reg && isApplicationLocked(eventId, reg.form_data)) {
+        setShowLocked(true);
       } else if (reg) {
         setInitialData(fromStoredFormData(eventId, reg.form_data));
         setIsEditMode(true);
@@ -164,6 +167,16 @@ function RegistrationContent() {
         title="Already Registered"
         body="You have already completed registration and payment for this event."
         action={{ label: 'Go to Home', onClick: () => { window.location.href = '/'; } }}
+      />
+    );
+  }
+
+  if (showLocked) {
+    return (
+      <Notice
+        title="Application Under Review"
+        body="Your application has been reviewed and can no longer be edited. Track its progress and next steps on your profile."
+        action={{ label: 'Go to Profile', onClick: () => { window.location.href = '/profile'; } }}
       />
     );
   }

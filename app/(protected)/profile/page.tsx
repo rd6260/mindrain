@@ -1,6 +1,6 @@
 'use client';
 
-import { getProjectConfig, ARCHITECTURE_OF_PLAY, FUNCTION_FOLLOWS_FORM, MR_LENS_TROPHY } from '@/config/projects';
+import { getProjectConfig, isPaymentUnlocked, ARCHITECTURE_OF_PLAY, FUNCTION_FOLLOWS_FORM, MR_LENS_TROPHY } from '@/config/projects';
 import { lensIsOpen, lensPhotoIds } from '@/lib/projects/lensTrophy';
 import { capturedQuantity, capturedBreakdown } from '@/lib/projects/orders';
 import FunctionFollowsFormProgress from '@/app/components/progress/FunctionFollowsFormProgress';
@@ -222,6 +222,7 @@ const ProfilePage = () => {
   const [participatedEvents, setParticipatedEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [certPopup, setCertPopup] = useState<string[] | null>(null);
+  const [hasEarnAccount, setHasEarnAccount] = useState(false);
   const supabase = createClient();
   const router = useRouter();
   const certAvailable = isCertificatesAvailable();
@@ -253,6 +254,14 @@ const ProfilePage = () => {
       }
 
       setUserInfo(userInfoData);
+
+      // Same check the earn dashboard uses to decide access
+      supabase
+        .from('referral_account')
+        .select('id')
+        .eq('id', currentUser.id)
+        .maybeSingle()
+        .then(({ data }) => setHasEarnAccount(!!data));
 
       const { data: registrationsData, error: registrationsError } = await supabase
         .from('registrations')
@@ -334,7 +343,11 @@ const ProfilePage = () => {
   };
 
   // Exclude thesis-award (registrations_2) from the pending-payments check when the competition is closed
-  const needsPayment = (reg: Registration3) => !reg.paid && reg.event_id !== ARCHITECTURE_OF_PLAY.eventId && (getProjectConfig(reg.event_id)?.paymentEnabled ?? true);
+  const needsPayment = (reg: Registration3) =>
+    !reg.paid &&
+    reg.event_id !== ARCHITECTURE_OF_PLAY.eventId &&
+    (getProjectConfig(reg.event_id)?.paymentEnabled ?? true) &&
+    isPaymentUnlocked(reg.event_id, reg.form_data);
   const hasPendingPayments = registrations.some(reg => !reg.paid) || (!THESIS_AWARD_CLOSED && registrations2.some(reg => !reg.paid)) || registrations3.some(needsPayment);
 
   const formatAcademicLevel = (level: string | null) => {
@@ -472,8 +485,19 @@ const ProfilePage = () => {
                   )}
                 </div>
 
-                {/* Logout Button */}
-                <div className="mt-8 pt-6 border-t" style={{ borderColor: '#D0CEC2' }}>
+                {/* Earn dashboard + Logout */}
+                <div className="mt-8 pt-6 border-t space-y-3" style={{ borderColor: '#D0CEC2' }}>
+                  {hasEarnAccount && (
+                    <button
+                      onClick={() => router.push('/earn/dashboard')}
+                      className="w-full px-4 py-2.5 rounded-lg font-semibold text-sm text-white bg-[#2C5F5F] hover:bg-[#1A4D4D] transition-colors flex items-center justify-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Earn Dashboard
+                    </button>
+                  )}
                   <button
                     onClick={handleLogout}
                     className="w-full px-4 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 hover:shadow-md flex items-center justify-center gap-2"

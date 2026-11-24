@@ -493,6 +493,12 @@ export default function AdminRegistrationList() {
   const setStageStatus = async (reg: UnifiedRegistration, stage: string, status: string) => {
     if (!reg.application) return;
     const stored = reg.application.stored;
+    // The LOR is mandatory from the final selection stage onwards.
+    if (
+      stage === FUNCTION_FOLLOWS_FORM.paymentAfterStage && status === 'approved' &&
+      !stored.form?.lor_path &&
+      !window.confirm('This applicant has not uploaded their Letter of Recommendation yet. Select them anyway? (This opens fee payment.)')
+    ) return;
     const nextStored = { ...stored, progress: { ...(stored.progress || {}), [stage]: status } };
     setSavingStage(`${reg.id}:${stage}`);
     setError(null);

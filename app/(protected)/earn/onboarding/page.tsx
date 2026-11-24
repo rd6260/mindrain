@@ -128,19 +128,19 @@ Any registered user of Mind Rain with a valid account can join the Refer & Earn 
 
 2. HOW YOU EARN
 
-You earn 10% of the competition registration fee when: A new user signs up using your referral link or code, and they complete the full payment for a competition. Unpaid registrations will not be counted.
+You earn MR POINTS when a participant enters your referral code on the payment page and completes the full payment. The number of points depends on the competition, workshop or product, and the participant also gets a discount for using your code. Unpaid registrations are not counted. You cannot use your own code.
 
-3. REWARD STATUS LOCKED TO WITHDRAWABLE
+3. WHEN POINTS ARE ADDED
 
-Your earnings go through two stages: Locked Balance This appears once your referral makes a successful payment. Withdrawable Balance This becomes available after the registration is verified and the refund period if any is completed. If a participant cancels or gets a refund, the related reward is automatically removed.
+Points are added to your wallet as soon as the referred payment is confirmed. If a participant cancels or gets a refund, the related points may be removed.
 
-4. WITHDRAWALS
+4. REDEMPTION
 
-Minimum withdrawal amount: ₹1500. Payout method: UPI. Processing time: 24 hours to 7 working days. Please ensure your UPI details are correct while submitting the withdrawal request.
+You can apply for redemption once you have at least 3,000 MR POINTS. Payout method: UPI. Processing time: 24 hours to 7 working days. Please ensure your UPI details are correct while submitting the redemption request.
 
 5. MIND RAIN WALLET
 
-Your referral earnings are stored in your Mind Rain Wallet. The wallet shows: Locked balance, Withdrawable balance, Total earnings. Wallet balance: Cannot be transferred to another user. Can only be withdrawn once the minimum amount is reached.
+Your MR POINTS are stored in your Mind Rain Wallet. The wallet shows your total points earned, points redeemed and points available. Points cannot be transferred to another user and can only be redeemed once the minimum is reached.
 
 6. FAIR USE POLICY
 
@@ -156,7 +156,7 @@ Any taxes applicable on the rewards earned are the responsibility of the user.
 
 9. PROGRAM UPDATES
 
-Mind Rain reserves the right to: Modify the reward percentage, Update withdrawal conditions, Pause or end the program if required. Any changes will be reflected on this page.
+Mind Rain reserves the right to: Modify the points awarded and discounts offered, Update withdrawal conditions, Pause or end the program if required. Any changes will be reflected on this page.
 
 10. FINAL DECISION
 

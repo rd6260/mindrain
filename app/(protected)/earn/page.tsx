@@ -9,7 +9,7 @@ const steps = [
   { n: '02', title: 'Generate Your Code', desc: 'Get your unique referral code from your dashboard.' },
   { n: '03', title: 'Share With Your Network', desc: 'Send the code to friends, classmates, and colleagues.' },
   { n: '04', title: 'They Register & Pay', desc: 'The participant enters your code at the payment page.' },
-  { n: '05', title: 'You Earn', desc: 'Once payment is confirmed, your reward lands in your wallet.' },
+  { n: '05', title: 'You Earn', desc: 'Once payment is confirmed, MR POINTS land in your wallet.' },
 ];
 
 const perks = [
@@ -19,8 +19,8 @@ const perks = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33" />
       </svg>
     ),
-    label: '10% per referral',
-    sub: 'On successful registration',
+    label: 'MR POINTS per referral',
+    sub: 'On every successful payment',
   },
   {
     icon: (
@@ -28,8 +28,8 @@ const perks = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 14.25l6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0c1.1.128 1.907 1.077 1.907 2.185z" />
       </svg>
     ),
-    label: '5% off for your referral',
-    sub: 'Your friend saves on registration too',
+    label: 'A discount for your friend',
+    sub: 'They save when they use your code',
   },
   {
     icon: (
@@ -84,7 +84,7 @@ export default function EarnPage() {
               Turn your network<br />into real earnings.
             </h1>
             <p className="text-lg leading-relaxed mb-8" style={{ color: 'rgba(248,247,242,0.75)' }}>
-              Share your referral code, invite participants, and receive a direct cash reward for every confirmed registration you bring in.
+              Share your referral code, invite participants, and collect MR POINTS for every confirmed payment you bring in. Redeem them via UPI.
             </p>
             <Link
               href="/earn/onboarding"
@@ -181,11 +181,11 @@ export default function EarnPage() {
             <ul className="space-y-3 text-sm" style={{ color: '#3A3A3A' }}>
               <li className="flex items-baseline gap-2">
                 <span className="w-1.5 h-1.5 rounded-full shrink-0 translate-y-[3px]" style={{ backgroundColor: '#2C5F5F' }} />
-                <span>Minimum wallet balance to withdraw: <strong>₹1,500</strong></span>
+                <span>Minimum to redeem: <strong>3,000 MR POINTS</strong></span>
               </li>
               <li className="flex items-baseline gap-2">
                 <span className="w-1.5 h-1.5 rounded-full shrink-0 translate-y-[3px]" style={{ backgroundColor: '#2C5F5F' }} />
-                <span>Payout via <strong>UPI transfer</strong> — apply anytime once threshold is met</span>
+                <span>Redeemed via <strong>UPI transfer</strong> — apply anytime once you reach the minimum</span>
               </li>
               <li className="flex items-baseline gap-2">
                 <span className="w-1.5 h-1.5 rounded-full shrink-0 translate-y-[3px]" style={{ backgroundColor: '#2C5F5F' }} />
@@ -222,7 +222,7 @@ export default function EarnPage() {
             </p>
             <ul className="space-y-2 text-sm" style={{ color: '#3A3A3A' }}>
               {[
-                'Earn real cash for every successful registration',
+                'Earn MR POINTS for every successful payment you refer',
                 'No earning limit — the more you refer, the more you earn',
                 'Build your profile as a contributor to an international design platform',
                 'Ideal for architecture & design students across India and worldwide',
@@ -247,10 +247,10 @@ export default function EarnPage() {
             Ready to start earning?
           </h2>
           <p className="text-base mb-8 max-w-md mx-auto" style={{ color: '#6B6B6B' }}>
-            Create your earn account in seconds and get your referral code. No caps, no delays — just rewards.
+            Create your earn account in seconds and get your referral code. No caps — just rewards.
           </p>
           <Link
-            href="/earn/create"
+            href="/earn/onboarding"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-base transition-all duration-200 hover:shadow-xl hover:scale-[1.02]"
             style={{ backgroundColor: '#2C5F5F', color: '#FFFFFF' }}
             onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#1A4D4D')}

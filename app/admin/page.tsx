@@ -3,6 +3,7 @@ import Link from 'next/link';
 const LINKS = [
   { href: '/admin/event-editor', label: 'Event editor', description: 'Edit event details and brief files' },
   { href: '/admin/reg-list', label: 'Registrations', description: 'View and manage event registrations' },
+  { href: '/admin/referrals', label: 'Referrals', description: 'Reward settings, redemptions and earn accounts' },
   { href: '/admin/payments', label: 'Payments', description: 'Money collected, fees and payout stats' },
 ];
 
