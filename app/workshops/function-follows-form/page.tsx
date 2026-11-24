@@ -82,7 +82,7 @@ const FACILITIES_DESCRIPTION =
   'More than just a workshop. Everything arranged to make your design journey comfortable, engaging and rewarding.';
 
 const FACILITIES = [
-  { icon: Building2,   title: 'Accommodation',    description: '3-star or above hotel stay' },
+  { icon: Building2,   title: 'Accommodation',    description: 'Stay will be provided by us' },
   { icon: Utensils,    title: 'Daily Meals',      description: 'Breakfast, lunch & evening snacks' },
   { icon: PencilRuler, title: 'Design Materials', description: 'Stationery & model-making supplies' },
   { icon: Laptop,      title: 'Online Sessions',  description: '3 days of online classes' },

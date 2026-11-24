@@ -108,7 +108,7 @@ export const functionFollowsForm: ProjectConfig = {
       key: 'accommodation',
       label: 'Accommodation',
       choices: [
-        { value: 'with', label: FFF_ACCOMMODATION_LABELS.with, description: '3-star or above hotel stay during the offline workshop' },
+        { value: 'with', label: FFF_ACCOMMODATION_LABELS.with, description: 'Stay will be provided by us' },
         { value: 'without', label: FFF_ACCOMMODATION_LABELS.without, description: 'You arrange your own stay' },
       ],
     },
