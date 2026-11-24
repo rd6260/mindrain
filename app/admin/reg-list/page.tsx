@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { FUNCTION_FOLLOWS_FORM, MR_LENS_TROPHY, fromStoredFormData } from '@/config/projects';
 import { capturedQuantity, capturedBreakdown } from '@/lib/projects/orders';
-import { FFF_QUESTION_KEYS, FFF_QUESTIONS } from '@/lib/projects/functionFollowsForm';
+import { FFF_QUESTION_KEYS, FFF_QUESTIONS, FFF_ACCOMMODATION_LABELS } from '@/lib/projects/functionFollowsForm';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -62,7 +62,7 @@ type UnifiedRegistration = {
   };
   // Function Follows Form (v3, essay-based application instead of members)
   application?: {
-    details: { name: string; email: string; whatsapp: string; academicYear: string; college: string };
+    details: { name: string; email: string; whatsapp: string; academicYear: string; college: string; accommodation: string };
     answers: Record<string, string>;
     lorPath: string | null;
     documents: { name: string; path: string; size: number; type: string }[];
@@ -323,6 +323,11 @@ export default function AdminRegistrationList() {
                     whatsapp: fd.whatsapp || '',
                     academicYear: fd.academic_year || '',
                     college: fd.college || '',
+                    // Chosen on the payment page (saved when the order is created / paid).
+                    accommodation:
+                      fd.accommodation === 'with' || fd.accommodation === 'without'
+                        ? `${FFF_ACCOMMODATION_LABELS[fd.accommodation as 'with' | 'without']}${reg.paid ? ' (paid)' : ''}`
+                        : '',
                   },
                   answers: Object.fromEntries(FFF_QUESTION_KEYS.map(k => [k, fd[k] || ''])),
                   lorPath: fd.lor_path || null,
@@ -836,6 +841,7 @@ export default function AdminRegistrationList() {
                         ['WhatsApp', reg.application.details.whatsapp],
                         ['Academic year', reg.application.details.academicYear],
                         ['College', reg.application.details.college],
+                        ['Accommodation', reg.application.details.accommodation],
                       ] as const).map(([k, v]) => (
                         <div key={k} className="flex gap-2">
                           <dt className="text-[#6B6B6B]">{k}:</dt>

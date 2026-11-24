@@ -17,6 +17,13 @@ export interface SummaryRow {
   value: string;
 }
 
+export interface PaymentOption {
+  /** form_data key the choice is stored under. */
+  key: string;
+  label: string;
+  choices: { value: string; label: string; description?: string }[];
+}
+
 export interface CouponContext {
   formData: FormData;
   userId: string;
@@ -89,6 +96,16 @@ export interface ProjectConfig {
       parse(input: unknown): Record<string, number> | null;
     };
   };
+
+  /**
+   * Choices made on the payment page that change the price (e.g. accommodation).
+   * The chosen value is saved into the form data under `key` and passed to `getBaseFee`.
+   * Every choice must have a different base price (used to tell which one a payment was for).
+   */
+  paymentOptions?: PaymentOption[];
+
+  /** Add the payment gateway fee + GST on top of the (discounted) fee and show the breakdown. */
+  passGatewayFee?: boolean;
 
   /** Project specific coupons, keyed by UPPERCASE code. Unmatched codes fall back to referral codes. */
   coupons?: Record<string, (ctx: CouponContext) => Promise<CouponResult>>;

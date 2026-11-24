@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { registration_id, code, quantity, breakdown } = await req.json();
+    const { registration_id, code, quantity, breakdown, options } = await req.json();
     if (!registration_id) {
       return NextResponse.json({ error: 'Missing registration_id' }, { status: 400 });
     }
@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
       code,
       quantity,
       breakdown,
+      options,
     });
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: result.status });

@@ -9,8 +9,9 @@ export const FUNCTION_FOLLOWS_FORM = {
   kind: 'workshop',
   pagePath: '/workshops/function-follows-form',
   registrationPath: registrationPath(eventId),
-  // Registration only for now; flip to true (and define pricing in lib/projects) to open payments.
-  paymentEnabled: false,
+  // Pricing lives in lib/projects/functionFollowsForm.ts. Payment only opens per applicant once
+  // they are approved at final selection (see paymentAfterStage).
+  paymentEnabled: true,
   brief: {
     meta: {
       title: 'Function Follows Form',

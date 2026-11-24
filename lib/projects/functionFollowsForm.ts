@@ -1,6 +1,17 @@
 import { FUNCTION_FOLLOWS_FORM } from '@/config/projects';
 import type { ProjectConfig } from './types';
 
+/** Workshop fee in paise, by accommodation choice (stored as `form.accommodation`). */
+export const FFF_FEES_MINOR = {
+  with: 17888_00,
+  without: 13999_00,
+} as const;
+
+export const FFF_ACCOMMODATION_LABELS: Record<keyof typeof FFF_FEES_MINOR, string> = {
+  with: 'With accommodation',
+  without: 'Without accommodation',
+};
+
 export const FFF_QUESTION_KEYS = [
   'excitement',
   'motivation',
@@ -67,6 +78,9 @@ export const functionFollowsForm: ProjectConfig = {
     // approved at the interview stage (uploaded from the profile page, see /api/v3/fff/lor).
     if (fd.lor_path != null && typeof fd.lor_path !== 'string') return 'Invalid Letter of Recommendation';
 
+    // Chosen on the payment page, not in the form.
+    if (fd.accommodation != null && !(fd.accommodation in FFF_FEES_MINOR)) return 'Invalid accommodation choice';
+
     if (fd.documents != null) {
       if (!Array.isArray(fd.documents) || fd.documents.length > FFF_DOCUMENT_MAX_COUNT) {
         return `You can attach at most ${FFF_DOCUMENT_MAX_COUNT} documents`;
@@ -89,14 +103,32 @@ export const functionFollowsForm: ProjectConfig = {
     return `${codeName}-${String(sequence).padStart(4, '0')}`;
   },
 
-  getBaseFee() {
-    // TODO: workshop fee has not been defined yet. Registration works; payment stays closed until this exists.
-    throw new Error('Function Follows Form pricing is not configured');
+  paymentOptions: [
+    {
+      key: 'accommodation',
+      label: 'Accommodation',
+      choices: [
+        { value: 'with', label: FFF_ACCOMMODATION_LABELS.with, description: '3-star or above hotel stay during the offline workshop' },
+        { value: 'without', label: FFF_ACCOMMODATION_LABELS.without, description: 'You arrange your own stay' },
+      ],
+    },
+  ],
+  passGatewayFee: true,
+
+  getBaseFee(fd) {
+    const choice = fd.accommodation === 'without' ? 'without' : 'with';
+    return {
+      amountMinor: FFF_FEES_MINOR[choice],
+      currency: 'INR',
+      description: `Workshop fee (${FFF_ACCOMMODATION_LABELS[choice].toLowerCase()})`,
+    };
   },
 
-  getSummary(_fd, fee) {
+  getSummary(fd, fee) {
+    const choice = fd.accommodation === 'without' ? 'without' : 'with';
     return [
       { label: 'Workshop', value: FUNCTION_FOLLOWS_FORM.title },
+      { label: 'Accommodation', value: choice === 'with' ? 'Included' : 'Not included' },
       ...(fee.badge ? [{ label: 'Registration Period', value: fee.badge }] : []),
     ];
   },

@@ -9,6 +9,15 @@ import confetti from 'canvas-confetti';
 interface Quote {
   amountMinor: number;
   originalAmountMinor: number;
+  discountMinor: number;
+  subtotalMinor: number;
+  charges?: { label: string; amountMinor: number }[];
+  options?: {
+    key: string;
+    label: string;
+    selected: string;
+    choices: { value: string; label: string; description?: string; amountMinor: number }[];
+  }[];
   currency: 'INR' | 'USD';
   badge?: string;
   description: string;
@@ -22,7 +31,8 @@ interface Quote {
   };
 }
 
-const money = (minor: number) => (minor / 100).toLocaleString();
+const money = (minor: number) =>
+  (minor / 100).toLocaleString(undefined, { minimumFractionDigits: minor % 100 ? 2 : 0, maximumFractionDigits: 2 });
 
 // Section heading with accent dot
 function SectionHeading({ children }: { children: React.ReactNode }) {
@@ -65,6 +75,8 @@ function PaymentContent() {
   const [quantity, setQuantity] = useState(1);
   // Add-more orders that are split into groups (e.g. photography categories): group key -> count
   const [breakdown, setBreakdown] = useState<Record<string, number> | null>(null);
+  // Price-changing choices (e.g. accommodation): option key -> chosen value. Empty = server default.
+  const [options, setOptions] = useState<Record<string, string>>({});
 
   // Coupon state — `quote` is always what the server says will be charged
   const [couponCode, setCouponCode] = useState('');
@@ -81,11 +93,17 @@ function PaymentContent() {
     code?: string,
     qty: number = quantity,
     split: Record<string, number> | null = breakdown,
+    opts: Record<string, string> = options,
   ): Promise<{ quote: Quote } | { error: string }> => {
     const res = await fetch('/api/v3/quote', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ registration_id: registrationId, ...(code && { code }), ...(addMode && (split ? { breakdown: split } : { quantity: qty })) }),
+      body: JSON.stringify({
+        registration_id: registrationId,
+        ...(code && { code }),
+        ...(addMode && (split ? { breakdown: split } : { quantity: qty })),
+        ...(Object.keys(opts).length > 0 && { options: opts }),
+      }),
     });
     const data = await res.json();
     return res.ok ? { quote: data.quote as Quote } : { error: (data.error as string) || 'Failed to calculate fee' };
@@ -174,6 +192,15 @@ function PaymentContent() {
     else setError(result.error);
   };
 
+  const changeOption = async (key: string, value: string) => {
+    const next = { ...options, [key]: value };
+    setOptions(next);
+    setError(null);
+    const result = await fetchQuote(appliedCode ?? undefined, quantity, breakdown, next);
+    if ('quote' in result) setQuote(result.quote);
+    else setError(result.error);
+  };
+
   const changeGroup = async (key: string, delta: number) => {
     if (!breakdown || !quote?.order) return;
     const next = { ...breakdown, [key]: Math.max(0, (breakdown[key] ?? 0) + delta) };
@@ -195,7 +222,13 @@ function PaymentContent() {
       const res = await fetch('/api/v3/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ registration_id: registrationId, ...(appliedCode && { code: appliedCode }), ...(addMode && (breakdown ? { breakdown } : { quantity })) }),
+        body: JSON.stringify({
+          registration_id: registrationId,
+          ...(appliedCode && { code: appliedCode }),
+          ...(addMode && (breakdown ? { breakdown } : { quantity })),
+          // Send the choices the shown price was computed with.
+          ...(quote.options && { options: Object.fromEntries(quote.options.map(o => [o.key, o.selected])) }),
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to create order');
@@ -317,7 +350,8 @@ function PaymentContent() {
   }
 
   const currencySymbol = quote?.currency === 'INR' ? '₹' : '$';
-  const discounted = !!quote && quote.amountMinor !== quote.originalAmountMinor;
+  const discounted = !!quote && quote.discountMinor > 0;
+  const hasCharges = !!quote?.charges?.length;
 
   return (
     <div className="min-h-screen bg-[#EDEBDF] py-10 px-4">
@@ -421,25 +455,64 @@ function PaymentContent() {
                 </div>
               )}
 
+              {/* Price-changing choices (e.g. accommodation) */}
+              {quote.options?.map(opt => (
+                <div key={opt.key}>
+                  <SectionHeading>{opt.label}</SectionHeading>
+                  <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label={opt.label}>
+                    {opt.choices.map(c => {
+                      const active = opt.selected === c.value;
+                      return (
+                        <button
+                          key={c.value}
+                          type="button"
+                          role="radio"
+                          aria-checked={active}
+                          onClick={() => !active && changeOption(opt.key, c.value)}
+                          disabled={isProcessing}
+                          className={`text-left px-4 py-3 rounded-xl border transition-all ${
+                            active
+                              ? 'bg-[#2C5F5F]/5 border-[#2C5F5F] ring-2 ring-[#2C5F5F]/15'
+                              : 'bg-white border-[#D0CEC2] hover:border-[#2C5F5F]'
+                          }`}
+                        >
+                          <span className="flex items-center justify-between gap-3">
+                            <span className="flex items-center gap-2">
+                              <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${active ? 'border-[#2C5F5F]' : 'border-[#B8B6AA]'}`}>
+                                {active && <span className="w-2 h-2 rounded-full bg-[#2C5F5F]" />}
+                              </span>
+                              <span className="text-sm font-semibold text-[#1A1A1A]">{c.label}</span>
+                            </span>
+                            <span className="text-sm font-bold text-[#2C5F5F] whitespace-nowrap">{currencySymbol}{money(c.amountMinor)}</span>
+                          </span>
+                          {c.description && <span className="block text-xs text-[#6B6B6B] mt-1 pl-6">{c.description}</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+
               {/* Summary card */}
               <div className="bg-white rounded-xl border border-[#E5E3D7] px-5 py-1">
                 {quote.summary.map((row) => (
                   <SummaryRow key={row.label} label={row.label} value={row.value} highlight />
                 ))}
-                {discounted && quote.amountMinor < quote.originalAmountMinor && (
-                  <SummaryRow
-                    label="Discount"
-                    value={`${quote.discountPercent ? `${quote.discountPercent}% off ` : ''}(-${currencySymbol}${money(quote.originalAmountMinor - quote.amountMinor)})`}
-                  />
+                {(discounted || hasCharges) && (
+                  <SummaryRow label="Base Fee" value={`${currencySymbol}${money(quote.originalAmountMinor)}`} />
                 )}
                 {discounted && (
-                  <div className="flex items-center justify-between py-3 border-b border-[#E5E3D7] last:border-0">
-                    <span className="text-sm text-[#6B6B6B] font-medium">Original Amount</span>
-                    <span className="text-sm text-[#8B8B8B] line-through">
-                      {currencySymbol}{money(quote.originalAmountMinor)}
-                    </span>
-                  </div>
+                  <SummaryRow
+                    label="Discount"
+                    value={`${quote.discountPercent ? `${quote.discountPercent}% off ` : ''}(-${currencySymbol}${money(quote.discountMinor)})`}
+                  />
                 )}
+                {discounted && hasCharges && (
+                  <SummaryRow label="Subtotal" value={`${currencySymbol}${money(quote.subtotalMinor)}`} />
+                )}
+                {quote.charges?.map(c => (
+                  <SummaryRow key={c.label} label={c.label} value={`+${currencySymbol}${money(c.amountMinor)}`} />
+                ))}
                 <SummaryRow
                   label="Total Amount"
                   value={`${currencySymbol}${money(quote.amountMinor)}`}

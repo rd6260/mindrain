@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getProject } from '@/lib/projects';
-import { fromStoredFormData, getProjectConfig } from '@/config/projects';
+import { fromStoredFormData, getProjectConfig, withFormValues } from '@/config/projects';
 import { mutateFormData, readOrders } from '@/lib/projects/orders';
 import { sendInvoiceEmail } from '@/lib/payments/invoice';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -55,6 +55,22 @@ export async function POST(req: NextRequest) {
     }
 
     const project = getProject(registration.event_id);
+
+    // Payment-page choices (e.g. accommodation) this payment was actually priced with: the choice whose
+    // base fee equals the order's original amount.
+    const paidOptions: Record<string, string> = {};
+    if (project?.paymentOptions && payment.original_amount != null) {
+      const fd = fromStoredFormData(registration.event_id, registration.form_data);
+      for (const opt of project.paymentOptions) {
+        const match = opt.choices.find(c => {
+          try {
+            return project.getBaseFee({ ...fd, [opt.key]: c.value }, new Date()).amountMinor === payment.original_amount;
+          } catch { return false; }
+        });
+        if (match) paidOptions[opt.key] = match.value;
+      }
+    }
+
     const eventTitle = (registration as any).events?.title || project?.title || 'Event';
     const invoiceBase = {
       to: user.email,
@@ -66,7 +82,7 @@ export async function POST(req: NextRequest) {
         const order = readOrders(registration.form_data).find(o => o.payment_id === payment_id);
         return order && project?.orders
           ? { ...fd, images: order.quantity, ...(order.breakdown && { categories: order.breakdown }) }
-          : fd;
+          : { ...fd, ...paidOptions };
       })(),
       hiddenKeys: project?.invoiceHiddenKeys,
       amountMinor: payment.amount,
@@ -143,13 +159,16 @@ export async function POST(req: NextRequest) {
     }
 
     // Projects with a progress tracker: mark the fee stage as done.
+    // Record what was paid for, and mark the fee stage as done for projects with a progress tracker.
     const paymentStage = getProjectConfig(registration.event_id)?.paymentStage;
-    if (paymentStage) {
-      const marked = await mutateFormData(supabase, registration_id, stored => ({
-        ...stored,
-        progress: { ...(stored.progress ?? {}), [paymentStage]: 'approved' },
-      }));
-      if (!marked.ok) console.error('Failed to mark fee stage as paid:', marked.error);
+    if (paymentStage || Object.keys(paidOptions).length > 0) {
+      const marked = await mutateFormData(supabase, registration_id, stored => {
+        const next = withFormValues(registration.event_id, stored, paidOptions);
+        return paymentStage
+          ? { ...next, progress: { ...(next.progress ?? {}), [paymentStage]: 'approved' } }
+          : next;
+      });
+      if (!marked.ok) console.error('Failed to record paid options / fee stage:', marked.error);
     }
 
     // Credit the referrer. Unique on payment_id, so a retried verification can't credit twice.

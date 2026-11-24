@@ -53,6 +53,14 @@ export function isPaymentUnlocked(eventId: string, stored: Json | null | undefin
   return !stage || stageStatus(stored, stage) === 'approved';
 }
 
+/** `stored` with `values` merged into the form answers (inside the `{ form, progress }` envelope when used). */
+export function withFormValues(eventId: string, stored: Json | null | undefined, values: Json): Json {
+  const base = stored ?? {};
+  return getProjectConfig(eventId)?.progressStages
+    ? { ...base, form: { ...(base.form ?? {}), ...values } }
+    : { ...base, ...values };
+}
+
 /** What actually gets written to `registrations_v3.form_data`. Existing progress is never overwritten. */
 export function toStoredFormData(eventId: string, form: Json, existingStored?: Json | null): Json {
   const cfg = getProjectConfig(eventId);

@@ -3,11 +3,26 @@ import { getProjectConfig, fromStoredFormData, isPaymentUnlocked } from '@/confi
 import { getProject } from '@/lib/projects';
 import type { BaseFee, SummaryRow } from '@/lib/projects';
 import { capturedQuantity } from '@/lib/projects/orders';
+import { withGatewayFee, GATEWAY_FEE_PERCENT, GST_PERCENT } from './gatewayFee';
 import { getReferralSettings, lookupReferralCode, referralDiscountMinor, referralPoints } from '@/lib/referral';
 
 export interface Quote {
+  /** What is charged: base − discount + charges. */
   amountMinor: number;
+  /** Base fee before any discount or charges. */
   originalAmountMinor: number;
+  discountMinor: number;
+  /** Base − discount, before charges. */
+  subtotalMinor: number;
+  /** Extra charges added on top of the subtotal (gateway fee, GST). */
+  charges?: { label: string; amountMinor: number }[];
+  /** Price-changing choices offered on the payment page. */
+  options?: {
+    key: string;
+    label: string;
+    selected: string;
+    choices: { value: string; label: string; description?: string; amountMinor: number }[];
+  }[];
   currency: 'INR' | 'USD';
   badge?: string;
   description: string;
@@ -38,7 +53,14 @@ export interface AppliedCode {
 }
 
 export type QuoteResult =
-  | { ok: true; quote: Quote; applied: AppliedCode | null }
+  | {
+      ok: true;
+      quote: Quote;
+      applied: AppliedCode | null;
+      /** Payment-page choices (key -> value) this quote was priced with; saved into the form on order. */
+      options: Record<string, string>;
+      eventId: string;
+    }
   | { ok: false; status: number; error: string };
 
 /**
@@ -55,6 +77,8 @@ export async function quoteRegistration(args: {
   quantity?: number | null;
   /** Split of the order by group, for projects with `orders.breakdown`. Overrides `quantity`. */
   breakdown?: unknown;
+  /** Payment-page choices, e.g. { accommodation: 'without' }. Missing ones use the saved / first choice. */
+  options?: unknown;
 }): Promise<QuoteResult> {
   const { supabase, userId, registrationId } = args;
 
@@ -81,7 +105,21 @@ export async function quoteRegistration(args: {
     return { ok: false, status: 400, error: 'Registration is closed for this event' };
   }
 
-  const formData = fromStoredFormData(reg.event_id, reg.form_data);
+  const storedForm = fromStoredFormData(reg.event_id, reg.form_data);
+
+  // Price-changing choices: validate what the client sent, else keep the saved choice, else the first one.
+  const sentOptions = (args.options && typeof args.options === 'object' ? args.options : {}) as Record<string, unknown>;
+  const options: Record<string, string> = {};
+  for (const opt of project.paymentOptions ?? []) {
+    const valid = (v: unknown): v is string => typeof v === 'string' && opt.choices.some(c => c.value === v);
+    if (sentOptions[opt.key] !== undefined && !valid(sentOptions[opt.key])) {
+      return { ok: false, status: 400, error: `Invalid ${opt.label.toLowerCase()} choice` };
+    }
+    options[opt.key] = valid(sentOptions[opt.key])
+      ? sentOptions[opt.key] as string
+      : valid(storedForm[opt.key]) ? storedForm[opt.key] : opt.choices[0].value;
+  }
+  const formData = { ...storedForm, ...options };
 
   // Multi-order projects: this order's size decides its price, not the participant's running total.
   let quantity: number | undefined;
@@ -177,12 +215,40 @@ export async function quoteRegistration(args: {
 
   const eventTitle = (reg as any).events?.title || project.title;
 
+  const subtotalMinor = fee.amountMinor;
+  let amountMinor = subtotalMinor;
+  let charges: Quote['charges'];
+  if (project.passGatewayFee) {
+    const g = withGatewayFee(subtotalMinor);
+    amountMinor = g.totalMinor;
+    charges = [
+      { label: `Payment gateway fee (${GATEWAY_FEE_PERCENT}%)`, amountMinor: g.gatewayMinor },
+      { label: `GST on gateway fee (${GST_PERCENT}%)`, amountMinor: g.gstMinor },
+    ];
+  }
+
+  const quoteOptions: Quote['options'] = project.paymentOptions?.map(opt => ({
+    key: opt.key,
+    label: opt.label,
+    selected: options[opt.key],
+    choices: opt.choices.map(c => ({
+      ...c,
+      amountMinor: project.getBaseFee({ ...formData, [opt.key]: c.value }, now, quantity).amountMinor,
+    })),
+  }));
+
   return {
     ok: true,
     applied: appliedCode,
+    options,
+    eventId: reg.event_id,
     quote: {
-      amountMinor: fee.amountMinor,
+      amountMinor,
       originalAmountMinor: base.amountMinor,
+      discountMinor: base.amountMinor - subtotalMinor,
+      subtotalMinor,
+      charges,
+      options: quoteOptions,
       currency: fee.currency,
       badge: fee.badge,
       description: fee.description,

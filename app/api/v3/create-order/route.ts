@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { quoteRegistration } from '@/lib/payments/quote';
 import { mutateFormData, readOrders } from '@/lib/projects/orders';
+import { withFormValues } from '@/config/projects';
 import Razorpay from 'razorpay';
 
 export async function POST(req: NextRequest) {
@@ -13,7 +14,7 @@ export async function POST(req: NextRequest) {
     }
 
     // The amount is never taken from the client — it is recomputed here.
-    const { registration_id, code, quantity, breakdown } = await req.json();
+    const { registration_id, code, quantity, breakdown, options } = await req.json();
     if (!registration_id) {
       return NextResponse.json({ error: 'Missing registration_id' }, { status: 400 });
     }
@@ -25,11 +26,12 @@ export async function POST(req: NextRequest) {
       code,
       quantity,
       breakdown,
+      options,
     });
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: result.status });
     }
-    const { quote, applied } = result;
+    const { quote, applied, options: chosenOptions, eventId } = result;
 
     if (quote.amountMinor < 100) {
       return NextResponse.json({ error: 'Invalid payment amount' }, { status: 400 });
@@ -65,7 +67,7 @@ export async function POST(req: NextRequest) {
         tax: 0,
         status: 'created',
         original_amount: quote.originalAmountMinor,
-        discount_amount: quote.originalAmountMinor - quote.amountMinor,
+        discount_amount: quote.discountMinor,
         coupon_code: applied?.code ?? null,
         // Points are fixed now, at the price the payer agreed to, and credited on capture.
         referral_id: applied?.referralId ?? null,
@@ -101,6 +103,13 @@ export async function POST(req: NextRequest) {
         await supabase.from('payments_v3').update({ status: 'failed' }).eq('payment_id', payment.payment_id);
         return NextResponse.json({ error: 'Failed to create order' }, { status: 500 });
       }
+    }
+
+    // Save the payment-page choices (e.g. accommodation) into the form. verify-payment re-saves the
+    // choice this payment was actually priced with, in case another order was started meanwhile.
+    if (Object.keys(chosenOptions).length > 0) {
+      const saved = await mutateFormData(supabase, registration_id, stored => withFormValues(eventId, stored, chosenOptions));
+      if (!saved.ok) console.error('Failed to save payment options:', saved.error);
     }
 
     if (applied?.referralId) {
