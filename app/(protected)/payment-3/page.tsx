@@ -519,7 +519,8 @@ function PaymentContent() {
                 />
               </div>
 
-              {/* Info notice */}
+              {/* Info notice (only when there is something to say) */}
+              {(quote.order || quote.badge) && (
               <div className="flex items-start gap-3 p-4 bg-[#2C5F5F]/5 border border-[#2C5F5F]/20 rounded-xl">
                 <div className="w-5 h-5 rounded-full bg-[#2C5F5F] flex items-center justify-center flex-shrink-0 mt-0.5">
                   <span className="text-white text-xs font-bold">i</span>
@@ -528,9 +529,9 @@ function PaymentContent() {
                   {quote.order
                     ? <>This order has <strong className="text-[#2C5F5F]">{quote.order.quantity} {quote.order.unit}{quote.order.quantity === 1 ? '' : 's'}</strong> and is priced on its own size ({quote.badge}), regardless of what you bought before. </>
                     : quote.badge && <>You&apos;re registering under the <strong className="text-[#2C5F5F]">{quote.badge}</strong> period. </>}
-                  The registration fee is <strong>non-refundable</strong> once payment is complete.
                 </p>
               </div>
+              )}
 
               {/* Coupon section */}
               <div>
