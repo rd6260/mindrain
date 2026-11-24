@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { FUNCTION_FOLLOWS_FORM, MR_LENS_TROPHY, fromStoredFormData } from '@/config/projects';
 import { capturedQuantity, capturedBreakdown } from '@/lib/projects/orders';
-import { FFF_QUESTION_KEYS, FFF_QUESTIONS, FFF_ACCOMMODATION_LABELS } from '@/lib/projects/functionFollowsForm';
+import { FFF_QUESTION_KEYS, FFF_QUESTIONS, FFF_ACCOMMODATION_LABELS, FFF_FEES_MINOR } from '@/lib/projects/functionFollowsForm';
+import { MANUAL_PAYMENT_METHODS } from '@/lib/payments/manual';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -90,6 +91,8 @@ export default function AdminRegistrationList() {
 
   const [registrationToDelete, setRegistrationToDelete] = useState<UnifiedRegistration | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [paymentToRemove, setPaymentToRemove] = useState<UnifiedRegistration | null>(null);
+  const [isRemovingPayment, setIsRemovingPayment] = useState(false);
 
   const supabase = createClient();
 
@@ -376,13 +379,22 @@ export default function AdminRegistrationList() {
   // ─── Delete ───────────────────────────────────────────────────────────────
 
   const confirmDelete = async () => {
-    if (!registrationToDelete || registrationToDelete.application) return;
+    if (!registrationToDelete) return;
     const reg = registrationToDelete;
     setIsDeleting(true);
     setError(null);
 
     try {
-      if (reg.source === 'v1') {
+      if (reg.application) {
+        // Function Follows Form: server deletes payments, referral points, the row and uploaded files.
+        const res = await fetch('/api/v3/admin/delete-registration', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ registration_id: reg.id }),
+        });
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(body.error || 'Failed to delete registration');
+      } else if (reg.source === 'v1') {
         // Delete member files from storage
         if (reg.members && reg.members.length > 0) {
           const pathsToDelete: string[] = [];
@@ -477,6 +489,44 @@ export default function AdminRegistrationList() {
     }
   };
 
+  // ─── Function Follows Form: remove a recorded payment ──────────────────────
+
+  const confirmRemovePayment = async () => {
+    if (!paymentToRemove) return;
+    const id = paymentToRemove.id;
+    setIsRemovingPayment(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/v3/admin/remove-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ registration_id: id }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error || 'Failed to remove the payment');
+      setRegistrations(prev => prev.map(r =>
+        r.id === id && r.application
+          ? {
+              ...r,
+              paid: false,
+              application: {
+                ...r.application,
+                stored: body.form_data,
+                details: { ...r.application.details, accommodation: r.application.details.accommodation.replace(' (paid)', '') },
+              },
+            }
+          : r
+      ));
+      setPaymentToRemove(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to remove the payment');
+      setPaymentToRemove(null);
+      window.scrollTo(0, 0);
+    } finally {
+      setIsRemovingPayment(false);
+    }
+  };
+
   // ─── Function Follows Form: open the (private) Letter of Recommendation ───
 
   const openPrivateFile = async (path: string) => {
@@ -495,8 +545,101 @@ export default function AdminRegistrationList() {
 
   const [savingStage, setSavingStage] = useState<string | null>(null);
 
+  // ─── Function Follows Form: record a payment when the fee stage is approved ─
+
+  type Accommodation = keyof typeof FFF_FEES_MINOR;
+  const today = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+  const [paymentFor, setPaymentFor] = useState<UnifiedRegistration | null>(null);
+  const [paymentForm, setPaymentForm] = useState({
+    accommodation: 'with' as Accommodation,
+    amount: '',
+    method: 'upi',
+    reference: '',
+    paidAt: today(),
+    gatewayFee: '',
+    tax: '',
+  });
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [savingPayment, setSavingPayment] = useState(false);
+
+  const openPaymentForm = (reg: UnifiedRegistration) => {
+    const saved = reg.application?.stored.form?.accommodation;
+    const accommodation: Accommodation = saved === 'without' ? 'without' : 'with';
+    setPaymentForm({
+      accommodation,
+      amount: String(FFF_FEES_MINOR[accommodation] / 100),
+      method: 'upi',
+      reference: '',
+      paidAt: today(),
+      gatewayFee: '',
+      tax: '',
+    });
+    setPaymentError(null);
+    setPaymentFor(reg);
+  };
+
+  const submitPayment = async () => {
+    if (!paymentFor) return;
+    setSavingPayment(true);
+    setPaymentError(null);
+    try {
+      const res = await fetch('/api/v3/admin/manual-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          registration_id: paymentFor.id,
+          options: { accommodation: paymentForm.accommodation },
+          amount: paymentForm.amount,
+          method: paymentForm.method,
+          reference: paymentForm.reference,
+          // Local midnight of the chosen day.
+          paid_at: new Date(`${paymentForm.paidAt}T00:00:00`).toISOString(),
+          gateway_fee: paymentForm.gatewayFee,
+          tax: paymentForm.tax,
+        }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error || 'Failed to record the payment');
+      if (body.warning) setError(body.warning);
+
+      const id = paymentFor.id;
+      setRegistrations(prev => prev.map(r => {
+        if (r.id !== id || !r.application) return r;
+        const stored = body.form_data ?? {
+          ...r.application.stored,
+          progress: { ...(r.application.stored.progress ?? {}), [FUNCTION_FOLLOWS_FORM.paymentStage]: 'approved' },
+        };
+        return {
+          ...r,
+          paid: true,
+          application: {
+            ...r.application,
+            stored,
+            details: {
+              ...r.application.details,
+              accommodation: `${FFF_ACCOMMODATION_LABELS[paymentForm.accommodation]} (paid)`,
+            },
+          },
+        };
+      }));
+      setPaymentFor(null);
+    } catch (err) {
+      setPaymentError(err instanceof Error ? err.message : 'Failed to record the payment');
+    } finally {
+      setSavingPayment(false);
+    }
+  };
+
   const setStageStatus = async (reg: UnifiedRegistration, stage: string, status: string) => {
     if (!reg.application) return;
+    // Approving the fee stage = a payment was received: record it (this also marks the registration paid).
+    if (stage === FUNCTION_FOLLOWS_FORM.paymentStage && status === 'approved' && !reg.paid) {
+      openPaymentForm(reg);
+      return;
+    }
     const stored = reg.application.stored;
     // The LOR is mandatory from the final selection stage onwards.
     if (
@@ -738,11 +881,20 @@ export default function AdminRegistrationList() {
 
                   <div className="flex flex-col items-end gap-2">
                     <div className="flex flex-wrap items-center justify-end gap-2">
-                      {!reg.paid && !reg.application && (
+                      {reg.application && reg.paid && (
+                        <button
+                          onClick={() => setPaymentToRemove(reg)}
+                          className="px-3 py-1 bg-white border border-[#D97757] text-[#C04B2B] rounded-full text-xs font-bold hover:bg-[#D97757] hover:text-white transition-colors"
+                          title="Remove the recorded payment"
+                        >
+                          REMOVE PAYMENT
+                        </button>
+                      )}
+                      {(!reg.paid || reg.application) && (
                         <button
                           onClick={() => setRegistrationToDelete(reg)}
                           className="px-3 py-1 bg-white border border-[#C85D3E] text-[#C85D3E] rounded-full text-xs font-bold hover:bg-[#C85D3E] hover:text-white transition-colors"
-                          title="Delete unpaid registration"
+                          title={reg.application ? 'Delete application' : 'Delete unpaid registration'}
                         >
                           DELETE
                         </button>
@@ -851,14 +1003,31 @@ export default function AdminRegistrationList() {
                     </dl>
                     {/* Status per stage */}
                     <div className="mb-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-                      {FUNCTION_FOLLOWS_FORM.progressStages.map(stage => {
-                        const current = reg.application!.stored.progress?.[stage] || 'pending';
+                      {FUNCTION_FOLLOWS_FORM.progressStages.map((stage, i, stages) => {
+                        const progress = reg.application!.stored.progress ?? {};
+                        const current = progress[stage] || 'pending';
+                        // A stage can only be changed once the previous one is approved.
+                        const prev = i > 0 ? stages[i - 1] : null;
+                        // A paid registration's fee stage is fixed (it reflects a recorded payment).
+                        const blocked =
+                          (!!prev && progress[prev] !== 'approved') ||
+                          (stage === FUNCTION_FOLLOWS_FORM.paymentStage && reg.paid);
                         return (
-                          <label key={stage} className="bg-white rounded-xl border border-[#E5E3D7] p-2.5 text-xs">
+                          <label
+                            key={stage}
+                            className={`bg-white rounded-xl border border-[#E5E3D7] p-2.5 text-xs ${blocked ? 'opacity-60' : ''}`}
+                            title={
+                              blocked
+                                ? reg.paid && stage === FUNCTION_FOLLOWS_FORM.paymentStage
+                                  ? 'Payment recorded'
+                                  : `Approve ${prev!.replace('_', ' ')} first`
+                                : undefined
+                            }
+                          >
                             <span className="block font-semibold text-[#1A1A1A] mb-1 capitalize">{stage.replace('_', ' ')}</span>
                             <select
                               value={current}
-                              disabled={savingStage === `${reg.id}:${stage}`}
+                              disabled={blocked || savingStage === `${reg.id}:${stage}`}
                               onChange={(e) => setStageStatus(reg, stage, e.target.value)}
                               className="w-full px-2 py-1.5 bg-[#F8F7F2] border border-[#D0CEC2] rounded-lg text-xs font-medium outline-none focus:border-[#2C5F5F] disabled:opacity-50"
                             >
@@ -977,6 +1146,159 @@ export default function AdminRegistrationList() {
         )}
       </div>
 
+      {/* Record payment (fee stage approved) */}
+      {paymentFor && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1A1A]/60 backdrop-blur-sm">
+          <div className="bg-[#F8F7F2] rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 shadow-2xl border border-[#D0CEC2]">
+            <h3 className="text-xl font-bold text-[#1A1A1A] mb-1">Record Payment</h3>
+            <p className="text-sm text-[#6B6B6B] mb-5">
+              {paymentFor.application?.details.name || paymentFor.user_info?.name || 'Applicant'} · {paymentFor.team_id}
+              <br />
+              Saving adds a captured payment, marks the registration as paid and approves the fee stage.
+            </p>
+
+            {paymentError && (
+              <div className="mb-4 p-3 bg-[#C85D3E]/10 border border-[#C85D3E]/30 rounded-xl text-sm text-[#C85D3E]">{paymentError}</div>
+            )}
+
+            <div className="space-y-4 text-sm">
+              <div>
+                <span className="block font-semibold text-[#1A1A1A] mb-1.5">Accommodation</span>
+                <div className="grid grid-cols-2 gap-2">
+                  {(Object.keys(FFF_FEES_MINOR) as Accommodation[]).map(a => (
+                    <button
+                      key={a}
+                      type="button"
+                      onClick={() => setPaymentForm(f => ({ ...f, accommodation: a, amount: String(FFF_FEES_MINOR[a] / 100) }))}
+                      className={`px-3 py-2 rounded-xl border text-left ${
+                        paymentForm.accommodation === a ? 'border-[#2C5F5F] bg-[#2C5F5F]/5 ring-2 ring-[#2C5F5F]/15' : 'border-[#D0CEC2] bg-white'
+                      }`}
+                    >
+                      <span className="block font-semibold text-[#1A1A1A]">{FFF_ACCOMMODATION_LABELS[a]}</span>
+                      <span className="text-xs text-[#6B6B6B]">Fee ₹{(FFF_FEES_MINOR[a] / 100).toLocaleString('en-IN')}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <label className="block">
+                  <span className="block font-semibold text-[#1A1A1A] mb-1.5">Amount received (₹)</span>
+                  <input type="number" min="1" step="0.01" value={paymentForm.amount}
+                    onChange={e => setPaymentForm(f => ({ ...f, amount: e.target.value }))}
+                    className="w-full px-3 py-2 bg-white border border-[#D0CEC2] rounded-xl outline-none focus:border-[#2C5F5F]" />
+                </label>
+                <label className="block">
+                  <span className="block font-semibold text-[#1A1A1A] mb-1.5">Payment date</span>
+                  <input type="date" max={today()} value={paymentForm.paidAt}
+                    onChange={e => setPaymentForm(f => ({ ...f, paidAt: e.target.value }))}
+                    className="w-full px-3 py-2 bg-white border border-[#D0CEC2] rounded-xl outline-none focus:border-[#2C5F5F]" />
+                </label>
+              </div>
+
+              <label className="block">
+                <span className="block font-semibold text-[#1A1A1A] mb-1.5">Method</span>
+                <select value={paymentForm.method}
+                  onChange={e => setPaymentForm(f => ({ ...f, method: e.target.value }))}
+                  className="w-full px-3 py-2 bg-white border border-[#D0CEC2] rounded-xl outline-none focus:border-[#2C5F5F]">
+                  {MANUAL_PAYMENT_METHODS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+                </select>
+              </label>
+
+              <label className="block">
+                <span className="block font-semibold text-[#1A1A1A] mb-1.5">
+                  Transaction / reference ID <span className="font-normal text-[#8B8B8B]">(optional)</span>
+                </span>
+                <input type="text" value={paymentForm.reference} placeholder="UTR, Razorpay payment ID, cheque no…"
+                  onChange={e => setPaymentForm(f => ({ ...f, reference: e.target.value }))}
+                  className="w-full px-3 py-2 bg-white border border-[#D0CEC2] rounded-xl outline-none focus:border-[#2C5F5F]" />
+              </label>
+
+              <div className="grid grid-cols-2 gap-3">
+                <label className="block">
+                  <span className="block font-semibold text-[#1A1A1A] mb-1.5">
+                    Gateway fee (₹) <span className="font-normal text-[#8B8B8B]">(optional)</span>
+                  </span>
+                  <input type="number" min="0" step="0.01" value={paymentForm.gatewayFee}
+                    onChange={e => setPaymentForm(f => ({ ...f, gatewayFee: e.target.value }))}
+                    className="w-full px-3 py-2 bg-white border border-[#D0CEC2] rounded-xl outline-none focus:border-[#2C5F5F]" />
+                </label>
+                <label className="block">
+                  <span className="block font-semibold text-[#1A1A1A] mb-1.5">
+                    GST on fee (₹) <span className="font-normal text-[#8B8B8B]">(optional)</span>
+                  </span>
+                  <input type="number" min="0" step="0.01" value={paymentForm.tax}
+                    onChange={e => setPaymentForm(f => ({ ...f, tax: e.target.value }))}
+                    className="w-full px-3 py-2 bg-white border border-[#D0CEC2] rounded-xl outline-none focus:border-[#2C5F5F]" />
+                </label>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setPaymentFor(null)}
+                disabled={savingPayment}
+                className="px-5 py-2.5 rounded-xl text-sm font-semibold text-[#6B6B6B] bg-white border border-[#D0CEC2] hover:bg-[#F0EFE6] transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={submitPayment}
+                disabled={savingPayment || !paymentForm.amount || Number(paymentForm.amount) <= 0}
+                className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#2C5F5F] hover:bg-[#1A4D4D] transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                {savingPayment && <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+                Record Payment
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Remove Payment Confirmation Modal */}
+      {paymentToRemove && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1A1A]/60 backdrop-blur-sm">
+          <div className="bg-[#F8F7F2] rounded-2xl w-full max-w-md p-6 shadow-2xl border border-[#D0CEC2]">
+            <h3 className="text-xl font-bold text-[#1A1A1A] mb-2 flex items-center gap-2">
+              <span className="w-8 h-8 rounded-full bg-[#D97757]/15 flex items-center justify-center text-[#C04B2B]">⚠</span>
+              Remove Payment
+            </h3>
+            <p className="text-sm text-[#6B6B6B] mb-5 leading-relaxed">
+              This permanently deletes the payment record for this registration, marks it as unpaid and sets
+              the fee payment stage back to pending. Referral points earned from it are taken back.
+              No refund is issued; do that separately if needed.
+            </p>
+            <div className="bg-white border border-[#E5E3D7] rounded-xl p-4 mb-6 text-sm">
+              <div className="font-semibold text-[#1A1A1A] mb-1">
+                Team ID: <span className="font-mono text-[#C04B2B]">{paymentToRemove.team_id || 'N/A'}</span>
+              </div>
+              <div className="text-[#6B6B6B]">
+                Applicant: <span className="font-medium text-[#1A1A1A]">
+                  {paymentToRemove.application?.details.name || paymentToRemove.user_info?.name || 'Unknown'}
+                </span>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setPaymentToRemove(null)}
+                disabled={isRemovingPayment}
+                className="px-5 py-2.5 rounded-xl text-sm font-semibold text-[#6B6B6B] bg-white border border-[#D0CEC2] hover:bg-[#F0EFE6] transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmRemovePayment}
+                disabled={isRemovingPayment}
+                className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#C85D3E] hover:bg-[#A94C31] transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                {isRemovingPayment && <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+                Remove Payment
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Delete Confirmation Modal */}
       {registrationToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1A1A]/60 backdrop-blur-sm">
@@ -987,7 +1309,15 @@ export default function AdminRegistrationList() {
             </h3>
             <p className="text-sm text-[#6B6B6B] mb-5 leading-relaxed">
               Are you sure you want to permanently delete this registration? All associated data will be removed.
+              {registrationToDelete.application && (
+                <> This includes the applicant&apos;s answers, LOR, uploaded documents and payment records. This cannot be undone.</>
+              )}
             </p>
+            {registrationToDelete.paid && (
+              <p className="text-sm font-semibold text-[#C85D3E] mb-5 -mt-2">
+                ⚠ This registration is PAID. Deleting it also deletes its payment record (no refund is issued).
+              </p>
+            )}
 
             <div className="bg-white border border-[#E5E3D7] rounded-xl p-4 mb-6">
               <div className="text-sm font-semibold text-[#1A1A1A] mb-1 flex items-center gap-2">

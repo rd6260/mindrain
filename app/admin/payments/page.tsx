@@ -67,6 +67,8 @@ const methodLabel = (m: string | null | undefined) => {
   const s = (m ?? '').trim().toLowerCase();
   if (!s) return 'Online (unspecified)';
   if (/bulk|bilk/.test(s)) return 'Bulk / manual';
+  // Recorded by an admin from the registration list (see /api/v3/admin/manual-payment).
+  if (s.startsWith('manual_')) return `Manual · ${s.slice(7).replace(/_/g, ' ').toUpperCase()}`;
   return s.toUpperCase();
 };
 
