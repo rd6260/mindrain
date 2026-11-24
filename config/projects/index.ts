@@ -47,6 +47,15 @@ export function isApplicationLocked(eventId: string, stored: Json | null | undef
   return s === 'approved' || s === 'rejected';
 }
 
+/** What the applicant may edit: everything, nothing, or only the listed form keys. */
+export type FormEditAccess = 'full' | 'none' | readonly string[];
+
+export function formEditAccess(eventId: string, stored: Json | null | undefined): FormEditAccess {
+  const partial = getProjectConfig(eventId)?.partialEdit;
+  if (partial && stageStatus(stored, partial.stage) === partial.status) return partial.keys;
+  return isApplicationLocked(eventId, stored) ? 'none' : 'full';
+}
+
 /** False while a project's payment is gated behind a selection stage that isn't approved yet. */
 export function isPaymentUnlocked(eventId: string, stored: Json | null | undefined): boolean {
   const stage = getProjectConfig(eventId)?.paymentAfterStage;

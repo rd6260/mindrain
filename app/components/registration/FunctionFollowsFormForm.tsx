@@ -15,9 +15,11 @@ const MAX_LOR_BYTES = 5 * 1024 * 1024;
 const safeFileName = (name: string) => name.replace(/[^a-zA-Z0-9._-]+/g, '_');
 const formatSize = (bytes: number) => (bytes >= 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(2)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`);
 
-export default function FunctionFollowsFormForm({ initialData, onSubmit }: RegistrationFormProps) {
+export default function FunctionFollowsFormForm({ initialData, onSubmit, editableKeys }: RegistrationFormProps) {
   const supabase = createClient();
   const fd = initialData ?? {};
+  // Final selection stage: only the LOR and documents can change; the answers are read-only.
+  const textLocked = !!editableKeys && !editableKeys.includes('name');
 
   const [answers, setAnswers] = useState<Record<string, string>>(
     Object.fromEntries(FFF_QUESTION_KEYS.map(k => [k, (fd[k] as string) || '']))
@@ -141,13 +143,7 @@ export default function FunctionFollowsFormForm({ initialData, onSubmit }: Regis
         }
         throw err;
       }
-
-      // Saved: delete files the applicant removed from their application.
-      const kept = new Set(savedDocs.map(d => d.path));
-      const removed = (Array.isArray(fd.documents) ? (fd.documents as FffDocument[]) : []).filter(d => !kept.has(d.path));
-      if (removed.length) {
-        await supabase.storage.from(FUNCTION_FOLLOWS_FORM.formUploadBucket).remove(removed.map(d => d.path));
-      }
+      // Removed / replaced documents are deleted from storage by the server after the save.
     } catch (err) {
       console.error('Registration error:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -168,6 +164,13 @@ export default function FunctionFollowsFormForm({ initialData, onSubmit }: Regis
         </div>
       </div>
 
+      {textLocked && (
+        <div className="mb-5 p-4 bg-[#D97757]/10 border border-[#D97757]/40 rounded-xl text-sm text-[#7A3B22] leading-relaxed">
+          <strong>Your application is in the final selection stage.</strong> Your details and answers can no longer be
+          changed, but you can upload or replace your Letter of Recommendation and update your documents below.
+        </div>
+      )}
+
       {error && (
         <div className="mb-5 p-4 bg-[#C85D3E]/10 border border-[#C85D3E]/30 rounded-xl flex items-start gap-3">
           <span className="text-[#C85D3E] text-lg mt-0.5">⚠</span>
@@ -179,24 +182,24 @@ export default function FunctionFollowsFormForm({ initialData, onSubmit }: Regis
         <div>
           <p className="text-sm font-semibold text-[#1A1A1A] mb-3">Your Details</p>
           <div className="space-y-3">
-            <FloatingInput label="Full name" value={name} onChange={e => setName(e.target.value)} disabled={isLoading} />
+            <FloatingInput label="Full name" value={name} onChange={e => setName(e.target.value)} disabled={isLoading || textLocked} />
             <div>
-              <FloatingInput label="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} disabled={isLoading} />
+              <FloatingInput label="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} disabled={isLoading || textLocked} />
               <p className="text-xs text-[#6B6B6B] mt-1.5">All communication and notifications about your application will be sent to this email.</p>
             </div>
             <div>
-              <FloatingInput label="WhatsApp number with country code (e.g. +91 98765 43210)" type="tel" value={whatsapp} onChange={e => setWhatsapp(e.target.value)} disabled={isLoading} />
+              <FloatingInput label="WhatsApp number with country code (e.g. +91 98765 43210)" type="tel" value={whatsapp} onChange={e => setWhatsapp(e.target.value)} disabled={isLoading || textLocked} />
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="relative block w-full">
-                <select value={academicYear} onChange={e => setAcademicYear(e.target.value)} disabled={isLoading}
+                <select value={academicYear} onChange={e => setAcademicYear(e.target.value)} disabled={isLoading || textLocked}
                   className="w-full px-4 pt-6 pb-2 text-[#1A1A1A] bg-[#F8F7F2] border border-[#D0CEC2] rounded-xl outline-none text-sm font-medium focus:border-[#2C5F5F] focus:ring-2 focus:ring-[#2C5F5F]/10 disabled:opacity-50">
                   <option value="" disabled>Select</option>
                   {FFF_ACADEMIC_YEARS.map(y => <option key={y} value={y}>{y}</option>)}
                 </select>
                 <span className="absolute left-4 top-2 text-xs font-semibold text-[#6B6B6B] pointer-events-none">Academic year</span>
               </label>
-              <FloatingInput label="College name" value={college} onChange={e => setCollege(e.target.value)} disabled={isLoading} />
+              <FloatingInput label="College name" value={college} onChange={e => setCollege(e.target.value)} disabled={isLoading || textLocked} />
             </div>
           </div>
         </div>
@@ -213,7 +216,8 @@ export default function FunctionFollowsFormForm({ initialData, onSubmit }: Regis
               id={`fff-${key}`}
               value={answers[key]}
               onChange={e => setAnswers({ ...answers, [key]: e.target.value })}
-              disabled={isLoading}
+              disabled={isLoading || textLocked}
+              readOnly={textLocked}
               maxLength={FFF_ANSWER_MAX_LENGTH}
               rows={5}
               className="w-full px-4 py-3 text-sm text-[#1A1A1A] bg-white border border-[#D0CEC2] rounded-xl outline-none transition-all duration-200 focus:border-[#2C5F5F] focus:ring-2 focus:ring-[#2C5F5F]/10 disabled:opacity-50 resize-y"
@@ -227,7 +231,10 @@ export default function FunctionFollowsFormForm({ initialData, onSubmit }: Regis
         <div>
           <p className="text-sm font-semibold text-[#1A1A1A] mb-2">
             <span className="font-mono text-[#2C5F5F] mr-2">07.</span>
-            Letter of Recommendation <span className="text-[#6B6B6B]">(Optional)</span>
+            Letter of Recommendation{' '}
+            {textLocked
+              ? <span className="text-[#C04B2B]">(Required)</span>
+              : <span className="text-[#6B6B6B]">(Optional)</span>}
           </p>
           <p className="text-sm text-[#4B4B4B] leading-relaxed mb-3">
             Upload a Letter of Recommendation (LOR) from an Architectural Design faculty member who has taught you in a previous or current semester.
@@ -309,7 +316,7 @@ export default function FunctionFollowsFormForm({ initialData, onSubmit }: Regis
                   <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   Saving...
                 </span>
-              : 'Submit Application →'
+              : textLocked ? 'Save LOR & Documents →' : 'Submit Application →'
             }
           </button>
           {!canSubmit && !isLoading && (

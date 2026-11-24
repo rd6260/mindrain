@@ -1,6 +1,6 @@
 'use client';
 
-import { getProjectConfig, isPaymentUnlocked, ARCHITECTURE_OF_PLAY, FUNCTION_FOLLOWS_FORM, MR_LENS_TROPHY } from '@/config/projects';
+import { getProjectConfig, isPaymentUnlocked, formEditAccess, ARCHITECTURE_OF_PLAY, FUNCTION_FOLLOWS_FORM, MR_LENS_TROPHY } from '@/config/projects';
 import { lensIsOpen, lensPhotoIds } from '@/lib/projects/lensTrophy';
 import { capturedQuantity, capturedBreakdown } from '@/lib/projects/orders';
 import FunctionFollowsFormProgress from '@/app/components/progress/FunctionFollowsFormProgress';
@@ -1001,6 +1001,16 @@ const ProfilePage = () => {
                           {registration.event_id === FUNCTION_FOLLOWS_FORM.eventId && (
                             <FunctionFollowsFormProgress progress={fd.progress as Record<string, string> | undefined} />
                           )}
+
+                          {registration.event_id === FUNCTION_FOLLOWS_FORM.eventId &&
+                            Array.isArray(formEditAccess(registration.event_id, registration.form_data)) && (
+                              <a
+                                href={FUNCTION_FOLLOWS_FORM.registrationPath}
+                                className="mt-3 inline-block px-4 py-2 rounded-lg text-xs font-bold text-white bg-[#2C5F5F] hover:bg-[#1A4D4D] transition-colors"
+                              >
+                                Update LOR &amp; Documents →
+                              </a>
+                            )}
 
                           {registration.event_id === FUNCTION_FOLLOWS_FORM.eventId &&
                             (fd.progress as Record<string, string> | undefined)?.interview === 'approved' && (

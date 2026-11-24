@@ -41,6 +41,8 @@ export const FUNCTION_FOLLOWS_FORM = {
   },
   /** Decided at shortlisting (approved or rejected) → the application form is frozen. */
   editLockedAfterStage: 'shortlisting',
+  /** During final selection the applicant can still update their LOR and documents (not the answers). */
+  partialEdit: { stage: 'final_selection', status: 'in_progress', keys: ['lor_path', 'documents'] },
   /** Selected in the final round → fee payment opens. */
   paymentAfterStage: 'final_selection',
   paymentStage: 'fee_payment',

@@ -48,6 +48,8 @@ export interface ProjectBaseConfig {
   initialProgress?: Readonly<Record<string, string>>;
   /** Once this stage is approved or rejected, the applicant can no longer edit the form. */
   editLockedAfterStage?: string;
+  /** While `stage` has `status`, the applicant may edit only these form keys (overrides the lock). */
+  partialEdit?: { stage: string; status: string; keys: readonly string[] };
   /** Payment opens only once this stage is approved. */
   paymentAfterStage?: string;
   /** Stage marked `approved` when the payment is captured. */

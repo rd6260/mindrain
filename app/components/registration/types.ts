@@ -10,6 +10,8 @@ export interface RegistrationFormProps {
   /** Previously saved `form_data` when editing an unpaid registration. */
   initialData: Record<string, any> | null;
   isEditMode: boolean;
+  /** When set, only these form keys may be changed (other fields are shown read-only). */
+  editableKeys?: readonly string[];
   /**
    * Hand the finished `form_data` to the page. Resolves after the registration
    * is saved (the page then redirects). Rejects with an Error whose message

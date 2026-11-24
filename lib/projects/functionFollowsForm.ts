@@ -76,7 +76,11 @@ export const functionFollowsForm: ProjectConfig = {
     }
     // The LOR is optional at application time; it becomes mandatory once the applicant is
     // approved at the interview stage (uploaded from the profile page, see /api/v3/fff/lor).
-    if (fd.lor_path != null && typeof fd.lor_path !== 'string') return 'Invalid Letter of Recommendation';
+    if (fd.lor_path != null) {
+      if (typeof fd.lor_path !== 'string') return 'Invalid Letter of Recommendation';
+      // Must be the applicant's own file.
+      if (ctx && fd.lor_path !== fffLorPath(ctx.userId)) return 'Invalid Letter of Recommendation';
+    }
 
     // Chosen on the payment page, not in the form.
     if (fd.accommodation != null && !(fd.accommodation in FFF_FEES_MINOR)) return 'Invalid accommodation choice';
@@ -131,6 +135,24 @@ export const functionFollowsForm: ProjectConfig = {
       { label: 'Accommodation', value: choice === 'with' ? 'Included' : 'Not included' },
       ...(fee.badge ? [{ label: 'Registration Period', value: fee.badge }] : []),
     ];
+  },
+
+  // Delete every file in the applicant's documents folder that the saved application doesn't list:
+  // documents they removed or replaced, and leftovers from uploads that never got saved.
+  async afterSave({ supabase, userId, formData }) {
+    const folder = fffDocumentsFolder(userId);
+    const keep = new Set(
+      (Array.isArray(formData.documents) ? (formData.documents as FffDocument[]) : []).map(d => d.path)
+    );
+    const { data: files, error } = await supabase.storage
+      .from(FUNCTION_FOLLOWS_FORM.formUploadBucket)
+      .list(folder, { limit: 1000 });
+    if (error) throw error;
+    const stale = (files ?? []).map(f => `${folder}/${f.name}`).filter(p => !keep.has(p));
+    if (stale.length) {
+      const { error: removeError } = await supabase.storage.from(FUNCTION_FOLLOWS_FORM.formUploadBucket).remove(stale);
+      if (removeError) throw removeError;
+    }
   },
 
   // Essays and the LOR path don't belong on a payment receipt.

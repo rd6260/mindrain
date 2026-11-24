@@ -110,6 +110,12 @@ export interface ProjectConfig {
   /** Project specific coupons, keyed by UPPERCASE code. Unmatched codes fall back to referral codes. */
   coupons?: Record<string, (ctx: CouponContext) => Promise<CouponResult>>;
 
+  /**
+   * Runs after the registration form was saved (insert or update), e.g. to delete uploads the saved
+   * form no longer references. Errors are logged, never fail the save.
+   */
+  afterSave?(ctx: { supabase: SupabaseClient; userId: string; formData: FormData }): Promise<void>;
+
   /** Top-level form_data keys to hide from the invoice email. */
   invoiceHiddenKeys?: string[];
 }

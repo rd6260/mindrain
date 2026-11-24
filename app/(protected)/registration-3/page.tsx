@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense, createElement } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { getProjectConfig, fromStoredFormData, isApplicationLocked } from '@/config/projects';
+import { getProjectConfig, fromStoredFormData, formEditAccess } from '@/config/projects';
 import { isOnboardingComplete } from '@/utils/onboarding';
 import { getRegistrationForm, hasRegistrationForm } from '@/app/components/registration/registry';
 
@@ -58,6 +58,7 @@ function RegistrationContent() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [showAlreadyPaid, setShowAlreadyPaid] = useState(false);
   const [showLocked, setShowLocked] = useState(false);
+  const [editableKeys, setEditableKeys] = useState<readonly string[] | undefined>(undefined);
   const [submitted, setSubmitted] = useState(false);
 
   const supabase = createClient();
@@ -84,11 +85,15 @@ function RegistrationContent() {
 
       if (reg?.paid) {
         setShowAlreadyPaid(true);
-      } else if (reg && isApplicationLocked(eventId, reg.form_data)) {
-        setShowLocked(true);
       } else if (reg) {
-        setInitialData(fromStoredFormData(eventId, reg.form_data));
-        setIsEditMode(true);
+        const access = formEditAccess(eventId, reg.form_data);
+        if (access === 'none') {
+          setShowLocked(true);
+        } else {
+          setInitialData(fromStoredFormData(eventId, reg.form_data));
+          setIsEditMode(true);
+          if (Array.isArray(access)) setEditableKeys(access);
+        }
       }
     }
     setSelectedEventId(eventId);
@@ -154,8 +159,10 @@ function RegistrationContent() {
   if (submitted) {
     return (
       <Notice
-        title="Application Submitted"
-        body="Thank you! We've received your application. We'll be in touch with next steps."
+        title={editableKeys ? 'Changes Saved' : 'Application Submitted'}
+        body={editableKeys
+          ? 'Your Letter of Recommendation and documents have been updated.'
+          : "Thank you! We've received your application. We'll be in touch with next steps."}
         action={{ label: 'Go to Home', onClick: () => { window.location.href = '/'; } }}
       />
     );
@@ -251,6 +258,7 @@ function RegistrationContent() {
           eventId: selectedEventId,
           initialData,
           isEditMode,
+          editableKeys,
           onSubmit: submitRegistration,
         })}
       </div>

@@ -2,7 +2,7 @@ import { lookupReferralCode } from '@/lib/referral';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getProject } from '@/lib/projects';
-import { getProjectConfig, isApplicationLocked, isPaymentUnlocked, toStoredFormData } from '@/config/projects';
+import { formEditAccess, fromStoredFormData, getProjectConfig, isPaymentUnlocked, toStoredFormData } from '@/config/projects';
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,7 +12,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { event_id, form_data } = await req.json();
+    const { event_id, form_data: submitted } = await req.json();
+    let form_data = submitted;
     if (!event_id || !form_data || typeof form_data !== 'object') {
       return NextResponse.json({ error: 'Missing event_id or form_data' }, { status: 400 });
     }
@@ -27,11 +28,6 @@ export async function POST(req: NextRequest) {
     }
 
     const paymentRequired = !!getProjectConfig(event_id)?.paymentEnabled;
-
-    const validationError = project.validateFormData(form_data, { userId: user.id });
-    if (validationError) {
-      return NextResponse.json({ error: validationError }, { status: 400 });
-    }
 
     const { data: event, error: eventError } = await supabase
       .from('events')
@@ -49,15 +45,36 @@ export async function POST(req: NextRequest) {
       .eq('event_id', event_id)
       .maybeSingle();
 
+    // Some stages only allow a few fields to change (e.g. LOR + documents): take just those from the request.
+    const access = existingReg ? formEditAccess(event_id, existingReg.form_data) : 'full';
+    if (access === 'none' && !existingReg?.paid) {
+      return NextResponse.json(
+        { error: 'Your application has been reviewed and can no longer be edited' },
+        { status: 403 }
+      );
+    }
+    if (Array.isArray(access)) {
+      const current = fromStoredFormData(event_id, existingReg!.form_data);
+      form_data = { ...current, ...Object.fromEntries(access.map(k => [k, submitted[k] ?? null])) };
+    }
+
+    const validationError = project.validateFormData(form_data, { userId: user.id });
+    if (validationError) {
+      return NextResponse.json({ error: validationError }, { status: 400 });
+    }
+
+    // Project clean-up after a successful save (e.g. delete uploads the form no longer references).
+    const runAfterSave = async () => {
+      try {
+        await project.afterSave?.({ supabase, userId: user.id, formData: form_data });
+      } catch (err) {
+        console.error('afterSave error:', err);
+      }
+    };
+
     if (existingReg) {
       if (existingReg.paid) {
         return NextResponse.json({ error: 'Already registered and paid' }, { status: 400 });
-      }
-      if (isApplicationLocked(event_id, existingReg.form_data)) {
-        return NextResponse.json(
-          { error: 'Your application has been reviewed and can no longer be edited' },
-          { status: 403 }
-        );
       }
       // Keep the same sequence, regenerate the rest in case form_data changed.
       const oldSequence = parseInt(existingReg.team_id?.split('-').pop() || '', 10);
@@ -77,6 +94,7 @@ export async function POST(req: NextRequest) {
         console.error('Update error:', updateError);
         return NextResponse.json({ error: 'Failed to update registration' }, { status: 500 });
       }
+      await runAfterSave();
       return NextResponse.json({
         registration_id: updatedReg.id,
         team_id: updatedReg.team_id,
@@ -119,6 +137,7 @@ export async function POST(req: NextRequest) {
         console.error('Insert error:', error);
         return NextResponse.json({ error: 'Failed to create registration' }, { status: 500 });
       }
+      await runAfterSave();
       return NextResponse.json({
         registration_id: data.id,
         team_id: data.team_id,
